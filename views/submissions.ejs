@@ -4,14 +4,7 @@
 <script src="<%- lib('textfit/2.3.1/textFit.min.js') %>"></script>
 <div class="padding">
   <% if (displayConfig.inContest) { %>
-    <div class="ui large info message">
-      <div class="ui header">比赛 - <%= contest.title %></div>
-      <% if (displayConfig.showOthers) { %>
-        <p>您可以看到其他人的提交。
-      <% } else { %>
-        <p>您只能看到自己的提交。</p>
-      <% } %>
-    </div>
+    <% include contest_head_block %>
   <% } %>
 
   <form action="<%= syzoj.utils.makeUrl(displayConfig.inContest ? ['contest', contest.id, 'submissions'] : ['submissions']) %>" class="ui mini form" method="get" role="form" id="form">
