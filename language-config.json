@@ -7,7 +7,7 @@
     "format": "cpp"
   },
   "cpp11-noilinux": {
-    "show": "C++ 11 (NOI)",
+    "show": "C++ 11",
     "highlight": "cpp",
     "version": "GCC 4.8.4",
     "editor": "cpp",
