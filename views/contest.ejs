@@ -28,7 +28,7 @@
       <div class="column">
         <div class="ui buttons">
           <% if(seeRanklist) { %>
-            <a class="ui small blue button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'ranklist']) %>">排行榜</a>
+            <a class="ui small blue button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'ranklist']) %>">比赛榜单</a>
           <% } %>
           <% let submissionsUrl = seeResult ?
             syzoj.utils.makeUrl(['submissions'], {contest: contest.id}) :
@@ -50,6 +50,7 @@
       </div>
     </div>
   <% } %>
+
   <% if (unveiled) { %>
     <div class="row">
       <div class="column">
