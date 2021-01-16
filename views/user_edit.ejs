@@ -60,7 +60,7 @@
       let allowedManagePrivilege = user && user.is_admin;
       %>
 
-      <% if user.is_admin { %>
+      <% if (user.is_admin) { %>
       <div class="inline field">
         <label class="ui header">权限</label>
         <div class="ui toggle disabled checkbox" style="margin-right: 20px; ">
