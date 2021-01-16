@@ -277,7 +277,7 @@ app.get('/problem/:id/edit', async (req, res) => {
 
     if (!problem) {
       if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
-      if (!await user.hasPrivilege('manage_problem'))  throw new ErrorMessage('您没有权限进行此操作。');
+      if (!res.locals.user.hasPrivilege('manage_problem'))  throw new ErrorMessage('您没有权限进行此操作。');
       problem = await Problem.create({
         time_limit: syzoj.config.default.problem.time_limit,
         memory_limit: syzoj.config.default.problem.memory_limit,
