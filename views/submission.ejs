@@ -85,7 +85,7 @@
       <div class="content" :class="singleSubtask ? 'active' : ''">
         <div class="accordion">
           <template v-for="curCase, $caseIndex in subtask.cases">
-            <div class="title" :class="checkTestcaseOK(curCase) || curCase.errorMessage ? '' : 'unexpandable'">
+            <div class="title" :class="checkTestcaseOK(curCase) || curCase.errorMessage || displayDetailResult ? '' : 'unexpandable'" >
               <div class="ui grid">
                 <div class="three wide column">
                     <i class="dropdown icon"></i>
@@ -107,8 +107,8 @@
                 </template>
               </div>
             </div>
-            <% if (displayDetailResult) { %>
             <div class="content">
+              <% if (displayDetailResult) { %>
               <template v-if="checkTestcaseOK(curCase)">
                 <code-box v-if="curCase.result.input" :title="'输入文件（<span style=\'font-family: monospace; \'>'+ curCase.result.input.name +'</span>）'" :content="curCase.result.input.content" :download="<%= serializejs(syzoj.utils.makeUrl(['problem', info.problemId, 'testdata', 'download'])) %> + '/' + curCase.result.input.name"></code-box>
                 <code-box v-if="curCase.result.output" :title="'答案文件（<span style=\'font-family: monospace; \'>'+ curCase.result.output.name +'</span>）'" :content="curCase.result.output.content" :download="<%= serializejs(syzoj.utils.makeUrl(['problem', info.problemId, 'testdata', 'download'])) %> + '/' + curCase.result.output.name"></code-box>
@@ -117,9 +117,9 @@
                 <code-box title="Special Judge 信息" :content="curCase.result.spjMessage"></code-box>
                 <code-box title="系统信息" :content="curCase.result.systemMessage"></code-box>
               </template>
+              <% } %>
               <code-box title="错误信息" :content="curCase.errorMessage"></code-box>
             </div>
-            <% } %>
           </template>
         </div>
       </div>
