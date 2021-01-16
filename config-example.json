@@ -2,6 +2,7 @@
   "title": "SYZOJ",
   "hostname": "127.0.0.1",
   "port": "5283",
+  "footer": "",
   "db": {
     "database": "syzoj",
     "username": "syzoj",
