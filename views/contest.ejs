@@ -18,6 +18,7 @@
     start = start.split(' ')[1]; end = end.split(' ')[1];
   } %>
   <div class="ui pointing below left label"><%= start %></div>
+  <div class="ui below middle"><h4 class="orange" id="_t"></h4></div>
   <div class="ui pointing below right label"><%= end %></div>
   <% let timePercentage = Math.floor(Math.min(1, (syzoj.utils.getCurrentDate() - contest.start_time) / (contest.end_time - contest.start_time)) * 100); %>
   <div id="timer-progress" class="ui tiny indicating progress<% if (timePercentage == 100) { %> success<% } %>" data-percent="<%= timePercentage %>">
@@ -130,6 +131,17 @@ $(function () {
       total: <%= contest.end_time - contest.start_time %>
     });
   }, 5000);
+});
+$(function () {
+  setInterval(function () {
+    var leftTime=Number("<%= contest.end_time %>") - Date.now() / 1000;
+    if (leftTime>=0) {
+      h = Math.floor(leftTime/1000/60/60);
+      m = Math.floor(leftTime/1000/60%60);
+      s = Math.floor(leftTime/1000%60);
+      document.getElementById("_t").innerHTML = ''.join(h) + ''.join(m).padStart(2,0) + ''.join(s).padStart(2, 0);
+    }
+  }, 1000);
 });
 </script>
 <% include footer %>

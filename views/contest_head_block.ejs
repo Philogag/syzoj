@@ -13,39 +13,20 @@
     <a class="small ui orange button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'ranklist']) %>">比赛榜单</a>
     <% if (now < contest.end_time) { %>
         <div id="time-block" class="ui bottom right attached segment">
-            <h4>
-            <p id="_h"></p>
-            <p id="_m"></p>:
-            <p id="_s"></p>:
-            </h4>
+            <h4 class="orange" id="_t"></h4>
         </div>
         <script type="text/javascript">
-            function countTime() {
-                //获取当前时间
-                var date = new Date();
-                var now = date.getTime();
-                //设置截止时间
-                // var end_time="<%= contest.end_time %>"; 
-                var end_time="2021-01-16 12:49:13";
-                var endDate = new Date(end_time);
-                var end = endDate.getTime();
-    
-                //时间差
-                var leftTime = end-now;
-                //定义变量 d,h,m,s保存倒计时的时间
-                var d,h,m,s;
-                if (leftTime>=0) {
+            $(function () {
+                setInterval(function () {
+                  var leftTime=Number("<%= contest.end_time %>") - Date.now() / 1000;
+                  if (leftTime>=0) {
                     h = Math.floor(leftTime/1000/60/60);
                     m = Math.floor(leftTime/1000/60%60);
                     s = Math.floor(leftTime/1000%60);
-                }
-                //将倒计时赋值到div中
-                document.getElementById("_h").innerHTML = h;
-                document.getElementById("_m").innerHTML = m;
-                document.getElementById("_s").innerHTML = s;
-                //递归每秒调用countTime方法，显示动态时间效果
-                setTimeout(countTime,1000);
-            }
+                    document.getElementById("_t").innerHTML = ''.join(h) + ''.join(m).padStart(2,0) + ''.join(s).padStart(2, 0);
+                  }
+                }, 1000);
+              });
         </script>
     <% } %>
 </div>
