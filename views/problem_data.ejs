@@ -43,7 +43,7 @@ function getIcon(filename) {
     </div>
     <div class="nine wide column">
       <h3 style="text-align: center; ">文件列表</h3>
-      <% if (testdata) { %>
+      <% if (testdata && is_public ) { %>
         <table class="ui very basic center aligned table">
           <thead>
             <tr>
@@ -107,8 +107,13 @@ function getIcon(filename) {
             <% } %>
           </tbody>
         </table>
+      <% } else if (is_public) { %>
+        <h4 style="text-align: center; ">无测试数据</h4>
+      <% } else if (testdata) { %>
+        <h4 style="text-align: center; ">测试数据不公开</h4>
       <% } else { %>
         <h4 style="text-align: center; ">无测试数据</h4>
+        <h4 style="text-align: center; ">测试数据不公开</h4>
       <% } %>
       <% if (problem.allowedEdit) { %>
         <form id="form_upload" class="ui form" action="<%= syzoj.utils.makeUrl(['problem', problem.id, 'testdata', 'upload']) %>" method="post" enctype="multipart/form-data">

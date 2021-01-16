@@ -801,7 +801,8 @@ app.get('/problem/:id/testdata', async (req, res) => {
     res.render('problem_data', {
       problem: problem,
       testdata: testdata,
-      testcases: testcases
+      testcases: testcases,
+      is_public: problem.is_data_public || problem.isAllowedUseBy(res.locals.user)
     });
   } catch (e) {
     syzoj.log(e);
@@ -875,6 +876,7 @@ app.get('/problem/:id/testdata/download/:filename?', async (req, res) => {
     let problem = await Problem.findById(id);
 
     if (!problem) throw new ErrorMessage('无此题目。');
+    if (!problem.is_data_public) throw new ErrorMessage('题目数据不公开。');
     if (!await problem.isAllowedUseBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
     if (typeof req.params.filename === 'string' && (req.params.filename.includes('../'))) throw new ErrorMessage('您没有权限进行此操作。)');
 
