@@ -21,6 +21,10 @@ if (contest) {
 
 <% include monaco-editor %>
 
+<% if (typeof contest !== 'undefined' && contest) { %>
+  <% include contest_head_block %>
+<% } %>
+
 <div class="ui center aligned grid">
     <div class="row">
       <h1 class="ui header">
@@ -76,18 +80,7 @@ if (contest) {
   <div class="row">
     <div class="column">
       <div class="ui buttons">
-        <% if (typeof contest !== 'undefined' && contest) { %>
-          <% if (!contest.ended) { %>
-            <a class="small ui primary button" href="#submit_code">提交</a>
-          <% } else { %>
-            <a class="small ui primary button" href="<%= syzoj.utils.makeUrl(['problem', problem.id]) %>">转到题库</a>
-          <% } %>
-          <a class="small ui positive button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'submissions'], { problem_id: pid }) %>">提交记录</a>
-          <% if (problem.additional_file) { %>
-            <a class="small ui teal button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, pid, 'download', 'additional_file']) %>">附加文件</a>
-          <% } %>
-          <a href="<%= syzoj.utils.makeUrl(['contest', contest.id]) %>" class="ui orange button">返回比赛</a>
-        <% } else { %>
+        <% if (typeof contest == 'undefined') { %>
           <% if (testcases && !testcases.error) { %>
             <a class="small ui primary button" href="#submit_code">提交</a>
           <% } %>
