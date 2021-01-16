@@ -3,7 +3,7 @@
 <% include util %>
 <script src="<%- lib('textfit/2.3.1/textFit.min.js') %>"></script>
 <div class="padding">
-  <% if (contest) { %>
+  <% if (typeof contest !== 'undefined' && contest) { %>
     <% include contest_head_block %>
   <% } %>
 
