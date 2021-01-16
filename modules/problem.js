@@ -595,12 +595,44 @@ async function setPublic(req, res, is_public) {
   }
 }
 
+// Set problem data public
+async function setDataPublic(req, res, is_data_public) {
+  try {
+    let id = parseInt(req.params.id);
+    let problem = await Problem.findById(id);
+    if (!problem) throw new ErrorMessage('无此题目。');
+
+    let allowedManage = await problem.isAllowedManageBy(res.locals.user);
+    if (!allowedManage) throw new ErrorMessage('您没有权限进行此操作。');
+
+    problem.is_data_public = is_data_public;
+    await problem.save();
+
+    JudgeState.query('UPDATE `judge_state` SET `is_data_public` = ' + is_data_public + ' WHERE `problem_id` = ' + id);
+
+    res.redirect(syzoj.utils.makeUrl(['problem', id]));
+  } catch (e) {
+    syzoj.log(e);
+    res.render('error', {
+      err: e
+    });
+  }
+}
+
 app.post('/problem/:id/public', async (req, res) => {
   await setPublic(req, res, true);
 });
 
 app.post('/problem/:id/dis_public', async (req, res) => {
   await setPublic(req, res, false);
+});
+
+app.post('/problem/:id/data_public', async (req, res) => {
+  await setDataPublic(req, res, true);
+});
+
+app.post('/problem/:id/dis_data_public', async (req, res) => {
+  await setDataPublic(req, res, false);
 });
 
 app.post('/problem/:id/submit', app.multer.fields([{ name: 'answer', maxCount: 1 }]), async (req, res) => {
@@ -643,7 +675,8 @@ app.post('/problem/:id/submit', app.multer.fields([{ name: 'answer', maxCount: 1
         language: null,
         user_id: curUser.id,
         problem_id: id,
-        is_public: problem.is_public
+        is_public: problem.is_public,
+        is_data_public: problem.is_data_public
       });
     } else {
       let code;

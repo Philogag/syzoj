@@ -202,6 +202,7 @@ app.get('/submission/:id', async (req, res) => {
         displayConfig: displayConfig
       }, syzoj.config.session_secret) : null,
       displayConfig: displayConfig,
+      displayDetailResult: judge.problem.is_data_public || await res.locals.user.is_admin
     });
   } catch (e) {
     syzoj.log(e);

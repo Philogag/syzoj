@@ -94,6 +94,9 @@ export default class Problem extends Model {
   is_public: boolean;
 
   @TypeORM.Column({ nullable: true, type: "boolean" })
+  is_data_public: boolean;
+
+  @TypeORM.Column({ nullable: true, type: "boolean" })
   file_io: boolean;
 
   @TypeORM.Column({ nullable: true, type: "text" })
