@@ -1,9 +1,51 @@
-
+<% let now = syzoj.utils.getCurrentDate(); %>
 <div class="ui large info message">
     <div class="ui header">比赛模式 - <%= contest.title %></div>
-    <p>您正在参加一个比赛。</p>
+
+      <% if (now < contest.end_time) { %>
+        <p>您正在参加一个比赛。</p>
+      <% } else { %>
+        <p>比赛已结束</p>
+      <% } %>
     
     <a class="small ui primary button" href="<%= syzoj.utils.makeUrl(['contest', contest.id]) %>">比赛主页</a>
     <a class="small ui positive button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'submissions']) %>">提交记录</a>
     <a class="small ui orange button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'ranklist']) %>">比赛榜单</a>
+    <% if (now < contest.end_time) { %>
+        <div id="time-block" class="ui bottom right attached segment">
+            <h4>
+            <p id="_h"></p>
+            <p id="_m"></p>:
+            <p id="_s"></p>:
+            </h4>
+        </div>
+        <script type="text/javascript">
+            function countTime() {
+                //获取当前时间
+                var date = new Date();
+                var now = date.getTime();
+                //设置截止时间
+                // var end_time="<%= contest.end_time %>"; 
+                var end_time="2021-01-16 12:49:13";
+                var endDate = new Date(end_time);
+                var end = endDate.getTime();
+    
+                //时间差
+                var leftTime = end-now;
+                //定义变量 d,h,m,s保存倒计时的时间
+                var d,h,m,s;
+                if (leftTime>=0) {
+                    h = Math.floor(leftTime/1000/60/60);
+                    m = Math.floor(leftTime/1000/60%60);
+                    s = Math.floor(leftTime/1000%60);
+                }
+                //将倒计时赋值到div中
+                document.getElementById("_h").innerHTML = h;
+                document.getElementById("_m").innerHTML = m;
+                document.getElementById("_s").innerHTML = s;
+                //递归每秒调用countTime方法，显示动态时间效果
+                setTimeout(countTime,1000);
+            }
+        </script>
+    <% } %>
 </div>

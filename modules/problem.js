@@ -792,7 +792,7 @@ app.get('/problem/:id/testdata', async (req, res) => {
 
     if (!problem) throw new ErrorMessage('无此题目。');
     if (!await problem.isAllowedUseBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
-    if (!problem.is_data_public && !problem.isAllowedManageBy(res.locals.user)) throw new ErrorMessage('题目数据不公开。');
+    if (!problem.is_data_public && !problem.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('题目数据不公开。');
 
     let testdata = await problem.listTestdata();
     let testcases = await syzoj.utils.parseTestdata(problem.getTestdataPath(), problem.type === 'submit-answer');
@@ -802,8 +802,7 @@ app.get('/problem/:id/testdata', async (req, res) => {
     res.render('problem_data', {
       problem: problem,
       testdata: testdata,
-      testcases: testcases,
-      is_public: problem.is_data_public || problem.isAllowedEditBy(res.locals.user)
+      testcases: testcases
     });
   } catch (e) {
     syzoj.log(e);
@@ -880,7 +879,7 @@ app.get('/problem/:id/testdata/download/:filename?', async (req, res) => {
     if (!await problem.isAllowedUseBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
     if (typeof req.params.filename === 'string' && (req.params.filename.includes('../'))) throw new ErrorMessage('您没有权限进行此操作。)');
     
-    if (!problem.is_data_public && !problem.isAllowedManageBy(res.locals.user)) throw new ErrorMessage('题目数据不公开。');
+    if (!problem.is_data_public && !problem.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('题目数据不公开。');
 
     if (!req.params.filename) {
       if (!await syzoj.utils.isFile(problem.getTestdataArchivePath())) {
