@@ -59,6 +59,8 @@
       <%
       let allowedManagePrivilege = user && user.is_admin;
       %>
+
+      <% if user.is_admin { %>
       <div class="inline field">
         <label class="ui header">权限</label>
         <div class="ui toggle disabled checkbox" style="margin-right: 20px; ">
@@ -78,6 +80,7 @@
           <label>管理用户</label>
         </div>
       </div>
+      <% } %>
       <div style="text-align: center; margin-top: 30px; ">
         <button id="submit_button" type="submit" class="ui blue labeled icon button"><i class="ui icon edit"></i>修改</button>
         <a href="<%= syzoj.utils.makeUrl(['user', edited_user.id]) %>" class="ui labeled icon button"><i class="ui icon angle left"></i>返回</a>
