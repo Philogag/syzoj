@@ -1,0 +1,17 @@
+<h4 class="ui top attached block header"><i class="ui search icon"></i>搜索题目</h4>
+<div class="ui bottom attached segment">
+  <form action="<%= syzoj.utils.makeUrl(['problems', 'search']) %>" method="get">
+    <div class="ui search" style="width: 100%; ">
+      <div class="ui left icon input" style="width: 100%; ">
+        <input class="prompt" style="width: 100%; " type="text" placeholder="ID / 题目名 …" name="keyword">
+        <i class="search icon"></i>
+      </div>
+      <div class="results" style="width: 100%; "></div>
+    </div>
+  </form>
+  <div sytle="height: 5px"> </div>
+  <a href="<%= syzoj.utils.makeUrl(['problems', 'rand']) %>" class="ui primary labeled icon button">
+    <i class="ui icon write"></i>
+    随机一题
+  </a>
+</div>

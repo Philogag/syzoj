@@ -1,0 +1,20 @@
+<h4 class="ui top attached block header">
+    <i class="ui info icon"></i>公告</h4>
+<div class="ui bottom attached segment">
+    <table class="ui very basic table">
+        <thead>
+        <tr>
+            <th>标题</th>
+            <th>时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% for (let item of notices) { %>
+            <tr>
+                <td><a href="<%= item.url %>"><%= item.title %></a></td>
+                <td><%= item.date %></td>
+            </tr>
+        <% } %>
+        </tbody>
+    </table>
+</div>

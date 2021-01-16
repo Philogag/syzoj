@@ -1,0 +1,21 @@
+<h4 class="ui top attached block header"><i class="ui rss icon"></i>最近更新</h4>
+<div class="ui bottom attached segment">
+  <table class="ui very basic center aligned table">
+    <thead>
+      <tr>
+        <th width="70%">题目</th>
+        <th width="30%">更新时间</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%
+      for (let problem of problems) {
+      %>
+      <tr>
+        <td><a href="<%= syzoj.utils.makeUrl(['problem', problem.id]) %>"><%= problem.title %></a></td>
+        <td><%= problem.time %></td>
+      </tr>
+      <% } %>
+    </tbody>
+</table>
+</div>
