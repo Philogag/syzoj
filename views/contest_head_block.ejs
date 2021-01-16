@@ -14,16 +14,20 @@
     <% if (now < contest.end_time) { %>
         <style>
             div#time-block {
-                float: right;
-                width: auto;
-                margin: auto;
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
                 background-color: rgba(0,0,0,0);
                 border: 0px;
-            }
+              }
+              div#time-block.h2{
+                color: orangered;
+                font-size: 24px;
+              }
         </style>
 
         <div id="time-block" class="ui bottom right attached segment">
-            <h4 class="orange" id="_t"></h4>
+            <h2 style="orange" id="_t"></h2>
         </div>
 
         <script type="text/javascript">
@@ -31,10 +35,10 @@
                 setInterval(function () {
                   var leftTime=Number("<%= contest.end_time %>") - Date.now() / 1000;
                   if (leftTime>=0) {
-                    h = Math.floor(leftTime/1000/60/60);
-                    m = Math.floor(leftTime/1000/60%60);
-                    s = Math.floor(leftTime/1000%60);
-                    document.getElementById("_t").innerHTML = h.toString() + m.toString().padStart(2,0) + s.toString().padStart(2, 0);
+                    h = Math.floor(leftTime/60/60);
+                    m = Math.floor(leftTime/60%60);
+                    s = Math.floor(leftTime%60);
+                    document.getElementById("_t").innerHTML = h.toString() + ":" + m.toString().padStart(2,0) + ":" + s.toString().padStart(2, 0);
                   }
                 }, 1000);
               });
