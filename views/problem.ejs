@@ -80,7 +80,11 @@ if (contest) {
   <div class="row">
     <div class="column">
       <div class="ui buttons">
-        <% if (typeof contest == 'undefined') { %>
+        <% if (typeof contest !== 'undefined' && contest) { %>
+          <% if (problem.additional_file) { %>
+            <a class="small ui teal button" href="<%= syzoj.utils.makeUrl(['contest', 'contest.id', 'problem', problem.id, 'download', 'additional_file']) %>">附加文件</a>
+          <% } %>
+        <% } else { %>
           <% if (testcases && !testcases.error) { %>
             <a class="small ui primary button" href="#submit_code">提交</a>
           <% } %>

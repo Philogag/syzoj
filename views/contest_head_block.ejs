@@ -3,14 +3,7 @@
     <div class="ui header">比赛模式 - <%= contest.title %></div>
     <p>您正在参加一个比赛。</p>
     
-    <% if (typeof contest !== 'undefined' && contest) { %>
-        <a class="small ui primary button" href="<%= syzoj.utils.makeUrl(['contest', contest.id]) %>">比赛主页</a>
-        <a class="small ui positive button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'submissions']) %>">提交记录</a>
-        <a class="small ui positive button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'submissions']) %>">比赛榜单</a>
-        <% if (typeof problem !== 'undefined' && problem) { %>
-            <% if (problem.additional_file) { %>
-            <a class="small ui teal button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, pid, 'download', 'additional_file']) %>">附加文件</a>
-            <% } %>
-        <% } %>
-    <% } else { %>
+    <a class="small ui primary button" href="<%= syzoj.utils.makeUrl(['contest', contest.id]) %>">比赛主页</a>
+    <a class="small ui positive button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'submissions']) %>">提交记录</a>
+    <a class="small ui positive button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'ranklist']) %>">比赛榜单</a>
 </div>
