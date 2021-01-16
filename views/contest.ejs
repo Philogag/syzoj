@@ -5,6 +5,13 @@
 .ui.label.pointing.below.left { margin-bottom: 0; }
 .ui.label.pointing.below.right { margin-bottom: 0; float: right; }
 #back_to_contest { display: none;  }
+div#time-block {
+  float: middle;
+  width: auto;
+  margin: auto;
+  background-color: rgba(0,0,0,0);
+  border: 0px;
+}
 </style>
 <% include header %>
 <div class="padding">
@@ -17,8 +24,9 @@
   <% if (contest.running && start.split(' ')[0] === end.split(' ')[0]) {
     start = start.split(' ')[1]; end = end.split(' ')[1];
   } %>
+  
+  <div class="ui below middle" id="time-block"><h4 class="orange" id="_t"></h4></div>
   <div class="ui pointing below left label"><%= start %></div>
-  <div class="ui below middle"><h4 class="orange" id="_t"></h4></div>
   <div class="ui pointing below right label"><%= end %></div>
   <% let timePercentage = Math.floor(Math.min(1, (syzoj.utils.getCurrentDate() - contest.start_time) / (contest.end_time - contest.start_time)) * 100); %>
   <div id="timer-progress" class="ui tiny indicating progress<% if (timePercentage == 100) { %> success<% } %>" data-percent="<%= timePercentage %>">
@@ -139,7 +147,7 @@ $(function () {
       h = Math.floor(leftTime/1000/60/60);
       m = Math.floor(leftTime/1000/60%60);
       s = Math.floor(leftTime/1000%60);
-      document.getElementById("_t").innerHTML = ''.join(h) + ''.join(m).padStart(2,0) + ''.join(s).padStart(2, 0);
+      document.getElementById("_t").innerHTML = h.toString() + m.toString().padStart(2,0) + s.toString().padStart(2, 0);
     }
   }, 1000);
 });

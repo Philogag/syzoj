@@ -12,9 +12,20 @@
     <a class="small ui positive button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'submissions']) %>">提交记录</a>
     <a class="small ui orange button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'ranklist']) %>">比赛榜单</a>
     <% if (now < contest.end_time) { %>
+        <style>
+            div#time-block {
+                float: right;
+                width: auto;
+                margin: auto;
+                background-color: rgba(0,0,0,0);
+                border: 0px;
+            }
+        </style>
+
         <div id="time-block" class="ui bottom right attached segment">
             <h4 class="orange" id="_t"></h4>
         </div>
+
         <script type="text/javascript">
             $(function () {
                 setInterval(function () {
@@ -23,7 +34,7 @@
                     h = Math.floor(leftTime/1000/60/60);
                     m = Math.floor(leftTime/1000/60%60);
                     s = Math.floor(leftTime/1000%60);
-                    document.getElementById("_t").innerHTML = ''.join(h) + ''.join(m).padStart(2,0) + ''.join(s).padStart(2, 0);
+                    document.getElementById("_t").innerHTML = h.toString() + m.toString().padStart(2,0) + s.toString().padStart(2, 0);
                   }
                 }, 1000);
               });
