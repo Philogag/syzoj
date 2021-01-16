@@ -802,7 +802,7 @@ app.get('/problem/:id/testdata', async (req, res) => {
       problem: problem,
       testdata: testdata,
       testcases: testcases,
-      is_public: problem.is_data_public || problem.isAllowedUseBy(res.locals.user)
+      is_public: problem.is_data_public || problem.isAllowedEditBy(res.locals.user)
     });
   } catch (e) {
     syzoj.log(e);
