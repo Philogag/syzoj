@@ -113,59 +113,6 @@
 	  </tbody>
 	</table>
       </div>
-        <%
-        if (fortune) {
-            let color;
-            if (fortune.fortune.indexOf('吉') != -1) color = '#0ccf00';
-            else if (fortune.fortune.indexOf('凶') != -1) color = '#f25e65';
-            else color = '#444';
-        %>
-        <h4 class="ui top attached block header"><i class="ui magic icon"></i>今日运势</h4>
-        <div class="ui bottom attached segment">
-            <div style="height: 15px; "></div>
-            <div class="ui two column center aligned padded grid">
-                <div class="one column row">
-                    <div style="text-align: center; ">
-                        <div style="color: <%= color %>; font-size: 49px;"><%- (user.sex == -1 ? '♀ ' : '♂ ') + fortune.fortune + (user.sex == 1 ? ' <span style="transform: scaleX(-1); display: inline-block; ">♂</span>' : ' ♀') %></div>
-                    </div>
-                </div>
-                <div class="two column row">
-                    <div class="column">
-                        <div style="color: #0ccf00; ">
-                            <% if (fortune.good.length) { %>
-                            <strong>宜：</strong><%= fortune.good[0].title %>
-                            <br>
-                            <span style="color: #888; font-size: 0.7em; "><%= fortune.good[0].detail %></span>
-                            <div style="margin-top: 10px; "></div>
-                            <strong>宜：</strong><%= fortune.good[1].title %>
-                            <br>
-                            <span style="color: #888; font-size: 0.7em; "><%= fortune.good[1].detail %></span>
-                            <% } else { %>
-                            <strong>诸事不宜<br>
-                            </strong>
-                            <% } %>
-                        </div>
-                    </div>
-                    <div class="column">
-                        <div style="color: #f25e65; ">
-                            <% if (fortune.bad.length) { %>
-                            <strong>忌：</strong><%= fortune.bad[0].title %>
-                            <br>
-                            <span style="color: #888; font-size: 0.7em; "><%= fortune.bad[0].detail %></span>
-                            <div style="margin-top: 10px; "></div>
-                            <strong>忌：</strong><%= fortune.bad[1].title %>
-                            <br>
-                            <span style="color: #888; font-size: 0.7em; "><%= fortune.bad[1].detail %></span>
-                            <% } else { %>
-                            <strong>万事皆宜<br>
-                            </strong>
-                            <% } %>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <% } %>
       <h4 class="ui top attached block header"><i class="ui search icon"></i>搜索题目</h4>
       <div class="ui bottom attached segment">
         <form action="<%= syzoj.utils.makeUrl(['problems', 'search']) %>" method="get">
@@ -177,6 +124,10 @@
             <div class="results" style="width: 100%; "></div>
           </div>
         </form>
+        <a href="<%= syzoj.utils.makeUrl(['problems', 'rand']) %>" class="ui primary labeled icon button">
+          <i class="ui icon write"></i>
+          随机一题
+        </a>
       </div>
       <h4 class="ui top attached block header"><i class="ui calendar icon"></i>近期比赛</h4>
       <div class="ui bottom attached <% if (!contests || !contests.length) { %>center aligned <% } %>segment">
