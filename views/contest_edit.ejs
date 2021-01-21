@@ -15,15 +15,16 @@
                 <label>试题列表</label>
                 <select class="ui fluid search dropdown" multiple="" id="search_problems" name="problems">
                 <% for (let problem of problems) { %>
-                <option value="<%= problem.id %>" selected>#<%= problem.id %>. <%= problem.title %></option>
+                <option value="<%= problem.id %>.p" selected>#<%= problem.id %>. <%= problem.title %></option>
                 <% } %>
                 </select>
             </div>
+            
             <div class="field">
                 <label>比赛管理员</label>
                 <select class="ui fluid search dropdown" multiple="" id="search_admins" name="admins">
                 <% for (let admin of admins) { %>
-                <option value="<%= admin.id %>" selected><%= admin.username %></option>
+                <option value="<%= admin.id %>.u" selected class=""><%= admin.username %></option>
                 <% } %>
                 </select>
             </div>

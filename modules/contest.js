@@ -108,8 +108,9 @@ app.post('/contest/:id/edit', async (req, res) => {
     contest.subtitle = req.body.subtitle;
     if (!Array.isArray(req.body.problems)) req.body.problems = [req.body.problems];
     if (!Array.isArray(req.body.admins)) req.body.admins = [req.body.admins];
-    contest.problems = req.body.problems.join('|');
-    contest.admins = req.body.admins.join('|');
+
+    contest.problems = req.body.problems.map(item => { return item.split('.')[0]; }).join('|');
+    contest.admins = req.body.admins.map(item => { return item.split('.')[0]; }).join('|');
     contest.information = req.body.information;
     contest.start_time = syzoj.utils.parseDate(req.body.start_time);
     contest.end_time = syzoj.utils.parseDate(req.body.end_time);
