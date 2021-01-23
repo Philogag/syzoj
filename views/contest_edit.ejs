@@ -1,5 +1,15 @@
 <% this.title = contest.id ? '编辑比赛' : '新建比赛' %>
 <% include header %>
+<style>
+.tab{
+  margin-bottom: 10px; 
+}
+.tabinside{
+  width: 80%;
+  left: 10%;
+}
+</style>
+
 <div class="padding">
         <form action="<%= syzoj.utils.makeUrl(['contest', contest.id, 'edit']) %>" method="post">
           <div class="ui form">
@@ -28,6 +38,7 @@
                 <% } %>
                 </select>
             </div>
+
             <div class="inline fields">
               <label>赛制</label>
               <div class="field">
@@ -49,10 +60,39 @@
                 </div>
               </div>
             </div>
-            <div class="field">
-                <label>排行参数（格式：<code>{ "题目 ID": 分值倍数 }</code>）</label>
-                <input type="text" name="ranking_params" value="<%= contest.ranklist ? JSON.stringify(contest.ranklist.ranking_params) : '' %>">
+            <div class="row">
+              <div class="column">
+                <h4 class="ui top attached block header">比赛加密</h4>
+                <input type="hidden" name="public_mode" value="<%= contest.public_mode %>">
+                <div class="ui bottom attached segment font-content">
+                  <div class="ui pointing secondary menu" id="public-mode-tab" style="margin-top: -10px; ">
+                    <a class="<%= contest.public_mode !== 'invite' && contest.public_mode !== 'passwd' ? 'active ' : '' %>item" data-tab="public_mod">公开</a>
+                    <a class="<%= contest.public_mode === 'invite' ? 'active ' : '' %>item" data-tab="invite_mod">邀请</a>
+                    <a class="<%= contest.public_mode === 'passwd' ? 'active ' : '' %>item" data-tab="passwd_mod">密码</a>
+                  </div>
+                  <div id="public_mode_tab" class="ui <%= contest.public_mode !== 'invite' && contest.public_mode !== 'passwd' ? 'active ' : '' %> tab" data-tab="public_mod"  style="margin-bottom: 10px;">
+                    <div class="ui tabinside"> 
+                      <h4> 公开模式：任何人都可以参加本场比赛 </h4>
+                    </div>
+                  </div>
+                  <div id="invite_mode_tab" class="ui <%= contest.public_mode === 'invite' ? 'active ' : '' %> tab" data-tab="invite_mod" style="margin-bottom: 10px; ">
+                    <div class="ui tabinside"> 
+                    <h4> 邀请模式：名单中的用户可以参加本场比赛 </h4>
+                    </div>
+                  </div>
+                  <div id="passwd_mode_tab" class="ui <%= contest.public_mode === 'passwd' ? 'active ' : '' %> tab" data-tab="passwd_mod">
+                  <div class="ui tabinside"> 
+                    <h4> 密码模式：正确填写密码的用户可以参加本场比赛 </h4>
+                    <div class="field">
+                      <label>密码</label>
+                      <input type="text" name="passwd" value="<%= contest.passwd %>">
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+            </div>
+
             <div class="field">
                 <label>比赛公告</label>
                 <textarea rows="5" name="information" class="markdown-edit"><%= contest.information %></textarea>
@@ -66,9 +106,9 @@
                 <input type="text" name="end_time" value="<%= syzoj.utils.formatDate(contest.end_time || syzoj.utils.getCurrentDate()) %>">
             </div>
             <div class="inline field">
-              <label class="ui header">公开</label>
+              <label class="ui header">公布比赛</label>
               <div class="ui toggle checkbox">
-                <input type="checkbox"<% if (contest.is_public) { %> checked<% } %> name="is_public">
+                <input type="checkbox"<% if (contest.is_enabled) { %> checked<% } %> name="is_enable">
                 <label><span style="visibility: hidden; ">　</span></label>
               </div>
             </div>
@@ -115,5 +155,37 @@ $(function () {
       }
     });
 });
+
+$(function(){
+  $('#public-mode-tab .item').tab();
+
+  function show_tab(showed_tab){
+    var tabs = [
+      "#public_mode_tab",
+      "#invite_mode_tab",
+      "#passwd_mode_tab",
+    ]
+    for (let tab in tabs){
+      $(tab).hide();
+    }
+    $(showed_tab).show();
+  }
+
+  $('a[data-tab="public_mod"]').click(function () {
+    $('input[name=public_mode]').val('public');
+    show_tab("#public_mode_tab");
+  });
+
+  $('a[data-tab="invite_mod"]').click(function () {
+    $('input[name=public_mode]').val('interaction');
+    $('#io-type').hide();
+    show_tab("#invite_mode_tab");
+  });
+
+  $('a[data-tab="passwd_mod"]').click(function () {
+    $('input[name=public_mode]').val('passwd');
+    show_tab("#passwd_mode_tab");
+  });
+})
 </script>
 <% include footer %>

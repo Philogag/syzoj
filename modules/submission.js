@@ -44,7 +44,7 @@ app.get('/submissions', async (req, res) => {
       const contestId = Number(req.query.contest);
       const contest = await Contest.findById(contestId);
       contest.ended = contest.isEnded();
-      if ((contest.ended && contest.is_public) || // If the contest is ended and is not hidden
+      if ((contest.ended && contest.is_enabled) || // If the contest is ended and is not hidden
         (curUser && await contest.isSupervisior(curUser)) // Or if the user have the permission to check
       ) {
         query.andWhere('type = 1');
@@ -164,7 +164,7 @@ app.get('/submission/:id', async (req, res) => {
       contest = await Contest.findById(judge.type_info);
       contest.ended = contest.isEnded();
 
-      if ((!contest.ended || !contest.is_public) &&
+      if ((!contest.ended || !contest.is_enabled) &&
         !(await judge.problem.isAllowedEditBy(res.locals.user) || await contest.isSupervisior(curUser))) {
         throw new Error("比赛未结束或未公开。");
       }

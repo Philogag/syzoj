@@ -29,7 +29,7 @@ app.get('/', async (req, res) => {
       fortune = Divine(res.locals.user.username, res.locals.user.sex);
     }
 
-    let contests = await Contest.queryRange([1, 5], { is_public: true }, {
+    let contests = await Contest.queryRange([1, 5], { is_enabled: true }, {
       start_time: 'DESC'
     });
 

@@ -18,7 +18,7 @@ function randstr(){
 }
 
 $(function(){
-    ss = '<button type="button" class="button copybutton" data-clipboard-action="copy"';
+    ss = '<button type="button" class="ui button copybutton" data-clipboard-action="copy"';
     for(let p of $("code")){
         randid = "block_" + randstr();
         p.id = randid;
@@ -34,7 +34,7 @@ $(function(){
         obj.innerHTML = "Copied!";
         setTimeout(function(){
             obj.innerHTML = "Copy";
-        }, 500)
+        }, 300)
     });
 
     clipboard.on('error', function (e) {
@@ -42,7 +42,7 @@ $(function(){
         obj.innerHTML = "Failed!";
         setTimeout(function(){
             obj.innerHTML = "Copy";
-        }, 1000)
+        }, 300)
     });
 })
 </script>

@@ -1,0 +1,105 @@
+<% this.title = contest.title + ' - 比赛' %>
+<style>
+.ui.label.pointing.below.left::before { left: 12%; }
+.ui.label.pointing.below.right::before { left: 88%; }
+.ui.label.pointing.below.left { margin-bottom: 0; }
+.ui.label.pointing.below.right { margin-bottom: 0; float: right; }
+#back_to_contest { display: none;  }
+div#time-block {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0,0,0,0);
+  border: 0px;
+}
+div#time-block.h2{
+  color: orangered;
+  font-size: 24px;
+}
+</style>
+<% include header %>
+<div class="padding">
+  <h1><%= contest.title %></h1>
+  <div style="margin-bottom: 30px;"><%- contest.subtitle %></div>
+  <% const seeResult = (isSupervisior || contest.ended); %>
+  <% const seeRanklist = seeResult || (contest.allowedSeeingResult() && contest.allowedSeeingOthers()); %>
+  <% let start = syzoj.utils.formatDate(contest.start_time), end = syzoj.utils.formatDate(contest.end_time); %>
+  <% if (contest.running && start.split(' ')[0] === end.split(' ')[0]) {
+    start = start.split(' ')[1]; end = end.split(' ')[1];
+  } %>
+  
+  <div class="ui below middle" id="time-block"><h2 class="orange" id="_t"></h2></div>
+  <div class="ui pointing below left label"><%= start %></div>
+  <div class="ui pointing below right label"><%= end %></div>
+  <% let timePercentage = Math.floor(Math.min(1, (syzoj.utils.getCurrentDate() - contest.start_time) / (contest.end_time - contest.start_time)) * 100); %>
+  <div id="timer-progress" class="ui tiny indicating progress<% if (timePercentage == 100) { %> success<% } %>" data-percent="<%= timePercentage %>">
+    <div class="bar" style="width: <%= timePercentage %>%;"></div>
+  </div>
+  <div class="ui grid">
+    <div class="row">
+      <div class="column">
+        <div class="ui buttons">
+          <% if(seeRanklist) { %>
+            <a class="ui small blue button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'ranklist']) %>">比赛榜单</a>
+          <% } %>
+          <% let submissionsUrl = seeResult ?
+            syzoj.utils.makeUrl(['submissions'], {contest: contest.id}) :
+            syzoj.utils.makeUrl(['contest', contest.id, 'submissions']); %>
+          <a class="ui small positive button" href="<%= submissionsUrl %>">提交记录</a>
+        </div>
+      </div>
+    </div>
+  <% if (contest.information) { %>
+    <div class="row">
+      <div class="column">
+        <h4 class="ui top attached block header">信息与公告</h4>
+        <div class="ui bottom attached segment font-content">
+          <%- contest.information %>
+        </div>
+      </div>
+    </div>
+  <% } %>
+    <div class="row">
+        <div class="column" style="text-align: center; ">
+          <% if (contest.public_mode === 'passwd') { %>
+            <form id="login_contest"  method="post" action="<%= syzoj.utils.makeUrl(['contest', contest.id, 'login']) %>" >
+              <div class="ui center form">
+                <h2>本场比赛需要密码</h2>
+                <input class="font-content" placeholder="密码" type="password" id="passwd" name="passwd" style="width:400px; " />
+                <br>
+                <div style="text-align: center; margin-top: 20px; ">
+                  <button type="submit" id="submit_button" class="ui labeled submit icon button" >
+                    <i class="icon edit"></i> 提交
+                  </button>
+                </div>
+            </form>
+          <% } else { %>
+            <h2>本场比赛为邀请制，请联系管理员获得邀请函。</h2>
+          <% } %>
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(function () {
+  setInterval(function () {
+    $('#timer-progress').progress({
+      value: Date.now() / 1000 - <%= contest.start_time %>,
+      total: <%= contest.end_time - contest.start_time %>
+    });
+  }, 5000);
+});
+$(function () {
+  setInterval(function () {
+    var leftTime=Number("<%= contest.end_time %>") - Date.now() / 1000;
+    if (leftTime>=0) {
+      h = Math.floor(leftTime/60/60);
+      m = Math.floor(leftTime/60%60);
+      s = Math.floor(leftTime%60);
+      document.getElementById("_t").innerHTML = h.toString() + ":" + m.toString().padStart(2,0) + ":" + s.toString().padStart(2, 0);
+    }
+  }, 1000);
+});
+</script>
+<% include footer %>

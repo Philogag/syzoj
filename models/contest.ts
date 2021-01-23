@@ -14,6 +14,12 @@ enum ContestType {
   ICPC = "acm"
 }
 
+enum PublicModeType{
+  PUBLIC = 'public',
+  INVITE = 'invite',
+  PASSWD = 'passwd'
+}
+
 @TypeORM.Entity()
 export default class Contest extends Model {
   static cache = true;
@@ -54,8 +60,16 @@ export default class Contest extends Model {
   @TypeORM.Column({ nullable: true, type: "integer" })
   ranklist_id: number;
 
+  // mode of public 
+  @TypeORM.Column({ nullable: true, type: "enum", enum: PublicModeType })
+  public_mode: PublicModeType;
+
+  // for passwd mode
+  @TypeORM.Column({ nullable: true, type: "text" })
+  passwd: string;
+
   @TypeORM.Column({ nullable: true, type: "boolean" })
-  is_public: boolean;
+  is_enabled: boolean;
 
   @TypeORM.Column({ nullable: true, type: "boolean" })
   hide_statistics: boolean;
@@ -111,6 +125,39 @@ export default class Contest extends Model {
     this.problems = a.join('|');
   }
 
+  async createPlayer(uid) {
+    let player = ContestPlayer.create({
+      contest_id: this.id,
+      user_id: uid
+    });
+    await player.save();
+    return player;
+  }
+
+  async allowUser(uid, passwd = null) {
+    let player = await ContestPlayer.findInContest({
+      contest_id: this.id,
+      user_id: uid,
+    });
+    switch (this.public_mode) {
+      case PublicModeType.PUBLIC:
+        if (!player) {
+          await this.createPlayer(uid);
+          return true;
+        }
+        return true;
+      case PublicModeType.INVITE:
+        return player !== null;
+      case PublicModeType.PASSWD:
+        if (!player && passwd !== this.passwd) {
+          return false;
+        } else if (!player) {
+          await this.createPlayer(uid);
+        }
+        return true;
+    }
+  }
+
   async newSubmission(judge_state) {
     if (!(judge_state.submit_time >= this.start_time && judge_state.submit_time <= this.end_time)) {
       return;
@@ -119,18 +166,14 @@ export default class Contest extends Model {
     if (!problems.includes(judge_state.problem_id)) throw new ErrorMessage('当前比赛中无此题目。');
 
     await syzoj.utils.lock(['Contest::newSubmission', judge_state.user_id], async () => {
+
+      if (!await this.allowUser(judge_state.user_id)) {
+        throw new ErrorMessage('您没有此比赛的权限。');
+      }
       let player = await ContestPlayer.findInContest({
         contest_id: this.id,
-        user_id: judge_state.user_id
+        user_id: judge_state.user_id,
       });
-
-      if (!player) {
-        player = await ContestPlayer.create({
-          contest_id: this.id,
-          user_id: judge_state.user_id
-        });
-        await player.save();
-      }
 
       await player.updateScore(judge_state);
       await player.save();
