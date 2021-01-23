@@ -209,6 +209,13 @@ app.get('/problem/:id', async (req, res) => {
     problem.allowedEdit = await problem.isAllowedEditBy(res.locals.user);
     problem.allowedManage = await problem.isAllowedManageBy(res.locals.user);
 
+    console.log(problem.example);
+    try {
+      examples = JSON.parse(problem.example);
+    } catch(SyntaxError){
+      examples = [];
+    }
+
     if (problem.is_public || problem.allowedEdit) {
       await syzoj.utils.markdown(problem, ['description', 'input_format', 'output_format', 'example', 'limit_and_hint']);
     } else {
@@ -227,6 +234,7 @@ app.get('/problem/:id', async (req, res) => {
     res.render('problem', {
       problem: problem,
       state: state,
+      examples: examples,
       lastLanguage: res.locals.user ? await res.locals.user.getLastSubmitLanguage() : null,
       testcases: testcases,
       discussionCount: discussionCount
@@ -298,8 +306,15 @@ app.get('/problem/:id/edit', async (req, res) => {
 
     problem.allowedManage = await problem.isAllowedManageBy(res.locals.user);
 
+    try {
+      examples = JSON.parse(problem.example);
+    } catch(SyntaxError){
+      examples = [];
+    }
+
     res.render('problem_edit', {
-      problem: problem
+      problem: problem,
+      examples: examples,
     });
   } catch (e) {
     syzoj.log(e);
@@ -344,6 +359,8 @@ app.post('/problem/:id/edit', async (req, res) => {
         }
       }
     }
+
+    // console.log(req.body);
 
     if (!req.body.title.trim()) throw new ErrorMessage('题目名不能为空。');
     problem.title = req.body.title;

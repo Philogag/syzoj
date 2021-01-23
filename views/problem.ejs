@@ -153,46 +153,57 @@ if (contest) {
       <% } %>
     </div>
   </div>
-  <% if (problem.description) { %>
+
   <div class="row">
     <div class="column">
-      <h4 class="ui top attached block header">题目描述</h4>
-      <div class="ui bottom attached segment font-content"><%- problem.description %></div>
+      <% if (problem.description) { %>
+      <h2 class="ui attached">题目描述</h2>
+      <div class="ui attached font-content"><%- problem.description %></div>
+      <% } %>
+
+      <% if (problem.input_format) { %>
+      <h2 class="ui attached block">输入格式</h2>
+      <div class="ui attached font-content"><%- problem.input_format %></div>
+      <% } %>
+
+      <% if (problem.output_format) { %>
+        <h2 class="ui attached block">输出格式</h2>
+        <div class="ui attached font-content"><%- problem.output_format %></div>
+      <% } %>
+
+      <% if (problem.example && examples) { %>
+        <h2 class="ui attached block">样例</h2>
+        <table class="ui very basic aligned table">
+          <thead>
+            <tr>
+              <th width='50%'>输入</th>
+              <th>输出</th>
+            </tr>
+          </thead>
+          <tbody>
+          <% for (let exam of examples) { %>  
+            <tr>
+              <th>
+                <div class="ui existing segment"><pre><code><%= exam.in %></code></pre></div>
+              </th>
+              <th>
+                <div class="ui existing segment"><pre><code><%= exam.out %></code></pre></div>
+              </th>
+            </tr>
+          <% } %>
+          </tbody>
+        </table>
+      <% } %>
+
+      <% if (problem.limit_and_hint) { %>
+        <h2 class="ui attached block">数据范围与提示</h2>
+        <div class="ui attached font-content"><%- problem.limit_and_hint %></div>
+      <% } %>
+
     </div>
   </div>
-  <% } %>
-  <% if (problem.input_format) { %>
-  <div class="row">
-    <div class="column">
-        <h4 class="ui top attached block header">输入格式</h4>
-        <div class="ui bottom attached segment font-content"><%- problem.input_format %></div>
-    </div>
-  </div>
-  <% } %>
-  <% if (problem.output_format) { %>
-    <div class="row">
-        <div class="column">
-          <h4 class="ui top attached block header">输出格式</h4>
-          <div class="ui bottom attached segment font-content"><%- problem.output_format %></div>
-        </div>
-    </div>
-  <% } %>
-  <% if (problem.example) { %>
-    <div class="row">
-        <div class="column">
-          <h4 class="ui top attached block header">样例</h4>
-          <div class="ui bottom attached segment font-content"><%- problem.example %></div>
-        </div>
-    </div>
-  <% } %>
-  <% if (problem.limit_and_hint) { %>
-    <div class="row">
-        <div class="column">
-          <h4 class="ui top attached block header">数据范围与提示</h4>
-          <div class="ui bottom attached segment font-content"><%- problem.limit_and_hint %></div>
-        </div>
-    </div>
-  <% } %>
+
+
   <% if (problem.tags && problem.tags.length && (typeof contest === 'undefined' || !contest)) { %>
     <div class="row">
       <div class="column">
@@ -398,4 +409,8 @@ if (contest) {
   }
   </script>
 <% } %>
+
+
+<% include clipboard %>
+
 <% include footer %>

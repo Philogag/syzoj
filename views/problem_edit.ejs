@@ -5,8 +5,50 @@
     text-align: center;
   }
 </style>
+
+<script type="text/javascript">
+function addExample(){
+  ss = "<div class=\"three fields example-box\">";
+  ss += "  <div class=\"field\">";
+  ss += "    <label style=\"margin-top: 15px; \">输入</label>";
+  ss += "    <textarea class=\"ui attached font-content example-in\"></textarea>";
+  ss += "  </div>";
+  ss += "  <div class=\"field\">";
+  ss += "    <label style=\"margin-top: 15px; \">输出</label>";
+  ss += "    <textarea class=\"ui attached font-content example-out\"></textarea>";
+  ss += "  </div>";
+  ss += "  <div class=\"field\" style=\"margin: auto;\">";
+  ss += "    <button type=\"button\" onclick=\"deleteExample(this);\" class=\"ui labeled icon button\">";
+  ss += "      <i class=\"icon delete\"></i> Delete";
+  ss += "    </button>";
+  ss += "  </div>";
+  ss += "</div>";
+  node = new DOMParser().parseFromString(ss, "text/html").getElementsByClassName("example-box")[0];
+  document.getElementById("example-list").appendChild(node);
+}
+
+function deleteExample(obj){
+  rmobj = obj.parentNode.parentNode;
+  rmobj.parentNode.removeChild(rmobj);
+}
+
+function collectExample(){
+  var arr = []
+  for (let ele of document.getElementsByClassName("example-box")){
+    input_text = ele.getElementsByClassName("example-in")[0].value;
+    output_text = ele.getElementsByClassName("example-out")[0].value;
+    arr.push({
+      in: input_text,
+      out: output_text
+    })
+  }
+  var exam = document.getElementById("collected-examples").value = JSON.stringify(arr);
+  return true; 
+}
+</script>
+
 <div class="padding">
-    <form method="post" action="<%= syzoj.utils.makeUrl(['problem', req.params.id, 'edit']) %>">
+    <form id="edit-form" method="post" action="<%= syzoj.utils.makeUrl(['problem', req.params.id, 'edit']) %>" onsubmit="return collectExample()">
       <div class="ui top attached tabular menu">
         <a class="item active" data-tab="edit">编辑</a>
         <a class="item" data-tab="preview" id="preview_tab">预览</a>
@@ -35,7 +77,30 @@
           <label style="margin-top: 15px; " for="output_format">输出格式</label>
           <textarea class="markdown-edit" rows="10" id="output" name="output_format"><%= problem.output_format %></textarea>
           <label style="margin-top: 15px; ">样例</label>
-          <textarea class="markdown-edit" rows="15" id="example" name="example"><%= problem.example %></textarea>
+          <input type="hidden" name="example" id="collected-examples">
+          <div class="ui" id="example-list">
+            <% for (let exam of examples) { %>  
+              <div class="three fields example-box">
+                <div class="field">
+                  <label style="margin-top: 15px; ">输入</label>
+                  <textarea class="ui attached font-content example-in"><%= exam.in %></textarea>
+                </div>
+                <div class="field">
+                  <label style="margin-top: 15px; ">输出</label>
+                  <textarea class="ui attached font-content example-out"><%= exam.out %></textarea>
+                </div>
+                <div class="field" style="margin: auto;">
+                  <button type="button" onclick="deleteExample(this);" class="ui labeled icon button">
+                    <i class="icon delete"></i> Delete
+                  </button>
+                </div>
+              </div>
+            <% } %>
+          </div>
+          <button type="button" onclick="addExample();" class="ui labeled icon button" id="add-example">
+            <i class="icon edit"></i> Add Example
+          </button>
+          
           <label style="margin-top: 15px; ">数据范围与提示</label>
           <textarea class="markdown-edit" rows="10" id="hint" name="limit_and_hint"><%= problem.limit_and_hint %></textarea>
 
@@ -67,9 +132,9 @@
       </div>
       <% if (problem.allowedEdit) { %>
       <div style="text-align: center; ">
-      <button type="submit" id="submit_button" class="ui labeled submit icon button">
-        <i class="icon edit"></i> 提交
-      </button>
+        <button type="submit" id="submit_button" class="ui labeled submit icon button" >
+          <i class="icon edit"></i> 提交
+        </button>
       </div>
       <% } %>
     </form>
@@ -87,7 +152,7 @@ $(function () {
       render($("#pv-description"), $("#description"));
       render($("#pv-input"), $("#input"));
       render($("#pv-output"), $("#output"));
-      render($("#pv-example"), $("#example"));
+      // render($("#pv-example"), $("#example"));
       render($("#pv-hint"), $("#hint"));
     });
     $('.tabular.menu .item').tab();
@@ -112,4 +177,5 @@ $(function () {
     });
 });
 </script>
+
 <% include footer %>

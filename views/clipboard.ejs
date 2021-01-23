@@ -1,0 +1,48 @@
+
+<style>
+.copybutton{
+    position: absolute; 
+    top: 0px; 
+    right: -4px; 
+    border-top-left-radius: 0px; 
+    border-bottom-right-radius: 0px;
+}
+textarea.hidden{
+    display: true;
+}
+</style>
+<textarea id="clipboard" type="hidden" style="display:none;"></textarea>
+<script>
+function randstr(){
+    return Math.random().toString(36).slice(-8)
+}
+
+$(function(){
+    ss = '<button type="button" class="button copybutton" data-clipboard-action="copy"';
+    for(let p of $("code")){
+        randid = "block_" + randstr();
+        p.id = randid;
+        sss = ss + 'data-clipboard-target="#' + randid + '" >Copy</button>';
+        p.parentNode.parentNode.appendChild($(sss)[0]);
+    }
+
+    var clipboard = new ClipboardJS('.copybutton');
+
+    clipboard.on('success', function(e) {
+        console.info('Trigger:', e.trigger);
+        obj = e.trigger
+        obj.innerHTML = "Copied!";
+        setTimeout(function(){
+            obj.innerHTML = "Copy";
+        }, 500)
+    });
+
+    clipboard.on('error', function (e) {
+        obj = e.triger;
+        obj.innerHTML = "Failed!";
+        setTimeout(function(){
+            obj.innerHTML = "Copy";
+        }, 1000)
+    });
+})
+</script>
