@@ -38,14 +38,19 @@ app.get('/submissions', async (req, res) => {
       isFiltered = true;
     }
 
+    let contest = null;
+    let isSupervisior = null;
     if (!req.query.contest) {
       query.andWhere('type = 0');
     } else {
       const contestId = Number(req.query.contest);
-      const contest = await Contest.findById(contestId);
+      contest = await Contest.findById(contestId);
+
+      isSupervisior = curUser && await contest.isSupervisior(curUser);
+
       contest.ended = contest.isEnded();
       if ((contest.ended && contest.is_enabled) || // If the contest is ended and is not hidden
-        (curUser && await contest.isSupervisior(curUser)) // Or if the user have the permission to check
+        isSupervisior // Or if the user have the permission to check
       ) {
         query.andWhere('type = 1');
         query.andWhere('type_info = :type_info', { type_info: contestId });
@@ -141,7 +146,9 @@ app.get('/submissions', async (req, res) => {
       form: req.query,
       displayConfig: displayConfig,
       isFiltered: isFiltered,
-      fast_pagination: syzoj.config.submissions_page_fast_pagination
+      fast_pagination: syzoj.config.submissions_page_fast_pagination,
+      contest: contest,
+      isSupervisior
     });
   } catch (e) {
     syzoj.log(e);
@@ -202,7 +209,8 @@ app.get('/submission/:id', async (req, res) => {
         displayConfig: displayConfig
       }, syzoj.config.session_secret) : null,
       displayConfig: displayConfig,
-      displayDetailResult:  judge.problem.is_data_public || res.locals.user && await res.locals.user.is_admin
+      displayDetailResult: judge.problem.is_data_public || res.locals.user && await res.locals.user.is_admin,
+      contest: contest
     });
   } catch (e) {
     syzoj.log(e);

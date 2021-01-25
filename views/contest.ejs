@@ -19,7 +19,16 @@ div#time-block.h2{
 </style>
 <% include header %>
 <div class="padding">
-  <h1><%= contest.title %></h1>
+
+  <% if (contest.public_mode === 'public') { %>
+    <% sec_tab = '<span class="ui header"><div class="ui mini green label">公开</div></span>' %>
+  <% } else if (contest.public_mode === 'invite') { %>
+    <% sec_tab = '<span class="ui header"><div class="ui mini red label">邀请</div></span>' %>
+  <% } else { %>
+    <% sec_tab = '<span class="ui header"><div class="ui mini orange label">密码</div></span>' %>
+  <% } %>
+
+  <h1><%= contest.title %><%- sec_tab %></h1>
   <div style="margin-bottom: 30px;"><%- contest.subtitle %></div>
   <% let unveiled = (isSupervisior || syzoj.utils.getCurrentDate() >= contest.start_time); %>
   <% const seeResult = (isSupervisior || contest.ended); %>
@@ -53,6 +62,21 @@ div#time-block.h2{
         </div>
       </div>
     </div>
+  <% if (typeof contest.lang !== 'undefind' && contest.lang){ %>
+    <div class="row">
+      <div class="column">
+        <div class="ui bottom attached segment font-content">
+          <h4>本场比赛限制使用语言: 
+            <% for (var k in contestlang){ %>
+              <% if (contestlang[k].hasOwnProperty('enable') && contestlang[k]['enable']) { %>
+                <span class="ui header"><div class="ui mini green label"><%= contestlang[k]["show"] %></div></span>
+              <% } %>
+            <% } %>
+          </h4>
+        </div>
+      </div>
+    </div>
+  <% } %>
   <% if (contest.information) { %>
     <div class="row">
       <div class="column">
@@ -98,15 +122,15 @@ div#time-block.h2{
                     <% if (problem.status.accepted) { %>
                       <span class="score score_10">
                         <% if (problem.status.unacceptedCount === 0) { %>
-                          +
+                          <i class="check icon green"></i>
                         <% } else { %>
-                          +<%= problem.status.unacceptedCount %>
+                          <i class="check icon red"></i><%= problem.status.unacceptedCount %>
                         <% } %>
                       </span>
                     <% } else { %>
                       <span class="score score_0">
                         <% if (problem.status.unacceptedCount !== 0) { %>
-                          -<%= problem.status.unacceptedCount %>
+                          <i class="close icon red"></i><%= problem.status.unacceptedCount %>
                         <% } %>
                       </span>
                     <% } %>

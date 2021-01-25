@@ -183,12 +183,8 @@ if (contest) {
           <tbody>
           <% for (let exam of examples) { %>  
             <tr>
-              <th>
-                <div class="ui existing segment"><pre><code><%= exam.in %></code></pre></div>
-              </th>
-              <th>
-                <div class="ui existing segment"><pre><code><%= exam.out %></code></pre></div>
-              </th>
+              <th><div class="ui existing segment"><pre><code><%= exam.in %></code></pre></div></th>
+              <th><div class="ui existing segment"><pre><code><%= exam.out %></code></pre></div></th>
             </tr>
           <% } %>
           </tbody>
@@ -321,12 +317,15 @@ if (contest) {
                 <div class="four wide column" style="margin-right: -25px; ">
                   <div class="ui attached vertical fluid pointing menu" id="languages-menu" style="height: 370px; overflow-y: scroll; overflow-x: hidden; ">
                     <%
-                    let language = syzoj.config.enabled_languages[0];
+                    let allowLang = syzoj.config.enabled_languages;
+                    if (typeof contest !== 'undefined' && contest) allowLang = contest.lang.split('|');
+
+                    let language = allowLang[0];
                     if (state) {
                       language = state.language;
                     } else if (lastLanguage) language = lastLanguage;
                     %>
-                    <% for (lang of syzoj.config.enabled_languages) { %>
+                    <% for (lang of allowLang) { %>
                       <a style="border-radius: 0; " class="item<%= lang === language ? ' active' : '' %>" data-value="<%= lang %>" data-mode="<%= syzoj.languages[lang].editor %>">
                         <%= syzoj.languages[lang].show %>
                         <div class="ui right floated" style="opacity: 0.4; margin-top: 8px; font-size: 0.7em; "><%= syzoj.languages[lang].version %></div>

@@ -8,10 +8,6 @@ let User = syzoj.model('user');
 const jwt = require('jsonwebtoken');
 const { getSubmissionInfo, getRoughResult, processOverallResult } = require('../libs/submissions_process');
 
-function checkPromissionOfContest(cid, uid, passwd=null){
-
-}
-
 app.get('/contests', async (req, res) => {
   try {
     let where;
@@ -59,10 +55,18 @@ app.get('/contest/:id/edit', async (req, res) => {
     if (contest.problems) problems = await contest.problems.split('|').mapAsync(async id => await Problem.findById(id));
     if (contest.admins) admins = await contest.admins.split('|').mapAsync(async id => await User.findById(id));
 
+    let contestlang = JSON.parse(JSON.stringify(syzoj.languages)); // Deep copy;
+    if (contest.lang) {
+      for (let l of contest.lang.split("|")) {
+        contestlang[l].enable = true;
+      };
+    }
+
     res.render('contest_edit', {
       contest: contest,
       problems: problems,
-      admins: admins
+      admins: admins,
+      contestlang: contestlang
     });
   } catch (e) {
     syzoj.log(e);
@@ -110,11 +114,16 @@ app.post('/contest/:id/edit', async (req, res) => {
     if (!req.body.title.trim()) throw new ErrorMessage('比赛名不能为空。');
     contest.title = req.body.title;
     contest.subtitle = req.body.subtitle;
-    if (!Array.isArray(req.body.problems)) req.body.problems = [req.body.problems];
-    if (!Array.isArray(req.body.admins)) req.body.admins = [req.body.admins];
 
-    contest.problems = req.body.problems.map(item => { return item.split('.')[0]; }).join('|');
-    contest.admins = req.body.admins.map(item => { return item.split('.')[0]; }).join('|');
+    if (typeof req.body.admins === 'undefind') req.body.admins = [];
+
+    if (!Array.isArray(req.body.problems)) req.body.problems = req.body.problems.split(',');
+    if (!Array.isArray(req.body.admins)) req.body.admins = [req.body.admins];
+    if (!Array.isArray(req.body.contestlang)) req.body.contestlang = [req.body.contestlang];
+
+    contest.problems = req.body.problems.join('|');
+    contest.admins = req.body.admins.map((str) => { return str.split('.')[0]; }).join('|');
+    contest.lang = req.body.contestlang.join('|');
     contest.information = req.body.information;
     contest.start_time = syzoj.utils.parseDate(req.body.start_time);
     contest.end_time = syzoj.utils.parseDate(req.body.end_time);
@@ -249,6 +258,13 @@ app.get('/contest/:id', async (req, res) => {
       user_id: res.locals.user.id
     });
 
+    let contestlang = JSON.parse(JSON.stringify(syzoj.languages)); // Deep copy;
+    if (contest.lang) {
+      for (let l of contest.lang.split("|")) {
+        contestlang[l].enable = true;
+      }
+    }
+
     let problems_id = await contest.getProblems();
     let problems = await problems_id.mapAsync(async id => await Problem.findById(id));
 
@@ -319,7 +335,8 @@ app.get('/contest/:id', async (req, res) => {
       contest: contest,
       problems: problems,
       hasStatistics: hasStatistics,
-      isSupervisior: isSupervisior
+      isSupervisior: isSupervisior,
+      contestlang: contestlang
     });
   } catch (e) {
     syzoj.log(e);
@@ -334,6 +351,8 @@ app.get('/contest/:id/ranklist', async (req, res) => {
     let contest_id = parseInt(req.params.id);
     let contest = await Contest.findById(contest_id);
     const curUser = res.locals.user;
+
+    const isSupervisior = await contest.isSupervisior(curUser);
 
     if (!contest) throw new ErrorMessage('无此比赛。');
     // if contest is non-public, both system administrators and contest administrators can see it.
@@ -381,7 +400,8 @@ app.get('/contest/:id/ranklist', async (req, res) => {
     res.render('contest_ranklist', {
       contest: contest,
       ranklist: ranklist,
-      problems: problems
+      problems: problems,
+      isSupervisior: isSupervisior
     });
   } catch (e) {
     syzoj.log(e);
@@ -422,6 +442,7 @@ app.get('/contest/:id/submissions', async (req, res) => {
     const curUser = res.locals.user;
 
     let user = req.query.submitter && await User.fromName(req.query.submitter);
+    const isSupervisior = await contest.isSupervisior(curUser);
 
     let query = JudgeState.createQueryBuilder();
 
@@ -522,7 +543,8 @@ app.get('/contest/:id/submissions', async (req, res) => {
       displayConfig: displayConfig,
       pushType: pushType,
       isFiltered: isFiltered,
-      fast_pagination: syzoj.config.submissions_page_fast_pagination
+      fast_pagination: syzoj.config.submissions_page_fast_pagination,
+      isSupervisior: isSupervisior
     });
   } catch (e) {
     syzoj.log(e);
@@ -539,7 +561,6 @@ app.get('/contest/submission/:id', async (req, res) => {
     const judge = await JudgeState.findById(id);
     if (!judge) throw new ErrorMessage("提交记录 ID 不正确。");
     const curUser = res.locals.user;
-    if ((!curUser) || judge.user_id !== curUser.id) throw new ErrorMessage("您没有权限执行此操作。");
 
     if (judge.type !== 1) {
       return res.redirect(syzoj.utils.makeUrl(['submission', id]));
@@ -547,6 +568,8 @@ app.get('/contest/submission/:id', async (req, res) => {
 
     const contest = await Contest.findById(judge.type_info);
     contest.ended = contest.isEnded();
+    
+    if (((!curUser) || judge.user_id !== curUser.id) && !await contest.isSupervisior(curUser)) throw new ErrorMessage("您没有权限执行此操作。");
 
     const displayConfig = getDisplayConfig(contest);
     displayConfig.showCode = true;
@@ -574,6 +597,7 @@ app.get('/contest/submission/:id', async (req, res) => {
         type: 'detail'
       }, syzoj.config.session_secret) : null,
       displayConfig: displayConfig,
+      displayDetailResult: judge.problem.is_data_public || res.locals.user && contest.isSupervisior(curUser),
       contest: contest,
     });
   } catch (e) {

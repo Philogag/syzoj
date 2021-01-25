@@ -1,4 +1,5 @@
 <% this.title = contest.id ? '编辑比赛' : '新建比赛' %>
+<% include util %>
 <% include header %>
 <style>
 .tab{
@@ -8,79 +9,238 @@
   width: 80%;
   left: 10%;
 }
+ .accordion {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+ .accordion > .content {
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+ .accordion > .content > :last-child {
+  margin-bottom: -10px !important;
+}
 </style>
 
-<div class="padding">
-        <form action="<%= syzoj.utils.makeUrl(['contest', contest.id, 'edit']) %>" method="post">
-          <div class="ui form">
-              <div class="field">
-                <label>比赛名称</label>
-                <input type="text" name="title" value="<%= contest.title %>">
-              </div>
-              <div class="field">
-                <label>比赛描述</label>
-                <input type="text" name="subtitle" class="markdown-edit" value="<%= contest.subtitle %>">
-              </div>
-            <div class="field">
-                <label>试题列表</label>
-                <select class="ui fluid search dropdown" multiple="" id="search_problems" name="problems">
-                <% for (let problem of problems) { %>
-                <option value="<%= problem.id %>.p" selected>#<%= problem.id %>. <%= problem.title %></option>
-                <% } %>
-                </select>
-            </div>
-            
-            <div class="field">
-                <label>比赛管理员</label>
-                <select class="ui fluid search dropdown" multiple="" id="search_admins" name="admins">
-                <% for (let admin of admins) { %>
-                <option value="<%= admin.id %>.u" selected class=""><%= admin.username %></option>
-                <% } %>
-                </select>
-            </div>
+<script src="<%- lib('semantic-ui/2.4.1/components/accordion.min.js') %>"></script>
 
-            <div class="inline fields">
-              <label>赛制</label>
-              <div class="field">
-                <div class="ui radio checkbox">
-                  <input <% if (contest.id) { %>disabled <% } %>type="radio" name="type" id="type-noi" value="noi"<% if (contest.type === 'noi') { %> checked="checked"<% } %>>
-                  <label for="type-noi">NOI</label>
+<script>
+function newProblemRow(ptitle){
+  sarr = ptitle.replace('#', '').split('. ');
+  sss  = '<tr id="' + sarr[0] + '" style="height: 32px">';
+  sss += '  <td>#' + sarr[0] + '</td>';
+  sss += '  <td>' + sarr[1] + '</td>';
+  sss += '  <td>';
+  sss += '    <div class="ui buttons">';
+  sss += '    <button type="button" onclick="moveUp(this);" class="ui icon button"><i class="arrow up icon"></i></button>';
+  sss += '    <button type="button" onclick="moveDown(this);" class="ui icon button"><i class="arrow down icon"></i></button>';
+  sss += '    <button type="button" onclick="deleteP(this);" class="ui icon button"><i class="trash alternate icon"></i></button>';
+  sss += '    </div>';
+  sss += '  </td>';
+  sss += '</tr>';
+  document.getElementById("problem_table").appendChild($(sss)[0]);
+}
+function moveUp(_a){
+  var _row = _a.parentNode.parentNode.parentNode;
+  var _node = _row.previousSibling;
+  while(_node && _node.nodeType != 1){
+    _node = _node.previousSibling;
+  }
+  if(_node){
+    swapNode(_row,_node);
+  }
+}
+function moveDown(_a){
+  var _row = _a.parentNode.parentNode.parentNode;
+  var _node = _row.nextSibling;
+  while(_node && _node.nodeType != 1){
+    _node = _node.nextSibling;
+  }
+  if(_node){
+    swapNode(_row,_node);
+  }
+}
+function swapNode(node1,node2){
+  var _parent = node1.parentNode;
+  var _t1 = node1.nextSibling;
+  var _t2 = node2.nextSibling;
+  if(_t1)_parent.insertBefore(node2,_t1);
+  else _parent.appendChild(node2);
+  if(_t2)_parent.insertBefore(node1,_t2);
+  else _parent.appendChild(node1);
+}
+
+function deleteP(obj){
+  rmobj = obj.parentNode.parentNode.parentNode;
+  rmobj.parentNode.removeChild(rmobj);
+};
+
+
+function collectProblems(){
+  let arr = []
+  for(let tr of $('#problem_table').children('tr')){
+    arr.push(tr.id);
+  }
+  $('#problems').val(arr);
+}
+
+function collectAll(){
+  collectProblems();
+  return true;
+}
+
+</script>
+
+<div class="padding">
+        <form action="<%= syzoj.utils.makeUrl(['contest', contest.id, 'edit']) %>" method="post" onsubmit="return collectAll();">
+          <div class="ui form">
+            <div class="ui styled fluid accordion">
+              <div class="title active">
+                <h4 class=""> <i class="dropdown icon"></i> 基本信息</h4>
+              </div>
+              <div class="content active font-content">
+                <div class="field">
+                  <label>比赛名称</label>
+                  <input type="text" name="title" value="<%= contest.title %>">
+                </div>
+                <div class="field">
+                  <label>比赛描述</label>
+                  <textarea type="text" name="subtitle" class="markdown-edit"><%= contest.subtitle %></textarea>
+                </div>
+                <div class="field">
+                  <label>开始时间</label>
+                  <input type="text" name="start_time" value="<%= syzoj.utils.formatDate(contest.start_time || syzoj.utils.getCurrentDate()) %>">
+                </div>
+                <div class="field">
+                    <label>结束时间</label>
+                    <input type="text" name="end_time" value="<%= syzoj.utils.formatDate(contest.end_time || syzoj.utils.getCurrentDate()) %>">
+                </div>
+
+                <div class="inline field">
+                  <label class="ui header">公布比赛</label>
+                  <div class="ui toggle checkbox">
+                    <input type="checkbox"<% if (contest.is_enabled) { %> checked<% } %> name="is_enable">
+                    <label><span style="visibility: hidden; ">　</span></label>
+                  </div>
+                </div>
+                <div class="inline field">
+                  <label class="ui header">隐藏统计信息</label>
+                  <div class="ui toggle checkbox">
+                    <input type="checkbox"<% if (contest.hide_statistics) { %> checked<% } %> name="hide_statistics">
+                    <label><span style="visibility: hidden; ">　</span></label>
+                  </div>
                 </div>
               </div>
-              <div class="field">
-                <div class="ui radio checkbox">
-                  <input <% if (contest.id) { %>disabled <% } %>type="radio" name="type" id="type-ioi" value="ioi"<% if (contest.type === 'ioi') { %> checked="checked"<% } %>>
-                  <label for="type-ioi">IOI</label>
+
+              <div class="title">
+                <h4><i class="dropdown icon"></i>试题列表</h4>
+              </div>
+              <div class="content font-content" >
+                <div class="field">
+                  <table class="ui very basic table"> 
+                    <thead>
+                      <tr>
+                        <th class="one wide">ID</th>
+                        <th >题目</th>
+                        <th class="one wide center aligned">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody id="problem_table">
+                      <% for (let problem of problems) { %>
+                        <tr id="<%= problem.id %>" style="height: 32px">
+                          <td>#<%= problem.id %></td>
+                          <td><%= problem.title %></td>
+                          <td>
+                            <div class="ui buttons center aligned">
+                            <button type="button" onclick="moveUp(this);" class="ui icon button"><i class="arrow up icon"></i></button>
+                            <button type="button" onclick="moveDown(this);" class="ui icon button"><i class="arrow down icon"></i></button>
+                            <button type="button" onclick="deleteP(this);" class="ui icon button"><i class="trash alternate icon"></i></button>
+                            </div>
+                          </td>
+                        </tr>
+                      <% } %>
+                    </tbody>
+                  </table>
+                  <input type="hidden" id="problems" name="problems">
+                  <label>搜索题目</label>
+                  <select placeholder="Type for Searching." class="ui fluid search dropdown" multiple="" id="search_problems">
+
+                  </select>
                 </div>
               </div>
-              <div class="field">
-                <div class="ui radio checkbox">
-                  <input <% if (contest.id) { %>disabled <% } %>type="radio" name="type" id="type-acm" value="acm"<% if (contest.type === 'acm') { %> checked="checked"<% } %>>
-                  <label for="type-acm">ICPC</label>
+
+              <div class="title">
+                <h4><i class="dropdown icon"></i>人员管理</h4>
+              </div>
+              <div class="content font-content">
+                <div class="field">
+                  <label>比赛管理员</label>
+                  <select class="ui fluid search dropdown" multiple="" id="search_admins" name="admins">
+                  <% for (let admin of admins) { %>
+                  <option value="<%= admin.id %>.u" selected class=""><%= admin.username %></option>
+                  <% } %>
+                  </select>
                 </div>
               </div>
-            </div>
-            <div class="row">
-              <div class="column">
-                <h4 class="ui top attached block header">比赛加密</h4>
+
+              <div class="title ">
+                <h4><i class="dropdown icon"></i>比赛机制</h4>
+              </div>
+              <div class="content font-content">
+                <div class="inline fields">
+                  <label>赛制</label>
+                  <div class="field">
+                    <div class="ui radio checkbox">
+                      <input <% if (contest.id) { %>disabled <% } %>type="radio" name="type" id="type-noi" value="noi"<% if (contest.type === 'noi') { %> checked="checked"<% } %>>
+                      <label for="type-noi">NOI</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <div class="ui radio checkbox">
+                      <input <% if (contest.id) { %>disabled <% } %>type="radio" name="type" id="type-ioi" value="ioi"<% if (contest.type === 'ioi') { %> checked="checked"<% } %>>
+                      <label for="type-ioi">IOI</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <div class="ui radio checkbox">
+                      <input <% if (contest.id) { %>disabled <% } %>type="radio" name="type" id="type-acm" value="acm"<% if (contest.type === 'acm') { %> checked="checked"<% } %>>
+                      <label for="type-acm">ICPC</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>允许提交语言（留空则不限制）</label>
+                  <select class="ui fluid search dropdown" multiple="" id="contest_lang" name="contestlang">
+                    <% for (var lang in contestlang) { %>
+                      <option class="item" value="<%= lang %>" <%=contestlang[lang].hasOwnProperty('enable') && contestlang[lang]['enable'] ? 'selected':'' %>><%= contestlang[lang]["show"] %></option>
+                    <% } %>
+                  </select>
+                </div>
+
+              </div>
+
+              <div class="title">
+                <h4><i class="dropdown icon"></i>比赛加密</h4>
+              </div>
+              <div class="content font-content">
                 <input type="hidden" name="public_mode" value="<%= contest.public_mode %>">
-                <div class="ui bottom attached segment font-content">
-                  <div class="ui pointing secondary menu" id="public-mode-tab" style="margin-top: -10px; ">
-                    <a class="<%= contest.public_mode !== 'invite' && contest.public_mode !== 'passwd' ? 'active ' : '' %>item" data-tab="public_mod">公开</a>
-                    <a class="<%= contest.public_mode === 'invite' ? 'active ' : '' %>item" data-tab="invite_mod">邀请</a>
-                    <a class="<%= contest.public_mode === 'passwd' ? 'active ' : '' %>item" data-tab="passwd_mod">密码</a>
+                <div class="ui pointing secondary menu" id="public-mode-tab" style="margin-top: -10px; ">
+                  <a class="<%= contest.public_mode !== 'invite' && contest.public_mode !== 'passwd' ? 'active ' : '' %>item" data-tab="public_mod">公开</a>
+                  <a class="<%= contest.public_mode === 'invite' ? 'active ' : '' %>item" data-tab="invite_mod">邀请</a>
+                  <a class="<%= contest.public_mode === 'passwd' ? 'active ' : '' %>item" data-tab="passwd_mod">密码</a>
+                </div>
+                <div id="public_mode_tab" class="ui <%= contest.public_mode !== 'invite' && contest.public_mode !== 'passwd' ? 'active' : '' %> tab" data-tab="public_mod"  style="margin-bottom: 10px;">
+                  <div class="ui tabinside"> 
+                    <h4> 公开模式：任何人都可以参加本场比赛 </h4>
                   </div>
-                  <div id="public_mode_tab" class="ui <%= contest.public_mode !== 'invite' && contest.public_mode !== 'passwd' ? 'active ' : '' %> tab" data-tab="public_mod"  style="margin-bottom: 10px;">
-                    <div class="ui tabinside"> 
-                      <h4> 公开模式：任何人都可以参加本场比赛 </h4>
-                    </div>
-                  </div>
-                  <div id="invite_mode_tab" class="ui <%= contest.public_mode === 'invite' ? 'active ' : '' %> tab" data-tab="invite_mod" style="margin-bottom: 10px; ">
-                    <div class="ui tabinside"> 
+                </div>
+                <div id="invite_mode_tab" class="ui <%= contest.public_mode === 'invite' ? 'active' : '' %> tab" data-tab="invite_mod" style="margin-bottom: 10px; ">
+                  <div class="ui tabinside"> 
                     <h4> 邀请模式：名单中的用户可以参加本场比赛 </h4>
-                    </div>
                   </div>
-                  <div id="passwd_mode_tab" class="ui <%= contest.public_mode === 'passwd' ? 'active ' : '' %> tab" data-tab="passwd_mod">
+                </div>
+                <div id="passwd_mode_tab" class="ui <%= contest.public_mode === 'passwd' ? 'active' : '' %> tab" data-tab="passwd_mod">
                   <div class="ui tabinside"> 
                     <h4> 密码模式：正确填写密码的用户可以参加本场比赛 </h4>
                     <div class="field">
@@ -91,41 +251,20 @@
                 </div>
               </div>
             </div>
-            </div>
-
-            <div class="field">
-                <label>比赛公告</label>
-                <textarea rows="5" name="information" class="markdown-edit"><%= contest.information %></textarea>
-            </div>
-            <div class="field">
-                <label>开始时间</label>
-                <input type="text" name="start_time" value="<%= syzoj.utils.formatDate(contest.start_time || syzoj.utils.getCurrentDate()) %>">
-            </div>
-            <div class="field">
-                <label>结束时间</label>
-                <input type="text" name="end_time" value="<%= syzoj.utils.formatDate(contest.end_time || syzoj.utils.getCurrentDate()) %>">
-            </div>
-            <div class="inline field">
-              <label class="ui header">公布比赛</label>
-              <div class="ui toggle checkbox">
-                <input type="checkbox"<% if (contest.is_enabled) { %> checked<% } %> name="is_enable">
-                <label><span style="visibility: hidden; ">　</span></label>
-              </div>
-            </div>
-            <div class="inline field">
-              <label class="ui header">隐藏统计信息</label>
-              <div class="ui toggle checkbox">
-                <input type="checkbox"<% if (contest.hide_statistics) { %> checked<% } %> name="hide_statistics">
-                <label><span style="visibility: hidden; ">　</span></label>
-              </div>
-            </div>
-            <div style="text-align: center; "><button id="submit_button" type="submit" class="ui labeled icon blue button"><i class="ui edit icon"></i>提交</button></div>
           </div>
+            <div style="text-align: center; margin-top: 20px;  ">
+              <button id="submit_button" type="submit" class="ui labeled icon blue button"><i class="ui edit icon"></i>提交</button>
+            </div>
         </form>
 <script>
+$('.accordion')
+.accordion({
+  selector: {
+    trigger: '.title'
+  }
+});
 $(function () {
-  $('#search_admins')
-    .dropdown({
+  $('#search_admins').dropdown({
       debug: true,
       apiSettings: {
         url: '/api/v2/search/users/{query}',
@@ -139,8 +278,7 @@ $(function () {
         cache: false
       }
     });
-  $('#search_problems')
-    .dropdown({
+  $('#search_problems').dropdown({
       debug: true,
       apiSettings: {
         url: '/api/v2/search/problems/{query}',
@@ -152,8 +290,13 @@ $(function () {
           return response;
         },
         cache: false
+      },
+      onChange: function(id, pid, ptitle){
+        newProblemRow(ptitle);
+        $('#search_problems').dropdown('clear');  
       }
     });
+  $('#contest_lang').dropdown({});
 });
 
 $(function(){
@@ -177,7 +320,7 @@ $(function(){
   });
 
   $('a[data-tab="invite_mod"]').click(function () {
-    $('input[name=public_mode]').val('interaction');
+    $('input[name=public_mode]').val('invite');
     $('#io-type').hide();
     show_tab("#invite_mode_tab");
   });
@@ -186,6 +329,7 @@ $(function(){
     $('input[name=public_mode]').val('passwd');
     show_tab("#passwd_mode_tab");
   });
-})
+  console.log('done');
+});
 </script>
 <% include footer %>

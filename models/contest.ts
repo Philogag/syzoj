@@ -68,6 +68,9 @@ export default class Contest extends Model {
   @TypeORM.Column({ nullable: true, type: "text" })
   passwd: string;
 
+  @TypeORM.Column({ nullable: true, type: "text" })
+  lang: string;
+
   @TypeORM.Column({ nullable: true, type: "boolean" })
   is_enabled: boolean;
 
@@ -139,6 +142,7 @@ export default class Contest extends Model {
       contest_id: this.id,
       user_id: uid,
     });
+    console.log(player);
     switch (this.public_mode) {
       case PublicModeType.PUBLIC:
         if (!player) {
@@ -147,7 +151,7 @@ export default class Contest extends Model {
         }
         return true;
       case PublicModeType.INVITE:
-        return player !== null;
+        return typeof player !== undefined && player;
       case PublicModeType.PASSWD:
         if (!player && passwd !== this.passwd) {
           return false;

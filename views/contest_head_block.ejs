@@ -9,43 +9,46 @@
       <% } %>
     
     <a class="small ui primary button" href="<%= syzoj.utils.makeUrl(['contest', contest.id]) %>">比赛主页</a>
-    <a class="small ui positive button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'submissions']) %>">提交记录</a>
+    <% const seeResult = (isSupervisior || contest.ended);
+    let submissionsUrl = seeResult ?
+    syzoj.utils.makeUrl(['submissions'], {contest: contest.id}) :
+    syzoj.utils.makeUrl(['contest', contest.id, 'submissions']); %>
+    <a class="small ui positive button" href="<%= submissionsUrl %>">提交记录</a>
     <a class="small ui orange button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'ranklist']) %>">比赛榜单</a>
     <% if (now < contest.end_time) { %>
-        <style>
-            div#time-block {
-                position: absolute;
-                top: 50%;
-                left: 100%;
-                transform: translate(-135%, -50%);
-                background-color: rgba(0,0,0,0);
-                border: 0px;
-                width: fit-content;
-                height: fit-content;
-              }
-              div#time-block.h2{
-                color: orangered;
-                font-size: 24px;
-                height: fit-content;
-              }
-        </style>
+    <style>
+    #time_counter_block {
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      transform: translate(-135%, -50%);
+      background-color: rgba(0,0,0,0);
+      border: 0px;
+      width: fit-content;
+      height: fit-content;
+    }
+    #time_counter_block.h2{
+      font-size: 24px;
+      height: fit-content;
+    }
+    </style>
 
-        <div id="time-block" class="ui bottom right attached segment">
-            <h2 style="orange" id="_t"></h2>
-        </div>
+    <div id="time_counter_block" class="ui bottom attached segment">
+        <h2 style="orange" id="_t"></h2>
+    </div>
 
-        <script type="text/javascript">
-            $(function () {
-                setInterval(function () {
-                  var leftTime=Number("<%= contest.end_time %>") - Date.now() / 1000;
-                  if (leftTime>=0) {
-                    h = Math.floor(leftTime/60/60);
-                    m = Math.floor(leftTime/60%60);
-                    s = Math.floor(leftTime%60);
-                    document.getElementById("_t").innerHTML = h.toString() + ":" + m.toString().padStart(2,0) + ":" + s.toString().padStart(2, 0);
-                  }
-                }, 1000);
-              });
-        </script>
+    <script type="text/javascript">
+        $(function () {
+            setInterval(function () {
+              var leftTime=Number("<%= contest.end_time %>") - Date.now() / 1000;
+              if (leftTime>=0) {
+                h = Math.floor(leftTime/60/60);
+                m = Math.floor(leftTime/60%60);
+                s = Math.floor(leftTime%60);
+                document.getElementById("_t").innerHTML = h.toString() + ":" + m.toString().padStart(2,0) + ":" + s.toString().padStart(2, 0);
+              }
+            }, 1000);
+          });
+    </script>
     <% } %>
 </div>

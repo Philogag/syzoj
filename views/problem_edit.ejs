@@ -23,8 +23,7 @@ function addExample(){
   ss += "    </button>";
   ss += "  </div>";
   ss += "</div>";
-  node = new DOMParser().parseFromString(ss, "text/html").getElementsByClassName("example-box")[0];
-  document.getElementById("example-list").appendChild(node);
+  document.getElementById("example-list").appendChild($(ss)[0]);
 }
 
 function deleteExample(obj){
@@ -154,6 +153,18 @@ $(function () {
       render($("#pv-output"), $("#output"));
       // render($("#pv-example"), $("#example"));
       render($("#pv-hint"), $("#hint"));
+      
+      // preview the example boxes.
+      table = $('<table class="ui very basic aligned table"><thead><tr><th width="50%"">输入</th><th>输出</th></tr></thead><tbody></tbody><table>')
+      console.log()
+      $('.example-box').each(function(){
+        ss =  '<tr>';
+        ss += '<th><div class="ui existing segment"><pre><code>' + this.getElementsByTagName('textarea')[0].value + '</code></pre></div></th>';
+        ss += '<th><div class="ui existing segment"><pre><code>' + this.getElementsByTagName('textarea')[1].value + '</code></pre></div></th>';
+        ss += '</tr>';
+        table.children('tbody').append($(ss));
+      })
+      $("#pv-example").text('').append(table);
     });
     $('.tabular.menu .item').tab();
 });

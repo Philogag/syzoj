@@ -726,6 +726,7 @@ app.post('/problem/:id/submit', app.multer.fields([{ name: 'answer', maxCount: 1
       if ((!contest.isRunning()) && (!await contest.isSupervisior(curUser))) throw new ErrorMessage('比赛未开始或已结束。');
       let problems_id = await contest.getProblems();
       if (!problems_id.includes(id)) throw new ErrorMessage('无此题目。');
+      if (problem.type !== 'submit-answer' && !contest.lang.split('|').includes(req.body.language)) throw new ErrorMessage('本场比赛不支持该语言。');
 
       judge_state.type = 1;
       judge_state.type_info = contest_id;
@@ -770,7 +771,7 @@ app.post('/problem/:id/submit', app.multer.fields([{ name: 'answer', maxCount: 1
       throw new ErrorMessage(`无法开始评测：${err.toString()}`);
     }
 
-    if (contest && (!await contest.isSupervisior(curUser))) {
+    if (contest) {
       res.redirect(syzoj.utils.makeUrl(['contest', contest_id, 'submissions']));
     } else {
       res.redirect(syzoj.utils.makeUrl(['submission', judge_state.id]));
