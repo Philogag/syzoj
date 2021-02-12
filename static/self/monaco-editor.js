@@ -601,7 +601,7 @@ require(['vs/editor/editor.main'], function () {
             theme: 'tomorrow',
             lineHeight: 22,
             fontSize: 14,
-            fontFamily: "'Fira Mono', 'Bitstream Vera Sans Mono', 'Menlo', 'Consolas', 'Lucida Console', 'Source Han Sans SC', 'Noto Sans CJK SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft Yahei', monospace",
+            fontFamily: 'Consolas',
             lineNumbersMinChars: 4,
             glyphMargin: false,
             renderFinalNewline: true,

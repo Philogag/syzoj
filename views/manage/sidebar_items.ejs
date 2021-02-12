@@ -1,0 +1,22 @@
+
+
+<div class="ui fixed sidebar inverted vertical menu visible overlay" style="position: fixed; width: 10%">
+<div class="item" style="height: 50px;"><h4>管理员菜单</h4></div>
+    
+<% for (let key in this.items) { %>
+    <% if (this.items[key] instanceof Array) { %>
+    <div class="item">
+        <div class="header"><%= key %></div>
+        <div class="menu">
+        <% for (var k of this.items[key]){ %>
+            <a class="item <% if (this.adminPage === k.id) { %> active<% } %>" href="<%= k.url %>">
+            <%= k.name %>
+            </a>
+        <% } %>
+        </div>
+    </div>
+    <% } else { %>
+        <a class="item <% if (this.adminPage === this.items[key].id) { %>active<% } %>" href="<%= this.items[key].url %>"><%= this.items[key].name %></a>
+    <% } %>
+<% } %>
+</div>

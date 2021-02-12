@@ -26,7 +26,7 @@
 
 <script>
 function newProblemRow(ptitle){
-  sarr = ptitle.replace('#', '').split('. ');
+  sarr = ptitle.replace('#', '').split('.');
   sss  = '<tr id="' + sarr[0] + '" style="height: 32px">';
   sss += '  <td>#' + sarr[0] + '</td>';
   sss += '  <td>' + sarr[1] + '</td>';
@@ -70,22 +70,24 @@ function swapNode(node1,node2){
   else _parent.appendChild(node1);
 }
 
-function deleteP(obj){
+function deleteRow(obj){
   rmobj = obj.parentNode.parentNode.parentNode;
   rmobj.parentNode.removeChild(rmobj);
 };
 
 
-function collectProblems(){
+function collectTable(tableobj, inputobj){
   let arr = []
-  for(let tr of $('#problem_table').children('tr')){
-    arr.push(tr.id);
+  for(let tr of $(tableobj).find('tr')){
+    arr.push($($(tr).find('td')[0]).text().slice(1));
   }
-  $('#problems').val(arr);
+  $(inputobj).val(arr);
 }
 
 function collectAll(){
-  collectProblems();
+  collectTable('#problem_table', "#problems");
+  collectTable('#invite_group_table', "#allowed_group");
+  collectTable('#invite_user_table', "#allowed_user");
   return true;
 }
 
@@ -117,9 +119,9 @@ function collectAll(){
                 </div>
 
                 <div class="inline field">
-                  <label class="ui header">公布比赛</label>
+                  <label class="ui header">公布比赛（关闭时，用户无法在比赛列表中看到该比赛）</label>
                   <div class="ui toggle checkbox">
-                    <input type="checkbox"<% if (contest.is_enabled) { %> checked<% } %> name="is_enable">
+                    <input type="checkbox"<% if (contest.is_enabled || !contest.id ) { %> checked<% } %> name="is_enable">
                     <label><span style="visibility: hidden; ">　</span></label>
                   </div>
                 </div>
@@ -137,6 +139,11 @@ function collectAll(){
               </div>
               <div class="content font-content" >
                 <div class="field">
+                  <input type="hidden" id="problems" name="problems">
+                  <label>搜索题目</label>
+                  <select class="ui fluid search dropdown" multiple="" id="search_problems">
+                    <option value="">Type for Searching.</option>
+                  </select>
                   <table class="ui very basic table"> 
                     <thead>
                       <tr>
@@ -154,18 +161,13 @@ function collectAll(){
                             <div class="ui buttons center aligned">
                             <button type="button" onclick="moveUp(this);" class="ui icon button"><i class="arrow up icon"></i></button>
                             <button type="button" onclick="moveDown(this);" class="ui icon button"><i class="arrow down icon"></i></button>
-                            <button type="button" onclick="deleteP(this);" class="ui icon button"><i class="trash alternate icon"></i></button>
+                            <button type="button" onclick="deleteRow(this);" class="ui icon button"><i class="trash alternate icon"></i></button>
                             </div>
                           </td>
                         </tr>
                       <% } %>
                     </tbody>
                   </table>
-                  <input type="hidden" id="problems" name="problems">
-                  <label>搜索题目</label>
-                  <select placeholder="Type for Searching." class="ui fluid search dropdown" multiple="" id="search_problems">
-
-                  </select>
                 </div>
               </div>
 
@@ -176,8 +178,9 @@ function collectAll(){
                 <div class="field">
                   <label>比赛管理员</label>
                   <select class="ui fluid search dropdown" multiple="" id="search_admins" name="admins">
+                  <option value="">Type for Searching.</option>
                   <% for (let admin of admins) { %>
-                  <option value="<%= admin.id %>.u" selected class=""><%= admin.username %></option>
+                    <option value="<%= admin.id %>.u" selected class=""><%= admin.username %></option>
                   <% } %>
                   </select>
                 </div>
@@ -203,42 +206,114 @@ function collectAll(){
                   </div>
                   <div class="field">
                     <div class="ui radio checkbox">
-                      <input <% if (contest.id) { %>disabled <% } %>type="radio" name="type" id="type-acm" value="acm"<% if (contest.type === 'acm') { %> checked="checked"<% } %>>
+                      <input <% if (contest.id) { %>disabled <% } %>type="radio" name="type" id="type-acm" value="acm"<% if (contest.type === 'acm' || !contest.id) { %> checked="checked"<% } %>>
                       <label for="type-acm">ICPC</label>
                     </div>
                   </div>
+                  <a href="/wiki/contest_type" target="_blank">赛制详细介绍</a>
                 </div>
 
                 <div class="field">
-                  <label>允许提交语言（留空则不限制）</label>
-                  <select class="ui fluid search dropdown" multiple="" id="contest_lang" name="contestlang">
+                  <label>允许提交语言</label>
+                  <select class="ui fluid search dropdown" multiple="" id="contest_lang" name="contestlang">、
+                    <option value="">不限制</option>
                     <% for (var lang in contestlang) { %>
                       <option class="item" value="<%= lang %>" <%=contestlang[lang].hasOwnProperty('enable') && contestlang[lang]['enable'] ? 'selected':'' %>><%= contestlang[lang]["show"] %></option>
                     <% } %>
                   </select>
                 </div>
-
               </div>
 
               <div class="title">
                 <h4><i class="dropdown icon"></i>比赛加密</h4>
               </div>
               <div class="content font-content">
-                <input type="hidden" name="public_mode" value="<%= contest.public_mode %>">
+                <input type="hidden" name="public_mode" value="<% if(!contest.id){ %>public<% } else { %><%= contest.public_mode %><% } %>">
                 <div class="ui pointing secondary menu" id="public-mode-tab" style="margin-top: -10px; ">
                   <a class="<%= contest.public_mode !== 'invite' && contest.public_mode !== 'passwd' ? 'active ' : '' %>item" data-tab="public_mod">公开</a>
                   <a class="<%= contest.public_mode === 'invite' ? 'active ' : '' %>item" data-tab="invite_mod">邀请</a>
                   <a class="<%= contest.public_mode === 'passwd' ? 'active ' : '' %>item" data-tab="passwd_mod">密码</a>
                 </div>
-                <div id="public_mode_tab" class="ui <%= contest.public_mode !== 'invite' && contest.public_mode !== 'passwd' ? 'active' : '' %> tab" data-tab="public_mod"  style="margin-bottom: 10px;">
+                <div id="public_mode_tab" class="ui <%= contest.public_mode === 'public' ? 'active' : '' %> tab" data-tab="public_mod"  style="margin-bottom: 10px;">
                   <div class="ui tabinside"> 
                     <h4> 公开模式：任何人都可以参加本场比赛 </h4>
                   </div>
                 </div>
                 <div id="invite_mode_tab" class="ui <%= contest.public_mode === 'invite' ? 'active' : '' %> tab" data-tab="invite_mod" style="margin-bottom: 10px; ">
                   <div class="ui tabinside"> 
-                    <h4> 邀请模式：名单中的用户可以参加本场比赛 </h4>
+                    <h4> 邀请模式：名单中的用户或组员可以参加本场比赛 </h4>
                   </div>
+                  
+                  <h5 style="margin-top: 20px;">邀请组 (<a href="/admin/groups" target="_blank">组管理</a>)</h5> 
+                  
+                  <div style="width: 500px ! important;">
+                    <select class="ui fluid search dropdown" multiple id="search_groups">
+                      <option value="">Type for Searching Group.</option>
+                    </select>
+                  </div>
+                  
+                  <table class="ui very basic table"> 
+                    <thead>
+                      <tr>
+                        <th class="one wide">ID</th>
+                        <th class="three wide">组名</th>
+                        <th></th>
+                        <th class="one wide center aligned">操作</th>
+                      </tr>
+                    </thead>
+                    <input type="hidden" id="allowed_group" name="allowed_group">
+                    <tbody id="invite_group_table">
+                      <% if (contest.allowedGroup) { for (let group of contest.allowedGroup) { %>
+                        <tr style="height: 32px">
+                          <td>#<%= group.id %></td>
+                          <td><%= group.name %></td>
+                          <td></td>
+                          <td>
+                            <div class="ui buttons center aligned">
+                            <button type="button" onclick="deleteRow(this);" class="ui icon button"><i class="trash alternate icon"></i></button>
+                            </div>
+                          </td>
+                        </tr>
+                      <% }} %>
+                    </tbody>
+                  </table>
+
+                  <h5 style="margin-top: 20px;">邀请用户 (请善用组管理)</h5>
+                  <div style="width: 500px ! important;">
+                    <select class="ui fluid search dropdown" multiple id="search_users">
+                      <option value="">Type for Searching User.</option>
+                    </select>
+                  </div>
+                  
+                  <table class="ui very basic table"> 
+                    <thead>
+                      <tr>
+                        <th class="one wide">ID</th>
+                        <th class="three wide">用户名</th>
+                        <th class="three wide">昵称</th>
+                        <th class="three wide">实名</th>
+                        <th></th>
+                        <th class="one wide center aligned">操作</th>
+                      </tr>
+                    </thead>
+                    <input type="hidden" id="allowed_user" name="allowed_user">
+                    <tbody id="invite_user_table">
+                      <% if (contest.allowedUser) { for (let user of contest.allowedUser) { %>
+                        <tr style="height: 32px">
+                          <td ><%= user.id %></td>
+                          <td ><%= user.username %></td>
+                          <td ><%= user.nickname %></td>
+                          <td ><%= user.realname %></td>
+                          <td></td>
+                          <td>
+                            <div class="ui buttons center aligned">
+                            <button type="button" onclick="deleteRow(this);" class="ui icon button"><i class="trash alternate icon"></i></button>
+                            </div>
+                          </td>
+                        </tr>
+                      <% }} %>
+                    </tbody>
+                  </table>
                 </div>
                 <div id="passwd_mode_tab" class="ui <%= contest.public_mode === 'passwd' ? 'active' : '' %> tab" data-tab="passwd_mod">
                   <div class="ui tabinside"> 
@@ -257,13 +332,14 @@ function collectAll(){
             </div>
         </form>
 <script>
-$('.accordion')
-.accordion({
-  selector: {
-    trigger: '.title'
-  }
-});
+// Init UI
 $(function () {
+  $('.accordion').accordion({
+    animateChildren: false,
+    selector: {
+      trigger: '.title',
+    }
+  });
   $('#search_admins').dropdown({
       debug: true,
       apiSettings: {
@@ -283,7 +359,8 @@ $(function () {
       apiSettings: {
         url: '/api/v2/search/problems/{query}',
         onResponse: function (response) {
-          var a = $('#search_problems').val().map(function (x) { return parseInt(x) });
+          var a = []
+          $('#problem_table').find('tr').each((i, e) => { a.push(parseInt($(e).find('td')[0].innerText)); });
           if (response.results) {
             response.results = response.results.filter(function(x) {return !a.includes(parseInt(x.value));});
           }
@@ -291,18 +368,58 @@ $(function () {
         },
         cache: false
       },
-      onChange: function(id, pid, ptitle){
-        newProblemRow(ptitle);
+      onChange: function(val, name, e){
+        if (val){
+          newProblemRow(e);
+        }
         $('#search_problems').dropdown('clear');  
       }
     });
   $('#contest_lang').dropdown({});
+  $('#search_groups').dropdown({
+    apiSettings: {
+      url: '/api/v3/search/groups/{query}',
+      onResponse: function (response) {
+        var a = []
+        $('#invite_group_table').find('tr').each((i, e) => { a.push(parseInt($(e).find('td')[0].innerText)); });
+        if (response.results) {
+          response.results = response.results.filter(function(x) {return !a.includes(parseInt(x.value));});
+        }
+        return response;
+      },
+      cache: false
+    },
+    onChange: function(val, name, e){
+      if (val) newRow(e, '#invite_group_table');
+      $('#search_groups').dropdown('clear');  
+    }
+  });
+  $('#search_users').dropdown({
+    apiSettings: {
+      url: '/api/v3/search/users/{query}',
+      onResponse: function (response) {
+        var a = []
+        $('#invite_user_table').find('tr').each((i, e) => { a.push(parseInt($(e).find('td')[0].innerText)); });
+        if (response.results) {
+          response.results = response.results.filter(function(x) {return !a.includes(parseInt(x.value));});
+        }
+        return response;
+      },
+      cache: false
+    },
+    onChange: function(val, name, e){
+      if (val) newRow(e, '#invite_user_table');
+      $('#search_users').dropdown('clear');  
+    }
+  });
 });
 
+// Init Public Mode Selection Tab
 $(function(){
   $('#public-mode-tab .item').tab();
 
   function show_tab(showed_tab){
+    console.log('Switch to ', showed_tab)
     var tabs = [
       "#public_mode_tab",
       "#invite_mode_tab",
@@ -332,4 +449,17 @@ $(function(){
   console.log('done');
 });
 </script>
+<script>
+function newRow(e, obj){
+  console.log(e);
+  arr = e.split('\t');
+  ss = '<tr>'
+  for (var i of arr) ss += '<td>' + i + '</td>'
+  ss += '<td></td>'
+  ss += '<td><div class="ui buttons center aligned"><button type="button" onclick="deleteRow(this);" class="ui icon button"><i class="trash alternate icon"></i></button></div></td>';
+  ss += '</tr>'
+  $(obj).append(ss);
+}
+</script>
+
 <% include footer %>

@@ -1,0 +1,261 @@
+<% this.title = 'Wiki - 用户手册' %>
+<% this.wikiPage = 'user_guide' %>
+<% include ../header %>
+<style>
+blockquote > :last-child {
+    margin-bottom: 0px;
+}
+blockquote > :first-child,
+    li > :first-child {
+    margin-top: 0px;
+}
+blockquote {
+    border-left: 4px solid #dfe2e5;
+    padding: 0 15px;
+    color: #777777;
+}
+
+blockquote blockquote {
+    padding-right: 0;
+}
+
+pre {
+    white-space:pre-line;
+}
+</style>
+
+<div class="padding">
+    <h1 class="ui center aligned header">Wiki - 用户手册</h1>
+    <div class="font-content" >
+
+
+
+<h2 class="ui header">编译选项</h2>
+<p>本在线测评平台对代码的编译选项如下：</p>
+<table class="ui basic table center aligned">
+    <thead>
+        <tr>
+            <th class="tow wide">Lang</th>
+            <th>Compiler and options</th>
+            <th class="three wide">Version</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>C</td>
+            <td><code>gcc ${source_file.c} -o ${outputDirectory}/a.out -O2 -lm -DONLINE_JUDGE -mx32 </code></td>
+            <td>GCC 4.8.4</td>
+        </tr>
+        <tr>
+            <td>C++</td>
+            <td><code>g++ ${source_file.cpp} -o ${outputDirectory}/a.out -O2 -lm -DONLINE_JUDGE -mx32 -std=c++03</code></td>
+            <td>GCC 4.8.4</td>
+        </tr>
+        <tr>
+            <td>C++11</td>
+            <td><code>g++ ${source_file.cpp} -o ${outputDirectory}/a.out -O2 -lm -DONLINE_JUDGE -mx32 -std=c++11</code></td>
+            <td>GCC 4.8.4</td>
+        </tr>
+        <tr>
+            <td>Java</td>
+            <td><code>javac ${source_file.java} ${outputDirectory}</code></td>
+            <td>OpenJDK<br>64-Bit 10.0.2</td>
+        </tr>
+        <tr>
+            <td>Python 2</td>
+            <td><code>pypy -m py_compile a.py</code></td>
+            <td>Python 2.7.13 <br>PyPy 6.0.0 with GCC 7.2.0</td>
+        </tr>
+        <tr>
+            <td>Python 3</td>
+            <td><code>pypy3 -m py_compile a.py</code></td>
+            <td>Python 3.5.3<br>PyPy 6.0.0 with GCC 7.2.0</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>Java 编译时默认入口类为Main，当Class Main不存在时会自动检测您的代码中 public class</p>
+
+<h2 class="ui header">个人资料<br></h2>
+<p>本站不提供头像存储服务，而是使用 Gravatar 进行头像显示。请使用邮箱注册 <a href="https://zh-cn.wordpress.com/">WordPress.com</a>，登录 <a href="https://cn.gravatar.com/">Gravatar</a> 并上传头像。同样使用 Gravatar 的 OJ 有 Vijos、COGS、UOJ 等。</p>
+<p>个性签名可以使用 Markdown 与 HTML，请不要在其中添加恶意代码。</p>
+
+<h2 class="ui header">题型<br></h2>
+<h4>传统</h4>
+<pre class="font-content">
+传统题通常具有如下三大块内容：
+		题目背景与题面，输入输出格式，输入输出样例
+通常需要选手用指定语言编写一个可以解决如题格式的程序，并提交代码。代码仅限单个文件，且通常输入仅限键盘，输出仅限控制台（即print，cout等）。
+题目通常会提供几组样例数据以更好地解释题意并帮助选手初步测试代码。通常需要代码输出与目标完全一致，当并非强制要求一致时，衍生出了<strong>Special Judge</strong>
+在选手提交代码后，系统将使用管理员预设的<strong>额外大规模数据组</strong>对程序进行编译运行测试，并反馈最终得分等测评状态。
+同时，系统还会根据题目的时间限制、内存限制，限制或强行终止测试。在本系统中，时间限制以ms为单位，内存限制以MB为单位。
+</pre>
+<h4>Special Judge</h4>
+<pre class="font-content">
+这是<strong>由传统题延申而来</strong>的判题形式。
+Special Judge不直接将选手代码输出与测试输出直接比较，而是通过出题人指定的测试程序进行判定，并返回系统所需的判定结果。
+通常用于如下输出结果：
+</pre>
+<ul>
+    <li><span>对浮点误差容错</span></li>
+    <li><span>在 非唯一解仅需求任意解时 进行 可行性判断</span></li>
+</ul>
+<h4>提交答案</h4>
+<pre class="font-content">
+如同标题意思，直接对选手提交的文件与后台数据进行对比，并得出评分。
+</pre>
+<h4>交互</h4>
+<pre class="font-content">
+交互器和选手程序同时运行，交互器的标准输入和标准输出连接了选手程序的标准输出和标准输入 —— 交互通过输入输出进行。
+另外还有 NOI 试题风格的交互，选手通过函数调用与交互器交互，通常题目会提供交互库代码。
+选手在本地测试时需要将库链接编译进自己的程序进行调试，提交时仅需提交自己的代码，由系统完成测试时的链接编译。
+</pre>
+<style>
+    .status{
+        font: bolder;
+    }
+    
+    .status.success,
+    .status.submitted,
+    .status.accepted{
+        color: forestgreen;
+    }
+    .status.wrong_answer{
+        color: red;
+    }
+    
+    .status.invalid_interaction,
+    .status.runtime_error,
+    .status.file_error {
+        color: darkorchid;
+    }
+    
+    .status.memory_limit_exceeded,
+    .status.time_limit_exceeded,
+    .status.output_limit_exceeded {
+        color: sandybrown;
+    }
+    
+    .status.waiting,
+    .status.system_error {
+        color: grey;
+    }
+    
+    .status.unknown {
+        color: #e28989;
+    }
+    
+    .status.running,
+    .status.pending,
+    .status.judging {
+        color: #6cf;
+    }
+    
+    .status.partially_correct {
+      color: #01bab2;
+    }
+    
+    .status.judgement_failed {
+      color: #FF5722;
+    }
+    
+    .status.skipped {
+      color: #78909C;
+    }
+    .status.compiling {
+        color: #00b5ad;
+    }
+    .status.no_testdata {
+        color: brown;
+    }
+    .status.compile_error {
+        color: rgb(0, 68, 136);
+    }
+    </style>
+<h2 class="ui header">测评状态<br></h2>
+通常，系统会返回如下几种测评结果，分别代表不同含义。
+<table class="ui basic table center aligned">
+    <thead>
+        <tr>
+            <th class="three wide">Status</th>
+            <th>Meaning</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="status accepted">Accepted</td>
+            <td class="left aligned">您的程序运行良好且通过了所有测试点。</td>
+        </tr>
+        <tr>
+            <td class="status wrong_answer">Wrong Answer</td>
+            <td class="left aligned">您的程序并未通过所有测试点。</td>
+        </tr>
+        <tr>
+            <td class="status pending">Pending</td>
+            <td class="left aligned">已提交，正在排队等待测评。</td>
+        </tr>
+        <tr>
+            <td class="status judging">Judging</td>
+            <td class="left aligned">系统正在测评。</td>
+        </tr>
+        <tr>
+            <td class="status compile_error">Compile Error</td>
+            <td class="left aligned">您的程序未能通过编译，请检查语法。</td>
+        </tr>
+        <tr>
+            <td class="status runtime_error">Runtime Error</td>
+            <td class="left aligned">您的程序运行时发生错误，发生崩溃。请检查递归爆栈、数组越界、除0等问题，详细条目见下。</td>
+        </tr>
+        <tr>
+            <td class="status invalid_interaction">Invalid Interaction</td>
+            <td class="left aligned">无效的交互。</td>
+        </tr>
+        <tr>
+            <td class="status file_error">File Error</td>
+            <td class="left aligned">您的程序运行文件读写错误。</td>
+        </tr>
+        <tr>
+            <td class="status time_limit_exceeded">Time Limit Exceeded</td>
+            <td class="left aligned">您的程序运行时间过久，请检查死循环或提高算法效率。</td>
+        </tr>
+        <tr>
+            <td class="status memory_limit_exceeded">Memory Limit Exceeded</td>
+            <td class="left aligned">您的程序运行内存占用过大，请优化算法。</td>
+        </tr>
+        <tr>
+            <td class="status output_limit_exceeded">Output Limit Exceeded</td>
+            <td class="left aligned">您的程序运行输出过多，请检查。</td>
+        </tr>
+        <tr>
+            <td class="status system_error">System Error</td>
+            <td class="left aligned" rowspan="2">系统错误，请重新提交或联系管理员。</td>
+        </tr>
+        <tr>
+            <td class="status judgement_failed">Judgement Failed</td>
+        </tr>
+    </tbody>
+</table>
+
+<blockquote>
+<p>通常 <font class="status runtime_error">Runtime Error</font> 由以下几种原因导致。</p>
+<ul>
+    <li>ACCESS_VIOLATION 您的程序想从一些非法的地址空间读取或向其中写入内容。一般例如指针、数组下标越界都会造成这个错误的。</li>
+    <li>ARRAY_BOUNDS_EXCEEDED 您的程序试图访问一个超出硬件支持范围的数组单元。</li>
+    <li>FLOAT_DENORMAL_OPERAND 进行了一个非正常的浮点操作。一般是由于一个非正常的浮点数参与了浮点操作所引起的，比如这个数的浮点格式不正确。</li>
+    <li>FLOAT_DIVIDE_BY_ZERO 浮点数除法出现除数为零的异常。</li>
+    <li>FLOAT_OVERFLOW 浮点溢出。要表示的数太大，超出了浮点数的表示范围。</li>
+    <li>FLOAT_UNDERFLOW 浮点下溢。要表示的数太小，超出了浮点数的表示范围。</li>
+    <li>INTEGER_DIVIDE_BY_ZERO 在进行整数除法的时候出现了除数为零的异常。</li>
+    <li>INTEGER_OVERFLOW 整数溢出。要表示的数值太大，超出了整数变量的范围。</li>
+    <li>STACK_OVERFLOW 栈溢出。一般是由于无限递归或者在函数里使用了太大的数组变量的原因。</li>
+    <li>...... 其他错误，包括C++标准库/STL运行时库错误等，这里不再举例。</li>
+</ul>
+</blockquote>
+
+<h2 class="ui header">系统安全<br></h2>
+<pre class="font-content">
+为保证系统安全防止恶意代码破坏稳定性，<strong>所有选手代码均运行在沙盒中</strong>，<font style="color: red">程序的越权行为（包括但不仅限于读写非白名单文件、调用额外库、访问网络、多线程等）可能会导致程序报错并崩溃，管理员对此不负任何责任且不会做任何解释。</font >
+</pre>
+    </div>
+</div>
+<% include ../footer %>

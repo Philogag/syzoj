@@ -11,7 +11,7 @@ const calcRating = require('../libs/rating');
 
 app.get('/admin/info', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
 
     let allSubmissionsCount = await JudgeState.count();
     let todaySubmissionsCount = await JudgeState.count({
@@ -22,7 +22,7 @@ app.get('/admin/info', async (req, res) => {
     let contestsCount = await Contest.count();
     let usersCount = await User.count();
 
-    res.render('admin_info', {
+    res.render('manage/global/info', {
       allSubmissionsCount: allSubmissionsCount,
       todaySubmissionsCount: todaySubmissionsCount,
       problemsCount: problemsCount,
@@ -66,14 +66,14 @@ let configItems = {
 
 app.get('/admin/config', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
 
     for (let i in configItems) {
       if (!configItems[i]) continue;
       configItems[i].val = eval(`syzoj.config.${i}`);
     }
 
-    res.render('admin_config', {
+    res.render('manage/global/config', {
       items: configItems
     });
   } catch (e) {
@@ -86,7 +86,7 @@ app.get('/admin/config', async (req, res) => {
 
 app.post('/admin/config', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
 
     for (let i in configItems) {
       if (!configItems[i]) continue;
@@ -116,57 +116,58 @@ app.post('/admin/config', async (req, res) => {
   }
 });
 
-app.get('/admin/privilege', async (req, res) => {
-  try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+// disabled
+// app.get('/admin/privilege', async (req, res) => {
+//   try {
+//     if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
 
-    let a = await UserPrivilege.find();
-    let users = {};
-    for (let p of a) {
-      if (!users[p.user_id]) {
-        users[p.user_id] = {
-          user: await User.findById(p.user_id),
-          privileges: []
-        };
-      }
+//     let a = await UserPrivilege.find();
+//     let users = {};
+//     for (let p of a) {
+//       if (!users[p.user_id]) {
+//         users[p.user_id] = {
+//           user: await User.findById(p.user_id),
+//           privileges: []
+//         };
+//       }
 
-      users[p.user_id].privileges.push(p.privilege);
-    }
+//       users[p.user_id].privileges.push(p.privilege);
+//     }
 
-    res.render('admin_privilege', {
-      users: Object.values(users)
-    });
-  } catch (e) {
-    syzoj.log(e);
-    res.render('error', {
-      err: e
-    })
-  }
-});
+//     res.render('admin_privilege', {
+//       users: Object.values(users)
+//     });
+//   } catch (e) {
+//     syzoj.log(e);
+//     res.render('error', {
+//       err: e
+//     })
+//   }
+// });
 
-app.post('/admin/privilege', async (req, res) => {
-  try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+// app.post('/admin/privilege', async (req, res) => {
+//   try {
+//     if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
 
-    let data = JSON.parse(req.body.data);
-    for (let id in data) {
-      let user = await User.findById(id);
-      if (!user) throw new ErrorMessage(`不存在 ID 为 ${id} 的用户。`);
-      await user.setPrivileges(data[id]);
-    }
+//     let data = JSON.parse(req.body.data);
+//     for (let id in data) {
+//       let user = await User.findById(id);
+//       if (!user) throw new ErrorMessage(`不存在 ID 为 ${id} 的用户。`);
+//       await user.setPrivileges(data[id]);
+//     }
 
-    res.redirect(syzoj.utils.makeUrl(['admin', 'privilege']));
-  } catch (e) {
-    syzoj.log(e);
-    res.render('error', {
-      err: e
-    })
-  }
-});
+//     res.redirect(syzoj.utils.makeUrl(['admin', 'privilege']));
+//   } catch (e) {
+//     syzoj.log(e);
+//     res.render('error', {
+//       err: e
+//     })
+//   }
+// });
 
 app.get('/admin/rating', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
     const contests = await Contest.find({
       order: {
         start_time: 'DESC'
@@ -179,7 +180,7 @@ app.get('/admin/rating', async (req, res) => {
     });
     for (const calc of calcs) await calc.loadRelationships();
 
-    res.render('admin_rating', {
+    res.render('manage/submission/rating', {
       contests: contests,
       calcs: calcs
     });
@@ -193,7 +194,7 @@ app.get('/admin/rating', async (req, res) => {
 
 app.post('/admin/rating/add', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
     const contest = await Contest.findById(req.body.contest);
     if (!contest) throw new ErrorMessage('无此比赛');
 
@@ -239,7 +240,7 @@ app.post('/admin/rating/add', async (req, res) => {
 
 app.post('/admin/rating/delete', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
     const calcList = await RatingCalculation.find({
       where: {
         id: TypeORM.MoreThanOrEqual(req.body.calc_id)
@@ -265,7 +266,7 @@ app.post('/admin/rating/delete', async (req, res) => {
 
 app.get('/admin/other', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
 
     res.render('admin_other');
   } catch (e) {
@@ -276,25 +277,9 @@ app.get('/admin/other', async (req, res) => {
   }
 });
 
-app.get('/admin/rejudge', async (req, res) => {
-  try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
-
-    res.render('admin_rejudge', {
-      form: {},
-      count: null
-    });
-  } catch (e) {
-    syzoj.log(e);
-    res.render('error', {
-      err: e
-    })
-  }
-});
-
 app.post('/admin/other', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
 
     if (req.body.type === 'reset_count') {
       const problems = await Problem.find();
@@ -326,9 +311,26 @@ app.post('/admin/other', async (req, res) => {
     })
   }
 });
+
+app.get('/admin/rejudge', async (req, res) => {
+  try {
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
+
+    res.render('manage/submission/rejudge', {
+      form: {},
+      count: null
+    });
+  } catch (e) {
+    syzoj.log(e);
+    res.render('error', {
+      err: e
+    })
+  }
+});
+
 app.post('/admin/rejudge', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
 
     let query = JudgeState.createQueryBuilder();
 
@@ -384,7 +386,7 @@ app.post('/admin/rejudge', async (req, res) => {
       }
     }
 
-    res.render('admin_rejudge', {
+    res.render('manage/submission/rejudge', {
       form: req.body,
       count: count
     });
@@ -398,9 +400,9 @@ app.post('/admin/rejudge', async (req, res) => {
 
 app.get('/admin/links', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
 
-    res.render('admin_links', {
+    res.render('manage/global/links', {
       links: syzoj.config.links || []
     });
   } catch (e) {
@@ -413,7 +415,7 @@ app.get('/admin/links', async (req, res) => {
 
 app.post('/admin/links', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
 
     syzoj.config.links = JSON.parse(req.body.data);
     await syzoj.utils.saveConfig();
@@ -429,9 +431,9 @@ app.post('/admin/links', async (req, res) => {
 
 app.get('/admin/raw', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isSuperAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
 
-    res.render('admin_raw', {
+    res.render('manage/global/raw', {
       data: JSON.stringify(syzoj.config, null, 2)
     });
   } catch (e) {
@@ -444,7 +446,7 @@ app.get('/admin/raw', async (req, res) => {
 
 app.post('/admin/raw', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isSuperAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
 
     syzoj.config = JSON.parse(req.body.data);
     await syzoj.utils.saveConfig();
@@ -460,7 +462,7 @@ app.post('/admin/raw', async (req, res) => {
 
 app.post('/admin/restart', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isSuperAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
 
     syzoj.restart();
 

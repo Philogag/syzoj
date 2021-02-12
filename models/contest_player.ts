@@ -28,12 +28,11 @@ export default class ContestPlayer extends Model {
   @TypeORM.Column({ nullable: true, type: "integer" })
   time_spent: number;
 
+  @TypeORM.Column({ default: false, type: "boolean" })
+  star: boolean;
+
   user?: User;
   contest?: Contest;
-
-  static async findInContest(where) {
-    return ContestPlayer.findOne({ where: where });
-  }
 
   async loadRelationships() {
     this.user = await User.findById(this.user_id);

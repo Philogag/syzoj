@@ -1,0 +1,208 @@
+<div class="ui longer test modal transition" id="<%= importpage.ids %>-window">
+    <i class="close icon"></i>
+    <div class="header">
+        <h4 id="<%= importpage.ids %>-title"><%= importpage.title %> - 仅支持Csv文件</h4>
+    </div>
+
+    <div clas="content scrolling font-content center aligned">
+        <div class="padding">
+        <div class="container">
+        <div class="ui form" style="width: 80%;left: 10%; height: 100% !important">
+          <form id="<%= importpage.ids %>-form" onsubmit="return false;"  method="post">
+            <div class="field" style="margin-top: 14px;"></div>
+            <div class="field">
+                <div class="ui right labeled input">
+                    <input type="file" id="<%= importpage.ids %>-fileinput" accept=".csv">
+                    <div class="ui label icon buttond" onclick="doReLoad();" style="text-align:center" data-tooltip="从文件中重新加载数据">
+                        <i class="redo icon"></i>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="field table">
+                <table>
+                    <thead id="<%= importpage.ids %>-thead"></thead>
+                    <tbody id="<%= importpage.ids %>-tbody"></tbody>
+                </table>
+            </div>
+          </form>
+        </div>
+            <div class="ui negative message hidden" id='<%= importpage.ids %>-err-box'>
+                <div class="header" id='<%= importpage.ids %>-err-header'></div>
+                <p id='<%= importpage.ids %>-err-text'></p>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <div class="actions" style="margin-top: 14px;">
+        <div type="button" onclick="$('#<%= importpage.ids %>-window').modal('hide');" class="ui button"><i class="grey cancel icon"></i>Cancel</div>
+        <div type="submit" onclick="<%= importpage.onSubmit %>" class="ui button" id="<%= importpage.ids %>-submit-button"><i class="grey upload icon"></i>Submit</div>
+    </div>
+</div>
+
+<script>
+
+$('#<%= importpage.ids %>-fileinput').change(function (e){
+    console.log(e.target.files[0])
+    doLoadFile(e.target.files[0], '<%= importpage.ids %>');
+});
+
+function doReLoad(){
+    file = $('#<%= importpage.ids %>-fileinput').get(0).files[0]
+    console.log(file);
+    doLoadFile(file, '<%= importpage.ids %>');
+}
+
+function doLoadFile(file, id){
+    let ftype = file.name.split('.').pop().toLowerCase();
+    console.log(ftype);
+    if (ftype !== 'csv'){
+        err = '文件类型不支持';
+        if (ftype === 'xls' || ftype === 'xlsx')
+            err += '<br> Excel文件请另存为 CSV-utf8 文件';
+        showMessage('Error', err, 'negative');
+        return;
+    }
+    // csv
+    const reader = new FileReader();
+    reader.onload = function (){
+        arrs = reader.result.split(/\r?\n/)
+            .map(row => {return row.split(',')});
+        displayMatrix(arrs);
+    }
+    reader.readAsText(file);
+}
+
+selection = '<select class="map-col" id="map-col-{:id}" class="ui dropdown"><option value=""></option><% for (var key in importpage.cols) { %><option value="<%= key %>"><%= importpage.cols[key] %></option><% } %></select>'
+
+function displayMatrix(arrs){
+    let maxlen = 0;
+            
+    arrs = arrs
+        .map(row => {maxlen = Math.max(maxlen, row.length); return row;})
+        .map(row => {while(row.length < maxlen) row.push(""); return row;})
+
+    thead = '<tr>'
+    for (var i = 0; i < maxlen; i++){ thead += '<th>' + selection.replace('{:id}', i) + '</th>';}
+    thead += '<th></th>';
+    thead += '</tr>'
+    $('#<%= importpage.ids %>-thead').html(thead);
+
+    $('#<%= importpage.ids %>-tbody').html('');
+    for (let row of arrs){
+        trow = '<tr class="<%= importpage.ids %>-datarow">'
+        if (row.length === maxlen){
+            for (let item of row)
+                trow += '<td>' + item + '</td>';
+        }
+        trow += '<td><div class="ui toggle checkbox"><input type="checkbox" class="row-enable" checked="checked"><label></label></div></td>';
+        trow += '</tr>'
+        $('#<%= importpage.ids %>-tbody').append(trow);
+    }
+    $('#<%= importpage.ids %>-window').modal('hide');
+    $('#<%= importpage.ids %>-window').modal('show');
+}
+
+button = {
+    new: '<i class="grey upload icon"></i>Submit</div>',
+    wait: '<i class="yellow spinner loading icon"></i>Waiting</div>',
+    fail: '<i class="red x icon"></i>Failed</div>',
+    succ: '<i class="green check icon"></i>Ok</div>',
+}
+
+function showMessage(title, text, level){
+    $('#<%= importpage.ids %>-err-box').removeClass("negative orange positive");
+    $('#<%= importpage.ids %>-err-box').addClass('level');
+
+    $('#<%= importpage.ids %>-err-header').html(title);
+    $('#<%= importpage.ids %>-err-text').html(text);
+
+    $('#<%= importpage.ids %>-err-box').removeClass('hidden');
+    $('#<%= importpage.ids %>-err-box').addClass('visible');
+}
+function hideMessage(){
+    $('#<%= importpage.ids %>-err-box').removeClass('visible');
+    $('#<%= importpage.ids %>-err-box').addClass('hidden');   
+}
+
+function setButton(type){
+    console.log('set button:', type);
+    switch(type){
+        case 'new':
+        case 'wait':
+            $('#<%= importpage.ids %>-submit-button').html(button[type]);
+            break;
+        case 'succ':
+            $('#<%= importpage.ids %>-submit-button').html(button.succ);
+            setTimeout(function(){
+                $('#<%= importpage.ids %>-window').modal('hide');
+                $('#<%= importpage.ids %>-submit-button').html(button.new);
+            }, 2000);
+            break;
+        case 'fail':
+            $('#<%= importpage.ids %>-submit-button').html(button.fail);
+            setTimeout(function(){
+                $('#<%= importpage.ids %>-submit-button').html(button.new);
+            }, 2000);
+    }
+}
+</script>
+
+<script>
+    function collectAndBuild(){
+        colmap = {}
+        $('.map-col').each((i, o) => {
+            key = $(o).val();
+            if(key){
+                if (colmap.hasOwnProperty(key)) {showMessage('Error', '字段重复：' + key, 'negative'); return {success: false}};
+                colmap[$(o).val()] = i;
+            }
+        })
+        console.log(colmap);
+        if (!colmap.username) {showMessage('Error', '用户名未指定！', 'negative'); return {success: false}};
+        if (!colmap.password) {showMessage('Error', '密码未指定！', 'negative'); return {success: false}};
+        
+        rows = []
+        $('.<%= importpage.ids %>-datarow').each((i, e) => {
+            if ($(e).find('input').is(':checked')){
+                rowd = {}; tds = $(e).children('td');
+                for (var key in colmap){
+                    rowd[key] = $(tds[colmap[key]]).text();
+                    if (!rowd[key]) {showMessage('Error', '存在空值行！', 'negative'); return {success: false}};
+                    if (key === 'password')
+                        rowd[key] = md5(rowd[key] + "syzoj2_xxx");
+                }
+                rows.push(rowd);
+            }
+        })
+        console.log(rows);
+      
+        return {success: true, data: rows}
+      }
+      
+      function doUserCreate(){
+        console.log("Try submit.");
+        setButton('wait');hideMessage();
+        
+        let data = collectAndBuild();
+        if (!data.success){
+          setButton('fail');
+          return;
+        }
+        $.post(
+            '<%= importpage.href %>',
+            {users: data.data},
+            function(result){
+                if (result.success){
+                  setButton('succ');
+                  showMessage("Success", result.msg, 'positive');
+                }else {
+                  setButton('fail');
+                  showMessage("Success", result.msg, 'negative');
+                }
+            }
+        );
+        return false;
+      }
+</script>

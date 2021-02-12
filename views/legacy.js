@@ -13,7 +13,3 @@ app.get('/judge_state', async (req, res) => {
 app.get('/judge_detail/:id', async (req, res) => {
   res.redirect('/submission/' + req.params.id);
 });
-
-app.get('/wiki', async (req, res) => {
-  res.redirect('/wiki/index');
-});

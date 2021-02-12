@@ -1,0 +1,83 @@
+<% this.title = 'Wiki - 比赛赛制' %>
+<% include ../header %>
+<style>
+blockquote > :last-child {
+    margin-bottom: 0px;
+}
+blockquote > :first-child,
+    li > :first-child {
+    margin-top: 0px;
+}
+blockquote {
+    border-left: 4px solid #dfe2e5;
+    padding: 0 15px;
+    color: #777777;
+}
+
+blockquote blockquote {
+    padding-right: 0;
+}
+</style>
+
+<div class="padding">
+    <h1 class="ui center aligned header">Wiki - 比赛赛制</h1>
+    <div style="font-content" >
+        <h2 class="ui header">ACM赛制</h2>
+        <p>每道题均有一个或多个隐藏测试点，每道题必须通过所有测试点才算通过。</p>
+        <p>每道题提交之后都有即时反馈，可以看到“通过”、“运行错误”、“答案错误”等等结果，但看不到错误的测试样例。</p>
+        <p><strong>罚时机制：</strong></p>
+        <ul>
+        <li>仅当某题提交通过时，计算该题的罚时。</li>
+        <li>某题的罚时为：第一次通过时间 + 第一次通过前未通过次数 * 20分钟。</li>
+        <li>已判定为通过的题目再次提交不计算罚时。</li>
+        <li>通常 “编译错误” 和 “系统错误” 不计算罚时，因不同系统而异。</li>
+        <li>总罚时为所有题目罚时之和。</li>
+        </ul>
+        <p><strong>排名机制：</strong></p>
+        <ul>
+        <li>按通过题数排序，多者靠前。</li>
+        <li>同题数时按总罚时排序，少者靠前。</li>
+        </ul>
+        <p><strong>封榜机制：</strong></p>
+        <p>当比赛进行到一定时间后（通常为最后一小时），榜单将不再实时更新排名，仍统计提交次数，但不更新通过状态（即看得到别人提交某题但无法得知它们是否通过）。提交状态列表也将只可看到提交记录，看不到提交结果。<strong>但自己队伍的提交结果仍可以在提交列表中看到！</strong>通常在比赛结束后官方会提供完整榜单或进行滚榜（相当刺激）。</p>
+        <blockquote>
+            <p><span>使用ACM赛制的比赛: </span></p>
+            <ul>
+              <li><span>ICPC </span></li>
+              <li><span>CCPC</span></li>
+            </ul>
+        </blockquote>
+
+        <h2 class="ui header">OI赛制(NOI)</h2>
+        <p>每道题都有一个或多个多个测试点，根据每道题通过的测试点的数量获得相应的分数。</p>
+        <p>每道题不限制提交次数，没有任何反馈，如果提交错误没有任何惩罚，仅以最后一次提交为准。</p>
+        <p>比赛过程中看不到实时排名，赛后按照总得分来排名。</p>
+        <blockquote>
+            <p><span>使用OI赛制的比赛: </span></p>
+            <ul>
+              <li><span>NOI全国青少年信息学奥林匹克竞赛</span></li>
+              <li><span>CCF CSP</span></li>
+              <li><span>考研机试</span></li>
+              <li><span>蓝桥杯</span></li>
+              <li><span>全国高校计算机能力挑战赛</span></li>
+            </ul>
+        </blockquote>
+
+        <h2 class="ui header">IOI赛制</h2>
+        <p>每道题都有一个或多个多个测试点，根据每道题通过的测试点的数量获得相应的分数。</p>
+        <p>每道题不限制提交次数，实时反馈所有测试点通过状态，看不到测试点数据。</p>
+        <p>如果提交错误没有任何惩罚，仅以得分最高的提交为准。</p>
+        <p>比赛过程中按照总得分实时排名。</p>
+        <blockquote>
+            <p><span>使用IOI赛制的比赛: </span></p>
+            <ul>
+              <li><span>CCCC团体程序设计天梯赛</span></li>
+              <li><span>CCF CCSP</span></li>
+              <li><span>洛谷月赛</span></li>
+              <li><span>PAT</span></li>
+            </ul>
+        </blockquote>
+
+    </div>
+</div>
+<% include ../footer %>

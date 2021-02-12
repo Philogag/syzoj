@@ -1,0 +1,26 @@
+<div class="ui small modal" id="edit-window">
+    <i class="close icon"></i>
+    <div class="header">
+        <h4 id="edit-title"></h4>
+    </div>
+
+    <div clas="content font-content center aligned">
+        <div class="padding">
+        <div class="ui form" style="width: 80%;left: 10%;">
+          <form id="edit-form" onsubmit="return false;"  method="post">
+              <input type="hidden" name="operation" value="rename">
+            <div class="field" style="margin-top: 14px;">
+              <label>组名</label>
+              <input type="text" id="edit-name" name="name">
+            </div>
+          </form>
+        </div>
+        </div>
+    </div>
+
+    <div class="actions" style="margin-top: 14px;">
+      <div type="button" onclick="$('#edit-window').modal('hide');" class="ui button"><i class="grey cancel icon"></i>Cancel</div>
+      <div type="submit" onclick="doEditApi();" class="ui button"><i class="grey upload icon" id="edit-submit-icon"></i>OK</div>
+    </div>
+</div>
+

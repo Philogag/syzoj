@@ -108,7 +108,7 @@ module.exports = {
     return parseInt(+new Date(s) / 1000);
   },
   getCurrentDate(removeTime) {
-    let d = new Date;
+    let d = new Date();
     if (removeTime) {
       d.setHours(0);
       d.setMinutes(0);
@@ -323,5 +323,24 @@ module.exports = {
           host = currentProto + '://' + req.get('host');
     if (hostOnly) return host;
     else return host + req.originalUrl;
+  },
+  mkdirsSync(dirname, mode = "0777") {
+    function makefatherpath(path) {
+      if (fs.existsSync(dirname)){
+        return true;
+      } else {
+        if(makefatherpath(path.dirname(dirname))){
+          fs.mkdirSync(dirname, mode);
+          return true;
+        }
+      }
+    }
+    return makefatherpath(dirname);
+  },
+  randomString(length) {
+    chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    var result = '';
+    for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+    return result;
   }
 };

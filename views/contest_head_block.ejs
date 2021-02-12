@@ -1,40 +1,37 @@
 <% let now = syzoj.utils.getCurrentDate(); %>
-<div class="ui large info message">
-    <div class="ui header">比赛模式 - <%= contest.title %></div>
-
-      <% if (now < contest.end_time) { %>
-        <p>您正在参加一个比赛。</p>
-      <% } else { %>
-        <p>比赛已结束</p>
+<div class="ui large info message" style="height: 130px;">
+  <div class="ui grid">
+    <div class="three wide">
+      <div class="ui header">比赛模式 - <%= contest.title %></div>
+        <% if (now < contest.end_time) { %>
+          <p>您正在参加一个比赛。</p>
+        <% } else { %>
+          <p>比赛已结束</p>
+        <% } %>
+      <div class="ui buttons">
+        <a class="small ui primary button" href="<%= syzoj.utils.makeUrl(['contest', contest.id]) %>">比赛主页</a>
+        <% const seeResult = (isSupervisior || contest.ended);
+        let submissionsUrl = seeResult ?
+        syzoj.utils.makeUrl(['submissions'], {contest: contest.id}) :
+        syzoj.utils.makeUrl(['contest', contest.id, 'submissions']); %>
+        <a class="small ui positive button" href="<%= submissionsUrl %>">提交记录</a>
+        <% if (contest.type !== 'noi' || user && isSupervisior) { %>
+        <a class="small ui orange button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'ranklist']) %>">比赛榜单</a>
+        <% } %>
+      </div>
+      <% if (isSupervisior) { %>
+      <div class="ui buttons">
+        <a class="ui small button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'edit']) %>">编辑比赛</a>
+        <a class="ui small button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'export_rank']) %>">榜单导出</a>
+        <a class="ui small button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'export_submissions']) %>">代码导出</a>
+      </div>
       <% } %>
-    
-    <a class="small ui primary button" href="<%= syzoj.utils.makeUrl(['contest', contest.id]) %>">比赛主页</a>
-    <% const seeResult = (isSupervisior || contest.ended);
-    let submissionsUrl = seeResult ?
-    syzoj.utils.makeUrl(['submissions'], {contest: contest.id}) :
-    syzoj.utils.makeUrl(['contest', contest.id, 'submissions']); %>
-    <a class="small ui positive button" href="<%= submissionsUrl %>">提交记录</a>
-    <a class="small ui orange button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'ranklist']) %>">比赛榜单</a>
+    </div>
     <% if (now < contest.end_time) { %>
-    <style>
-    #time_counter_block {
-      position: absolute;
-      top: 50%;
-      left: 100%;
-      transform: translate(-135%, -50%);
-      background-color: rgba(0,0,0,0);
-      border: 0px;
-      width: fit-content;
-      height: fit-content;
-    }
-    #time_counter_block.h2{
-      font-size: 24px;
-      height: fit-content;
-    }
-    </style>
-
-    <div id="time_counter_block" class="ui bottom attached segment">
-        <h2 style="orange" id="_t"></h2>
+    <div class="ui three wide right floated column">
+      <div id="time_counter_block" style="position: absolute; top: 50%; left: 100%; transform: translate(-135%, -50%);background-color: rgba(0,0,0,0);border: 0px;  width: fit-content; height: fit-content;">
+        <h2 style="orange" id="_t" style="font-size: 24px; height: fit-content; color: orange;"></h2>
+      </div>
     </div>
 
     <script type="text/javascript">
@@ -51,4 +48,5 @@
           });
     </script>
     <% } %>
+  </div>
 </div>

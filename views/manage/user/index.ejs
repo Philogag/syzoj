@@ -1,0 +1,88 @@
+<% this.adminPage = 'users'; %>
+<% include ../admin_header %>
+
+<script src="<%- lib('blueimp-md5/2.10.0/js/md5.min.js') %>"></script>
+<% include edit %>
+<% 
+  let importpage = {
+    title: '由文件导入用户',
+    href: '/admin/user/operate_many',
+    cols: {
+      username:"用户名",
+      realname:"真实姓名",
+      nickname:"昵称",
+      password:"密码"
+    },
+    ids: 'import-user',
+    onSubmit: 'doUserCreate();'
+  }
+%>
+<% include import %>
+
+
+  <div class="ui grid" style="margin-bottom: 25px;">
+    <div class="five wide column">
+      <form action="<%= syzoj.utils.makeUrl(['contests']) %>" class="ui mini form" method="get" role="form" id="form">
+        <div>
+          <div class="ui action input">
+            <input name="kargs" placeholder="模糊搜索..." style="width: 400px; " type="text" value="">
+            <button class="ui icon button"><i class="search icon"></i></button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="right floated three wide column" style="top: 5px;">
+      <button class="ui labeled icon button" onclick="$('#import-user-window').modal('show');" ><i class="plus icon"></i>从文件导入/更新用户</button>
+    </div>
+  </div>
+  <% if (userlist.length) { %>
+  <% if (user && user.is_admin) { %><% } %>
+  <table class="ui very basic center aligned table">
+    <thead>
+      <tr>
+        <th class="ui one wide">ID</th>
+        <th class="ui three wide">用户名</th>
+        <th class="ui three wide">昵称</th>
+        <th class="ui three wide">实名</th>
+        <th class="ui"></th>
+        <th class="ui one wide">权限级</th>
+        <th class="ui one wide center aligned">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for (let user of userlist) { %>
+      <tr id="row-<%= user.id %>"  style="height: 24px">
+        <td ><%= user.id %></td>
+        <td ><%= user.username %></td>
+        <td ><%= user.nickname %></td>
+        <td ><%= user.realname %></td>
+        <td></td>
+        <td>
+          <% if (user.isSuperAdmin()){ %>
+            <span class="ui header"><div class="ui mini red label">Admin</div></span>
+          <% } else if (user.isTeacherAdmin()) { %>
+            <span class="ui header"><div class="ui mini orange label">Teacher</div></span>
+          <% } %>
+        </td>
+        <td >
+          <div class="ui buttons">
+            <button type="button" onclick="doEditWindowShow(this);" class="ui icon button"><i class="edit icon"></i></button>
+            <button type="button" onclick="deleteP(this);" class="ui icon button"><i class="trash alternate icon"></i></button>
+          </div>
+        </td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+  <% } else { %>
+  <div class="ui placeholder segment">
+
+  </div>
+  <% } %>
+  <br>
+  <% include ../../page %>
+
+<script>  
+
+</script>
+<% include ../admin_footer %>

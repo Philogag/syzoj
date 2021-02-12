@@ -1,0 +1,131 @@
+<% this.adminPage = 'groups'; %>
+<% include ../admin_header %>
+
+<div class="ui mini buttons">
+  <a class="ui labeled icon mini button" href="<%= syzoj.utils.makeUrl(['admin', 'groups', '0']) %>"><i class="plus icon"></i>新建组</a>
+</div>
+<% if (groups.length > 0) { %>
+<table class="ui very basic center aligned table">
+  <thead>
+    <tr>
+      <th class="ui one wide">ID</th>
+      <th class="ui three wide">组名</th>
+      <th></th>
+      <th class="ui one wide">操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for (let group of groups) { %>
+    <tr id="row-<%= group.id %>"  style="height: 24px">
+      <td class="ui one wide"><%= group.id %></td>
+      <td class="ui three wide"><a href="<%= syzoj.utils.makeUrl(['admin', 'groups', group.id]) %>"><%= group.name %></a></td>
+      <td></td>
+      <td class="ui one wide">
+        <div class="ui buttons">
+          <button type="button" onclick="doEditWindowShow(this)" class="ui icon button"><i class="edit icon"></i></button>
+          <button type="button" onclick="doDeleteConfirm(this)" class="ui icon button"><i class="trash alternate icon"></i></button>
+        </div>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
+<% } else { %>
+<div class="ui placeholder segment center aligned">
+    <h2>无</h2>
+</div>
+<% } %>
+
+<div class="ui basic modal" id="delete-group-confirm">
+  <input type="hidden" id="delete-gid" value="">
+  <div class="ui icon header">
+    <i class="trash alternate icon"></i>
+    <p style="margin-top: 15px; ">删除组</p>
+  </div>
+  <div class="content" style="text-align: center; ">
+    <p id='delete-info'>确认删除组</p>
+  </div>
+  <div class="actions">
+    <div class="ui red basic cancel inverted button">
+      <i class="remove icon"></i>
+      否
+    </div>
+    <a class="ui green ok inverted button" onclick="deleteCol()">
+      <i class="checkmark icon"></i>
+      是
+    </a>
+  </div>
+</div>
+
+<% include edit %>
+  <script>
+    function doDeleteConfirm(obj){
+      grow = $(obj).parents('tr').find('td');
+      console.log(grow);
+      $('#delete-gid').val(grow[0].innerText);
+      $('#delete-info').html('是否确认删除组: ' + grow[1].innerText + '<br>此操作会删除当前组及所有当前组下的组员关系和管理员关系<br>（此操作不会删除用户）');
+      $('#delete-group-confirm').modal('show');
+    }
+    function deleteCol(){
+        row = $('#row-' + $("#delete-gid").val());
+        rowi = $(row).find('td');
+        url = '/admin/groups/' + rowi[0].innerText;
+        console.log(url);
+        $.post(
+            url,
+            {
+              operation: 'delete',
+            },
+            function(result){
+                console.log(result);
+                if (result.success){
+                    rmobj = row[0];
+                    rmobj.parentNode.removeChild(rmobj);
+                }else {
+                    $(obj).attr('data-tooltip', result.msg)
+                }
+            }
+        );
+        return false;
+    }
+    </script>
+    <script>
+      function doEditWindowShow(obj){
+          row = $(obj).parents("tr").find('td');
+          $('#edit-title').text("#" + row[0].innerText);
+          $('#edit-name').val(row[1].innerText);
+          $('#edit-form').attr("href",'/admin/groups/' + row[0].innerText);
+          $('#edit-submit-icon').attr('class', 'grey upload icon');
+      
+          $('#edit-window').modal('show');
+      }
+      
+      function doEditApi(){
+          console.log("Try submit.");
+          $('#edit-submit-icon').attr('class', 'spinner loading icon');
+      
+          console.log('Data:',$("#edit-form").serialize());
+          $.post(
+              $('#edit-form').attr("href"),
+              $("#edit-form").serialize(),
+              function(result){
+              if (result.success){
+                  $('#edit-submit-icon').attr('class', 'green check icon');
+                  row = $('#row-' + result.group.id).children('td');
+                  $($(row[1]).children('a')[0]).html(result.group.name);
+                  setTimeout(function(){
+                      $('#edit-window').modal('hide');
+                  }, 700);
+              }else {
+                  $('#edit-submit-icon').attr('class', 'red x icon');
+                  setTimeout(function(){
+                      $('#edit-submit-icon').attr('class', 'grey upload icon');
+                  }, 2000);
+              }
+              }
+          );
+          return false;
+      }
+      </script>
+
+<% include ../admin_footer %>

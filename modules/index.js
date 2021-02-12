@@ -10,7 +10,7 @@ const timeAgo = new TimeAgo('zh-CN');
 
 app.get('/', async (req, res) => {
   try {
-    let ranklist = await User.queryRange([1, syzoj.config.page.ranklist_index], { is_show: true }, {
+    let ranklist = await User.queryRange([1, 10], { is_show: true }, {
       [syzoj.config.sorting.ranklist.field]: syzoj.config.sorting.ranklist.order
     });
     await ranklist.forEachAsync(async x => x.renderInformation());
@@ -23,11 +23,6 @@ app.get('/', async (req, res) => {
       url: syzoj.utils.makeUrl(['article', article.id]),
       date: syzoj.utils.formatDate(article.public_time, 'L')
     }));
-
-    let fortune = null;
-    if (res.locals.user) {
-      fortune = Divine(res.locals.user.username, res.locals.user.sex);
-    }
 
     let contests = await Contest.queryRange([1, 5], { is_enabled: true }, {
       start_time: 'DESC'
@@ -44,7 +39,6 @@ app.get('/', async (req, res) => {
     res.render('index', {
       ranklist: ranklist,
       notices: notices,
-      fortune: fortune,
       contests: contests,
       problems: problems,
       links: syzoj.config.links
@@ -60,6 +54,18 @@ app.get('/', async (req, res) => {
 app.get('/help', async (req, res) => {
   try {
     res.render('help');
+  } catch (e) {
+    syzoj.log(e);
+    res.render('error', {
+      err: e
+    });
+  }
+});
+
+
+app.get('/wiki/*', async (req, res) => {
+  try {
+    res.render(req.url.slice(1));
   } catch (e) {
     syzoj.log(e);
     res.render('error', {

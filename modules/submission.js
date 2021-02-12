@@ -46,7 +46,7 @@ app.get('/submissions', async (req, res) => {
       const contestId = Number(req.query.contest);
       contest = await Contest.findById(contestId);
 
-      isSupervisior = curUser && await contest.isSupervisior(curUser);
+      isSupervisior = curUser && await Contest.isEditAllowed(curUser, contest);
 
       contest.ended = contest.isEnded();
       if ((contest.ended && contest.is_enabled) || // If the contest is ended and is not hidden
@@ -172,7 +172,7 @@ app.get('/submission/:id', async (req, res) => {
       contest.ended = contest.isEnded();
 
       if ((!contest.ended || !contest.is_enabled) &&
-        !(await judge.problem.isAllowedEditBy(res.locals.user) || await contest.isSupervisior(curUser))) {
+        !(await judge.problem.isAllowedEditBy(res.locals.user) || await Contest.isEditAllowed(curUser, contest))) {
         throw new Error("比赛未结束或未公开。");
       }
     }
@@ -210,7 +210,8 @@ app.get('/submission/:id', async (req, res) => {
       }, syzoj.config.session_secret) : null,
       displayConfig: displayConfig,
       displayDetailResult: judge.problem.is_data_public || res.locals.user && await res.locals.user.is_admin,
-      contest: contest
+      contest: contest,
+      isSupervisior: contest && await Contest.isEditAllowed(curUser, contest)
     });
   } catch (e) {
     syzoj.log(e);

@@ -6,6 +6,7 @@ declare var syzoj: any;
 import JudgeState from "./judge_state";
 import UserPrivilege from "./user_privilege";
 import Article from "./article";
+import Contest from "./contest";
 
 @TypeORM.Entity()
 export default class User extends Model {
@@ -27,6 +28,9 @@ export default class User extends Model {
   @TypeORM.Column({ nullable: true, type: "varchar", length: 80 })
   nickname: string;
 
+  @TypeORM.Column({ nullable: true, type: "varchar", length: 80 })
+  realname: string;
+
   @TypeORM.Column({ nullable: true, type: "text" })
   nameplate: string;
 
@@ -43,6 +47,13 @@ export default class User extends Model {
 
   @TypeORM.Column({ nullable: true, type: "boolean" })
   is_admin: boolean;
+
+  @TypeORM.Column({ nullable: true, type: "boolean" })
+  is_teacher: boolean;
+
+  @TypeORM.Index()
+  @TypeORM.Column({ nullable: true, type: "integer" })
+  creater: number;
 
   @TypeORM.Index()
   @TypeORM.Column({ nullable: true, type: "boolean" })
@@ -83,6 +94,14 @@ export default class User extends Model {
     if (!user) return false;
     if (await user.hasPrivilege('manage_user')) return true;
     return user && (user.is_admin || this.id === user.id);
+  }
+
+  isTeacherAdmin() {
+    return this.is_admin || this.is_teacher;
+  }
+
+  isSuperAdmin() {
+    return this.is_admin;
   }
 
   getQueryBuilderForACProblems() {

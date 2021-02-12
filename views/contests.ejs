@@ -1,17 +1,68 @@
 <% this.title = '比赛' %>
 <% include header %>
 <div class="padding">
+    <div class="ui grid" style="margin-bottom: 10px; ">
+      <div class='row' style="white-space: nowrap;" >
+        <div class="ui main container" style="width: 100%;">
+          <form action="<%= syzoj.utils.makeUrl(['contests']) %>" class="ui mini form" method="get" role="form" id="form">
+            <div class="inline fields" style="margin-bottom: 25px; white-space: nowrap; ">
+              <label style="font-size: 1.2em; margin-right: 5px; ">筛选:   </label>
+              <div class="field"><input name="title" placeholder="名称" style="width: 200px; " type="text" value="<%= args.title %>"></div>
+              <div class="field" style="width: 140px;">
+                <select class="ui fluid dropdown" id="contest_type" name="type">
+                  <%
+                    let kv = {
+                      none: "类型 - 不限",
+                      acm: "Acm",
+                      ioi: "IOI",
+                      noi: "NOI",
+                    }
+                  %>
+                  <% for (var k in kv) { %>
+                    <option class="item" value="<% if(k !== 'none') { %><%= k %><% } %>" <% if(k === args.type) { %>selected<% } %> ><%= kv[k] %></option>
+                  <% } %>
+                </select>
+              </div>
+              <div class="field" style="width: 140px;">
+                <select class="ui fluid dropdown" id="contest_pub" name="pub">
+                    <option class="item" value="" selected>权限 - 不限</option>
+                    <option class="item" value="public" >公开</option>
+                    <option class="item" value="invite" >邀请</option>
+                    <option class="item" value="passwd" >密码</option>
+                </select>
+              </div>
+              <div class="field">
+                <div class="ui checkbox">
+                    <input id="mine-id" type="checkbox" name="mine" <% if(args.mine === 'on') { %>checked<% } %>>
+                    <label for="mine-id">我的比赛</label>
+                </div>
+              </div>
+              
+              <button class="ui labeled icon mini button" type="submit">
+                <i class="search icon"></i>
+                查询
+              </button>
+            </div>
+
+          </form>
+        </div>
+        <% if (user && user.isTeacherAdmin()) { %>
+        <div class="three wide right aligned column">
+        <form class="ui mini form">
+          <div class="inline fields" style="margin-bottom: 25px; white-space: nowrap; ">
+            <a href="<%= syzoj.utils.makeUrl(['contest', 0, 'edit']) %>" class="ui mini labeled icon right floated button" style="margin-left: auto; ">
+              <i class="ui icon write"></i>
+              添加比赛
+            </a>
+          </div>
+        </form>
+        </div>
+        <% } %>
+      </div>
+    </div>
+
     <% if (contests.length) { %>
-    <% if (user && user.is_admin) { %>
-    <form class="ui mini form">
-      <div class="inline fields" style="margin-bottom: 25px; white-space: nowrap; ">
-        <a href="<%= syzoj.utils.makeUrl(['contest', 0, 'edit']) %>" class="ui mini labeled icon right floated button" style="margin-left: auto; ">
-          <i class="ui icon write"></i>
-          添加比赛
-        </a>
-     </div>
-    </form>
-    <% } %>
+
     <table class="ui very basic center aligned table">
       <thead>
         <tr>
@@ -78,5 +129,16 @@
     <% } %>
   <br>
   <% include page %>
+
+  <script>
+    $(function (){
+      $('#contest_type').dropdown({
+        clearable: true
+      });
+      $('#contest_pub').dropdown({
+        clearable: true
+      });
+    });
+  </script>
 </div>
 <% include footer %>

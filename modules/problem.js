@@ -46,8 +46,7 @@ app.get('/problems', async (req, res) => {
     });
 
     res.render('problems', {
-      allowedManageTag: res.locals.user && await res.locals.user.hasPrivilege('manage_problem_tag'),
-      allowedManageProblem: res.locals.user && await res.locals.user.hasPrivilege('manage_problem'),
+      allowedManageProblem: res.locals.user && await res.locals.user.isTeacherAdmin(),
       problems: problems,
       paginate: paginate,
       curSort: sort,
@@ -110,8 +109,7 @@ app.get('/problems/search', async (req, res) => {
     });
 
     res.render('problems', {
-      allowedManageTag: res.locals.user && await res.locals.user.hasPrivilege('manage_problem_tag'),
-      allowedManageProblem: res.locals.user && await res.locals.user.hasPrivilege('manage_problem'),
+      allowedManageProblem: res.locals.user && res.locals.user.isTeacherAdmin(),
       problems: problems,
       paginate: paginate,
       curSort: sort,
@@ -180,8 +178,7 @@ app.get('/problems/tag/:tagIDs', async (req, res) => {
     });
 
     res.render('problems', {
-      allowedManageTag: res.locals.user && await res.locals.user.hasPrivilege('manage_problem_tag'),
-      allowedManageProblem: res.locals.user && await res.locals.user.hasPrivilege('manage_problem'),
+      allowedManageProblem: res.locals.user && res.locals.user.isTeacherAdmin(),
       problems: problems,
       tags: tags,
       paginate: paginate,
@@ -288,7 +285,7 @@ app.get('/problem/:id/edit', async (req, res) => {
 
     if (!problem) {
       if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
-      if (!res.locals.user.hasPrivilege('manage_problem'))  throw new ErrorMessage('您没有权限进行此操作。');
+      if (!res.locals.user.isTeacherAdmin())  throw new ErrorMessage('您没有权限进行此操作。');
       problem = await Problem.create({
         time_limit: syzoj.config.default.problem.time_limit,
         memory_limit: syzoj.config.default.problem.memory_limit,
@@ -723,10 +720,10 @@ app.post('/problem/:id/submit', app.multer.fields([{ name: 'answer', maxCount: 1
     if (contest_id) {
       contest = await Contest.findById(contest_id);
       if (!contest) throw new ErrorMessage('无此比赛。');
-      if ((!contest.isRunning()) && (!await contest.isSupervisior(curUser))) throw new ErrorMessage('比赛未开始或已结束。');
+      if ((!contest.isRunning()) && (!await Contest.isEditAllowed(curUser, contest))) throw new ErrorMessage('比赛未开始或已结束。');
       let problems_id = await contest.getProblems();
       if (!problems_id.includes(id)) throw new ErrorMessage('无此题目。');
-      if (problem.type !== 'submit-answer' && !contest.lang.split('|').includes(req.body.language)) throw new ErrorMessage('本场比赛不支持该语言。');
+      if (problem.type !== 'submit-answer' && contest.lang && !contest.lang.split('|').includes(req.body.language)) throw new ErrorMessage('本场比赛不支持该语言。');
 
       judge_state.type = 1;
       judge_state.type_info = contest_id;
@@ -1039,3 +1036,18 @@ app.post('/problem/:id/custom-test', app.multer.fields([{ name: 'code_upload', m
   }
 });
 */
+
+
+app.get('/random_problem', async (req, res) => {
+  try {
+    let pids = await Problem.find({ select: ["id"],where: {is_public: true}});
+    let rand_p = Math.floor((Math.random() * pids.length))
+    // console.log(pids[rand_p].id);
+    res.redirect(syzoj.utils.makeUrl(['problem', pids[rand_p].id]));
+  } catch (e) {
+    syzoj.log(e);
+    res.render('error', {
+      err: e
+    });
+  }
+});

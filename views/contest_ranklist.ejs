@@ -89,6 +89,9 @@
                   <td>
                     <span class="score score_<%= parseInt((item.player.score / ranklist[0].player.score * 10) || 0) %>">
                       <%= item.player.score %>
+                      <% if (item.player.score === problems.length) { %>
+                        <span class="ui header"><div class="ui mini green label">AK</div></span>
+                      <% } %>
                     </span>
                   </td>
                   <td>
@@ -168,4 +171,5 @@
 </div>
 <% } %>
 </div>
+
 <% include footer %>

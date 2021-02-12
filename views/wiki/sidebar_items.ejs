@@ -1,0 +1,55 @@
+
+
+<div class="ui fixed sidebar inverted vertical menu visible overlay" style="position: fixed; width: 10%">
+<div class="item" style="height: 50px;"><h4>Wiki</h4></div>
+<% 
+items = {
+    主页: {
+        id: "index",
+        name: '主页',
+    },
+    相关知识: [
+        {
+            id: "contest_type",
+            name: "比赛类型",
+        },
+    ],
+    用户手册: [{
+        id: "user_guide",
+        name: '用户手册',
+    }, {
+        id: "user_qa",
+        name: "Q & A",
+    }],
+    管理员手册: [
+        {
+            id: "problem_manage",
+            name: "管理题目",
+        },{
+            id: "contest_manage",
+            name: "管理比赛",
+        },{
+            id: "user_manage",
+            name: "管理用户",
+        },
+    ],
+};
+%>
+
+<% for (let key in items) { %>
+    <% if (items[key] instanceof Array) { %>
+    <div class="item">
+        <div class="header"><%= key %></div>
+        <div class="menu">
+        <% for (var k of items[key]){ %>
+            <a class="item <% if (this.wikiPage === k.id) { %> active<% } %>" href="/wiki/<%= k.id %>">
+            <%= k.name %>
+            </a>
+        <% } %>
+        </div>
+    </div>
+    <% } else { %>
+        <a class="item <% if (this.wikiPage === items[key].id) { %>active<% } %>" href="/wiki/<%= items[key].id %>"><%= items[key].name %></a>
+    <% } %>
+<% } %>
+</div>

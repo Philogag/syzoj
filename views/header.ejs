@@ -33,6 +33,7 @@
       <link href="<%- this.builtInCdnUrl %>/google-fonts/exo-2.css" rel="stylesheet">
     <% } %>
     <script data-cfasync="false" src="<%- lib('jquery/3.3.1/jquery.min.js') %>"></script>
+    <script data-cfasync="false" src="<%- lib('semantic-ui/2.4.1/semantic.min.js') %>"></script>
     <% if (!useLocalLibs) { %>
       <script type="text/javascript" src="/cdnjs/clipboard.min.js"></script>
     <% } else { %>
@@ -70,7 +71,7 @@
             <a class="item<% if (active.startsWith('ranklist')) { %> active<% } %>" href="/ranklist"><i class="signal icon"></i> 排名</a>
             <a class="item<% if (active.startsWith('discussion') || active.startsWith('article')) { %> active<% } %>" href="/discussion/global"><i class="comments icon"></i> 讨论</a>
             <a class="item<% if (active.startsWith('help')) { %> active<% } %>" href="/help"><i class="help circle icon"></i> 帮助</a>
-
+            <a class="item<% if (active.startsWith('wiki')) { %> active<% } %>" href="/wiki"><i class="globe icon"></i> Wiki</a>
             <div class="right menu">
               <% if (user) { %>
               <a href="<%= syzoj.utils.makeUrl(['user', user.id]) %>" style="color: inherit; ">
@@ -78,7 +79,7 @@
                 <%= user.username %><% if (user.nameplate) { %><%- user.nameplate %><% } %> <i class="dropdown icon"></i>
                 <div class="menu">
                   <a class="item" href="<%= syzoj.utils.makeUrl(['user', user.id, 'edit']) %>"><i class="edit icon"></i>修改资料</a>
-                  <% if (user.is_admin) { %>
+                  <% if (user.isTeacherAdmin()) { %>
                     <a class="item" href="<%= syzoj.utils.makeUrl(['admin', 'info']) %>"><i class="settings icon"></i>后台管理</a>
                     <div class="ui basic modal" id="modal-restart">
                       <div class="ui icon header">
@@ -118,5 +119,16 @@
             </div>
         </div>
     </div>
+    <% if(user && (user.is_admin || user.is_teacher) && this.view_sidebar){ %>
+      <% this.view_sidebar = false; %>
+      <% include manage/sidebar_items %>
+    <div id="body" class="article pusher">
+      <div class="thirty wide" style="margin-top: 28px; margin-left: 10%; width: 85%;">
+    <% } else if (active.startsWith('wiki')) { %>
+      <% include wiki/sidebar_items %>
+      <div id="body" class="article pusher">
+        <div class="thirty wide" style="margin-top: 28px; margin-left: 10%; width: 85%;">
+    <% } else { %>
     <div style="margin-top: 28px; ">
-    <div class="ui main container">
+      <div class="ui main container">
+    <% } %>

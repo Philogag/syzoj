@@ -62,12 +62,6 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
           <label>显示分类标签</label>
         </div>
         <div style="margin-left: 10px; display: inline-block; ">
-          <% if (allowedManageTag) { %>
-            <% if (typeof tags !== 'undefined' && tags.length === 1) { %>
-              <a style="margin-left: 10px; " href="<%= syzoj.utils.makeUrl(['problems', 'tag', tags[0].id, 'edit']) %>" class="ui labeled icon mini blue button"><i class="write icon"></i> 编辑标签</a>
-            <% } %>
-            <a style="margin-left: 10px; " href="<%= syzoj.utils.makeUrl(['problems', 'tag', 0, 'edit']) %>" class="ui labeled icon mini green button"><i class="plus icon"></i> 添加标签</a>
-          <% } %>
           <% if (allowedManageProblem) { %>
           <div style="margin-left: 10px; " class="ui mini buttons">
             <div class="ui labeled icon mini dropdown button" id="add_problem_dropdown"><i class="plus icon"></i> 添加题目
@@ -95,6 +89,10 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
         <% } %>
         <th class="one wide"><%- createSortableTitle('id', '编号', true) %></th>
         <th class="left aligned"><%- createSortableTitle('title', '题目名称', true) %></th>
+        <% if (user && user.isTeacherAdmin()) { %>
+          <th class="one wide center aligned">题目公开</th>
+          <th class="one wide center aligned">数据公开</th>
+        <% } %>
         <th class="one wide"><%- createSortableTitle('ac_num', '通过', false) %></th>
         <th class="one wide"><%- createSortableTitle('submit_num', '提交', false) %></th>
         <th class="one wide">通过率</th>
@@ -118,7 +116,6 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
             <td><b><%= problem.id %></b></td>
             <td class="left aligned">
               <a style="vertical-align: middle; " href="<%= syzoj.utils.makeUrl(['problem', problem.id]) %>"><%= problem.title %>
-                <% if (!problem.is_public) { %><span class="ui header"><span class="ui tiny red label">未公开</span></span><% } %>
               </a>
               <div class="show_tag_controled" style="float: right; ">
                 <%
@@ -142,6 +139,10 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
                 %>
               </div>
             </td>
+            <% if (user && user.isTeacherAdmin()) { %>
+              <td><div class="ui toggle checkbox pp"><input type="checkbox" data-id="<%= problem.id %>" <% if (problem.is_public) { %>checked<% } %> ></div></td>
+              <td><div class="ui toggle checkbox dp"><input type="checkbox" data-id="<%= problem.id %>" <% if (problem.is_data_public) { %>checked<% } %> ></div></td>
+            <% } %>
             <td><%= problem.ac_num %></td>
             <td><%= problem.submit_num %></td>
             <td><%= problem.submit_num != 0 ? (((problem.ac_num / problem.submit_num * 100) || 0).toFixed(2) + '%') : '-' %></td>
@@ -186,7 +187,30 @@ $(function () {
       title: 'name'
     }
   });
+  $('.ui.toggle.checkbox').checkbox({
+  });
 });
+
+$(document).ready(() => {
+  $('.ui.toggle.checkbox.pp').each((i, e) => {
+    $(e).on("click", (e)=>{
+      obj = $(e.currentTarget).children('input');
+      checked = $(obj).prop("checked");
+      url = "/problem/" + $(obj).attr("data-id") + (checked ? "/public" : "/dis_public");
+      console.log(url);
+      $.post(url, {});
+    })
+  })
+  $('.ui.toggle.checkbox.dp').each((i, e) => {
+    $(e).on("click", (e)=>{
+      obj = $(e.currentTarget).children('input');
+      checked = $(obj).prop("checked");
+      url = "/problem/" + $(obj).attr("data-id") + (checked ? "/data_public" : "/dis_data_public");
+      console.log(url);
+      $.post(url, {});
+    })
+  })
+})
 </script>
 </div>
 <% include footer %>

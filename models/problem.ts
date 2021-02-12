@@ -128,21 +128,21 @@ export default class Problem extends Model {
 
   async isAllowedEditBy(user) {
     if (!user) return false;
-    if (await user.hasPrivilege('manage_problem')) return true;
+    if (user.isTeacherAdmin()) return true;
     return this.user_id === user.id;
   }
 
   async isAllowedUseBy(user) {
     if (this.is_public) return true;
     if (!user) return false;
-    if (await user.hasPrivilege('manage_problem')) return true;
+    if (user.isTeacherAdmin()) return true;
     return this.user_id === user.id;
   }
 
   async isAllowedManageBy(user) {
     if (!user) return false;
-    if (await user.hasPrivilege('manage_problem')) return true;
-    return user.is_admin;
+    if (user.isTeacherAdmin()) return true;
+    return this.user_id === user.id;
   }
 
   getTestdataPath() {

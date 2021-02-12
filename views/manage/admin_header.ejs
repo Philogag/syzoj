@@ -1,0 +1,85 @@
+<% this.view_sidebar = true; %>
+
+<%
+ this.items = {
+    信息统计: {
+        id: "info",
+        name: '信息统计',
+        url: '/admin/info',
+    },
+    用户与组: [
+        {
+            id: "users",
+            name: '用户管理',
+            url: '/admin/users',
+        },
+        {
+            id: "groups",
+            name: '组管理',
+            url: '/admin/groups',
+        }
+    ],
+    测评管理: [
+        {
+            id: "rejudge",
+            name: "批量重测",
+            url: '/admin/rejudge',
+        },
+        {
+            id: "rating",
+            name: "积分管理(功能未完善)",
+            url: '/admin/rating',
+        }
+    ],
+    后台管理: [
+        {
+            id: "config",
+            name: "系统配置",
+            url: "/admin/config",
+        },
+        {
+            id: "links",
+            name: "友链管理",
+            url: "/admin/links",
+        },
+    ]
+};
+if (user.isSuperAdmin()){
+    this.items["用户与组"].push({
+                            id: "teachers",
+                            name: '教师管理',
+                            url: '/admin/teachers',
+                        }),
+    this.items["后台管理"].push({
+            id: "raw",
+            name: "配置文件",
+            url: "/admin/raw",
+        })
+}
+%>
+
+<%
+    // get title
+    (() => {
+        for (let key in this.items){
+            if (this.items[key] instanceof Array) { 
+                for (var k of this.items[key]) {
+                    if (this.adminPage === k.id) {
+                        this.title = k.name;
+                        return;
+                    }
+                }
+            } else {
+                if (this.adminPage === this.items[key].id) {
+                    this.title = this.items[key].name;
+                    return;
+                }
+            }
+        }
+    })()
+%>
+
+<% include ../header %>
+
+<h1 style="text-align: center; margin-bottom: 27px; "><%= this.title %></h1>
+<div class="padding">

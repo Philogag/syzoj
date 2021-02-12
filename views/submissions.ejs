@@ -164,7 +164,9 @@ if (itemList.some(function(t) {return t.token != null;})) {
             x.result = data.result;
           }
         } else {
-          alert("ERROR: " + JSON.stringify(data));
+          console.log(data);
+          // alert("ERROR: " + JSON.stringify(data));
+          location.reload();
         }
       });
     }

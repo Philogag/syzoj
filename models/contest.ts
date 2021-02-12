@@ -7,6 +7,8 @@ import User from "./user";
 import Problem from "./problem";
 import ContestRanklist from "./contest_ranklist";
 import ContestPlayer from "./contest_player";
+import Group from "./group";
+import GroupUser from "./group_user"
 
 enum ContestType {
   NOI = "noi",
@@ -61,12 +63,19 @@ export default class Contest extends Model {
   ranklist_id: number;
 
   // mode of public 
-  @TypeORM.Column({ nullable: true, type: "enum", enum: PublicModeType })
+  @TypeORM.Column({ nullable: true, type: "enum", enum: PublicModeType, default: PublicModeType.PUBLIC })
   public_mode: PublicModeType;
 
   // for passwd mode
   @TypeORM.Column({ nullable: true, type: "text" })
   passwd: string;
+
+  @TypeORM.Column({ nullable: true, type: "text" })
+  allowedUser: string; 
+
+  @TypeORM.ManyToMany(type => Group, allowedGroup => Group.allowedContest)
+  @TypeORM.JoinTable()
+  allowedGroup: Group[];
 
   @TypeORM.Column({ nullable: true, type: "text" })
   lang: string;
@@ -83,10 +92,6 @@ export default class Contest extends Model {
   async loadRelationships() {
     this.holder = await User.findById(this.holder_id);
     this.ranklist = await ContestRanklist.findById(this.ranklist_id);
-  }
-
-  async isSupervisior(user) {
-    return user && (user.is_admin || this.holder_id === user.id || this.admins.split('|').includes(user.id.toString()));
   }
 
   allowedSeeingOthers() {
@@ -137,31 +142,6 @@ export default class Contest extends Model {
     return player;
   }
 
-  async allowUser(uid, passwd = null) {
-    let player = await ContestPlayer.findInContest({
-      contest_id: this.id,
-      user_id: uid,
-    });
-    console.log(player);
-    switch (this.public_mode) {
-      case PublicModeType.PUBLIC:
-        if (!player) {
-          await this.createPlayer(uid);
-          return true;
-        }
-        return true;
-      case PublicModeType.INVITE:
-        return typeof player !== undefined && player;
-      case PublicModeType.PASSWD:
-        if (!player && passwd !== this.passwd) {
-          return false;
-        } else if (!player) {
-          await this.createPlayer(uid);
-        }
-        return true;
-    }
-  }
-
   async newSubmission(judge_state) {
     if (!(judge_state.submit_time >= this.start_time && judge_state.submit_time <= this.end_time)) {
       return;
@@ -171,10 +151,10 @@ export default class Contest extends Model {
 
     await syzoj.utils.lock(['Contest::newSubmission', judge_state.user_id], async () => {
 
-      if (!await this.allowUser(judge_state.user_id)) {
+      if (!await Contest.isVisitAllowed(await User.findById(judge_state.user_id), this)) {
         throw new ErrorMessage('您没有此比赛的权限。');
       }
-      let player = await ContestPlayer.findInContest({
+      let player = await ContestPlayer.findOne({
         contest_id: this.id,
         user_id: judge_state.user_id,
       });
@@ -196,5 +176,86 @@ export default class Contest extends Model {
   isEnded(now?) {
     if (!now) now = syzoj.utils.getCurrentDate();
     return now >= this.end_time;
+  }
+
+  ///////// Permission Check /////////
+  static async isViewAllowed(user, contest) {
+    return contest.is_enabled || await Contest.isEditAllowed(user, contest); // not public and no permission to edit, then cannot see it. 
+  }
+  
+  static async isVisitAllowed(user: User, contest: Contest, passwd = null) {
+    if (!user) return false;
+    let player = await ContestPlayer.findOne({ contest_id: contest.id, user_id: user.id });
+    let player_exist = Boolean(player);
+    switch (contest.public_mode) {
+      
+      case 'public':
+        if (!player_exist) await contest.createPlayer(user.id);
+        return true;
+      
+      
+      case 'invite':
+        if (Contest.isEditAllowed(user, contest)) {
+          if (!player_exist) await contest.createPlayer(user.id);
+          return true;
+        }
+        if (contest.admins.split('|').map(x => parseInt(x)).includes(user.id)) {
+          let player_c = await ContestPlayer.create({
+            contest_id: contest.id, 
+            user_id: user.id,
+            star: true
+          })
+          await player_c.save();
+          return true;
+        }
+        if (!contest.allowedGroup || contest.allowedGroup.length <= 0)
+          return false;
+        console.log(contest.allowedGroup);
+        let gids = contest.allowedGroup.map(x => x.id);
+        let gusers = await GroupUser.findOne({
+          uid: user.id,
+          gid: TypeORM.In(gids)
+        });
+        if (gusers) { // allowed by group
+          if (!player_exist) await contest.createPlayer(user.id);
+          return true;
+        }
+        else
+          return false;
+        
+        
+      case 'passwd':
+        if (player_exist)
+          return true; // joined already
+        if (passwd === contest.passwd) {
+          await contest.createPlayer(user.id);
+          return true;
+        }
+        return false;
+    }
+  }
+  
+  static async isEditAllowed(user, contest) {
+    if (!user) return false;
+    let permission = contest.admins.split('|').map(x => parseInt(x)).includes(user.id)
+      || contest.holder_id === user.id
+      || user.isSuperAdmin() // super admin can edit any thing.
+    if (permission) {
+      let player = await ContestPlayer.findOne({ contest_id: contest.id, user_id: user.id });
+      let player_exist = Boolean(player);
+      if (!player_exist) {
+        let player_c = await ContestPlayer.create({
+          contest_id: contest.id, 
+          user_id: user.id,
+          star: true
+        })
+        await player_c.save();
+      }
+    }
+    return permission;
+  }
+  
+  static async isCreateAllowed(user) {
+    return user && user.isTeacherAdmin();
   }
 }
