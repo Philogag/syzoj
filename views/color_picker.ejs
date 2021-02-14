@@ -1,0 +1,38 @@
+
+<% 
+sematic_colors = [
+    "red",
+    "orange",
+    "yellow",
+    "olive",
+    "green",
+    "teal",
+    "blue",
+    "violet",
+    "purple",
+    "pink",
+    "brown",
+    "grey",
+    "black"
+]
+function upperFirstLetter(str){
+    newStr = str.slice(0,1).toUpperCase() + str.slice(1).toLowerCase();
+    return newStr;
+}
+%>
+<div class="ui fluid selection dropdown" id="<%= this.color_drop_id %>_color_dropdown">
+    <input type="hidden" id="<%= this.color_drop_id %>_color" name="<%= this.color_drop_id %>_color" value="">
+    <i class="dropdown icon"></i>
+    <div class="default text">选择颜色</div>
+    <div class="menu">
+      <% for (var _color of sematic_colors) { %>
+      <div class="item" data-value="<%= _color %>">
+        <div class="ui <%= _color %> empty circular label"></div>
+        <%= upperFirstLetter(_color) %>
+      </div>
+      <% } %>
+    </div>
+</div>
+<script>
+$("#<%= this.color_drop_id %>_color_dropdown").dropdown();
+</script>

@@ -4,24 +4,12 @@
 let tagIDs = [];
 if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
 %>
+
 <div class="padding">
   <div class="ui grid" style="margin-bottom: 10px; ">
     <div class="row" style="white-space: nowrap; ">
       <div class="seven wide column">
-        <% if (typeof tags !== 'undefined') { %>
-          <%
-          tags.sort((a, b) => {
-            return a.color > b.color ? 1 : -1;
-          });
-          %>
-          <% for (let tag of tags) { %>
-              <% let tagListRemovedThisTag = tagIDs.filter(x => x != tag.id).sort().join(','); %>
-              <% let url = tagListRemovedThisTag ? syzoj.utils.makeUrl(['problems', 'tag', tagListRemovedThisTag]) : syzoj.utils.makeUrl(['problems']); %>
-              <a href="<%= url %>" class="ui tiny <%= tag.color %> label">
-                <%= tag.name %>
-              </a>
-          <% } %>
-        <% } else { %>
+        <% if (typeof tags === 'undefined') { %>
           <form action="<%= syzoj.utils.makeUrl(['problems', 'search']) %>" method="get">
             <div class="ui search" style="width: 280px; height: 28px; margin-top: -5.3px; ">
               <div class="ui left icon input" style="width: 100%; ">
@@ -36,31 +24,33 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
       <div class="nine wide right aligned column">
         <div class="ui toggle checkbox" id="show_tag">
           <style id="show_tag_style"></style>
-          <script data-cfasync="false">
-          if (localStorage.getItem('show_tag') === '1') {
-            document.write('<input type="checkbox" checked>');
-            document.getElementById('show_tag_style').innerHTML = '.show_tag_controled { white-space: nowrap; overflow: hidden; }';
-          } else {
-            document.write('<input type="checkbox">');
-            document.getElementById('show_tag_style').innerHTML = '.show_tag_controled { width: 0; white-space: nowrap; overflow: hidden; }';
-          }
-          </script>
-
-          <script>
-          $(function () {
-            $('#show_tag').checkbox('setting', 'onChange', function () {
-              let checked = $('#show_tag').checkbox('is checked');
-              localStorage.setItem('show_tag', checked ? '1' : '0');
-              if (checked) {
-                document.getElementById('show_tag_style').innerHTML = '.show_tag_controled { white-space: nowrap; overflow: hidden; }';
-              } else {
-                document.getElementById('show_tag_style').innerHTML = '.show_tag_controled { width: 0; white-space: nowrap; overflow: hidden; }';
-              }
-            });
-          });
-          </script>
+          <input type="checkbox" id="show_tag_input">
           <label>显示分类标签</label>
         </div>
+
+        <script data-cfasync="false">
+          $(function () {
+            if (localStorage.getItem('show_tag') === '1') {
+              console.log('default show.')
+              $('#show_tag_input').attr('checked', '');
+            }
+            $('#show_tag').checkbox({
+              debug: true,
+              onChange: () => {
+                let checked = $('#show_tag').checkbox('is checked');
+                localStorage.setItem('show_tag', checked ? '1' : '0');
+                if (checked) {
+                  $('#show_tag_style').html('.show_tag_controled { white-space: nowrap; overflow: hidden; }');
+                } else {
+                  $('#show_tag_style').html('.show_tag_controled { width: 0; white-space: nowrap; overflow: hidden; }');
+                }
+              }
+            });
+
+            console.log("check box init over");
+          });
+        </script>
+
         <div style="margin-left: 10px; display: inline-block; ">
           <% if (allowedManageProblem) { %>
           <div style="margin-left: 10px; " class="ui mini buttons">
@@ -77,9 +67,49 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
     </div>
   </div>
 
-  <% if (problems.length) { %>
-  <div style="margin-bottom: 30px; ">
+<% if (problems.length) { %>
+  <div style="margin-bottom: 10px; ">
     <% include page %>
+  </div>
+
+<div class="ui attached segment" style="left: -10%; width: 90%; border: 0px;">
+  <div class="ui right close rail">
+    <div class="ui attached segment" style="border-radius: 8px;">
+      <h3 class="ui header">Tags: </h3>
+      <% if (typeof tags !== 'undefined') { 
+        tags.sort((a, b) => {
+          return a.color > b.color ? 1 : -1;
+        }); 
+      %>
+        <h4 class="ui dividing header"  style="margin-top: 7px; margin-bottom: 0px;">Selected Tag</h4>
+        <% for (let tag of tags) { %>
+          <% let tagListRemovedThisTag = tagIDs.filter(x => x != tag.id).sort().join(','); %>
+          <% let url = tagListRemovedThisTag ? syzoj.utils.makeUrl(['problems', 'tag', tagListRemovedThisTag]) : syzoj.utils.makeUrl(['problems']); %>
+          <a href="<%= url %>" class="ui olive tiny <%= tag.color %> label" style="margin-top: 3px;">
+            <%= tag.name %>
+            <i aria-hidden="true" class="delete icon"></i>
+          </a>
+        <% } %>
+        <div style="margin-top: 20px;"></div>
+      <% } %>
+      <% if (!tag_groups || tag_groups.length === 0) { %>
+        <p>No Tags Yet</p>
+      <% } else { for(let tg of tag_groups) if (tg.tags && tg.tags.length > 0) { %>
+        <h5 class="ui dividing header" style="margin-top: 7px; margin-bottom: 0px;"><%= tg.name %></h5>
+        <% for (let tag of tg.tags) { 
+          let tagListToggledThisTag;
+          if (!tagIDs.includes(tag.id)) tagListToggledThisTag = tagIDs.concat([tag.id]);
+          else tagListToggledThisTag = tagIDs.filter(x => x != tag.id);
+          tagListToggledThisTag = tagListToggledThisTag.sort().join(',');
+
+          let url = tagListToggledThisTag ? syzoj.utils.makeUrl(['problems', 'tag', tagListToggledThisTag]) : syzoj.utils.makeUrl(['problems']);
+          %>
+            <a href="<%= url %>" class="ui tiny <%= tag.color %> label" style="margin-top: 3px;">
+              <%= tag.name %>
+            </a>
+        <% } %>
+      <% }} %>
+    </div>
   </div>
   <table class="ui very basic center aligned table">
     <thead>
@@ -93,7 +123,6 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
           <th class="one wide center aligned">题目公开</th>
           <th class="one wide center aligned">数据公开</th>
         <% } %>
-        <th class="one wide"><%- createSortableTitle('ac_num', '通过', false) %></th>
         <th class="one wide"><%- createSortableTitle('submit_num', '提交', false) %></th>
         <th class="one wide">通过率</th>
       </tr>
@@ -143,8 +172,7 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
               <td><div class="ui toggle checkbox pp"><input type="checkbox" data-id="<%= problem.id %>" <% if (problem.is_public) { %>checked<% } %> ></div></td>
               <td><div class="ui toggle checkbox dp"><input type="checkbox" data-id="<%= problem.id %>" <% if (problem.is_data_public) { %>checked<% } %> ></div></td>
             <% } %>
-            <td><%= problem.ac_num %></td>
-            <td><%= problem.submit_num %></td>
+            <td><%= problem.ac_num %>/<%= problem.submit_num %></td>
             <td><%= problem.submit_num != 0 ? (((problem.ac_num / problem.submit_num * 100) || 0).toFixed(2) + '%') : '-' %></td>
         </tr>
         <% } %>
@@ -153,7 +181,8 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
   </table><br>
   <% include page  %>
   <% } else { %>
-  <div class="ui placeholder segment">
+  <div class="ui attached segment"  style="left: -10%; width: 90%; border: 0px;">
+    <div class="ui attached placeholder segment">
     <div class="ui icon header">
       <% if (typeof req.query.keyword !== 'undefined') { %>
       <i class="search icon" style="margin-bottom: 20px; "></i>
@@ -162,6 +191,45 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
       <i class="list icon" style="margin-bottom: 20px; "></i>
       暂无题目
       <% } %>
+    </div>
+    </div>
+    <div class="ui right close rail">
+      <div class="ui attached segment" style="border-radius: 8px;">
+        <h3 class="ui header">Tags: </h3>
+        <% if (typeof tags !== 'undefined') { 
+          tags.sort((a, b) => {
+            return a.color > b.color ? 1 : -1;
+          }); 
+        %>
+          <h4 class="ui dividing header"  style="margin-top: 7px; margin-bottom: 0px;">Selected Tag</h4>
+          <% for (let tag of tags) { %>
+            <% let tagListRemovedThisTag = tagIDs.filter(x => x != tag.id).sort().join(','); %>
+            <% let url = tagListRemovedThisTag ? syzoj.utils.makeUrl(['problems', 'tag', tagListRemovedThisTag]) : syzoj.utils.makeUrl(['problems']); %>
+            <a href="<%= url %>" class="ui olive tiny <%= tag.color %> label" style="margin-top: 3px;">
+              <%= tag.name %>
+              <i aria-hidden="true" class="delete icon"></i>
+            </a>
+          <% } %>
+          <div style="margin-top: 20px;"></div>
+        <% } %>
+        <% if (!tag_groups || tag_groups.length === 0) { %>
+          <p>No Tags Yet</p>
+        <% } else { for(let tg of tag_groups) if (tg.tags && tg.tags.length > 0) { %>
+          <h5 class="ui dividing header" style="margin-top: 7px; margin-bottom: 0px;"><%= tg.name %></h5>
+          <% for (let tag of tg.tags) { 
+            let tagListToggledThisTag;
+            if (!tagIDs.includes(tag.id)) tagListToggledThisTag = tagIDs.concat([tag.id]);
+            else tagListToggledThisTag = tagIDs.filter(x => x != tag.id);
+            tagListToggledThisTag = tagListToggledThisTag.sort().join(',');
+  
+            let url = tagListToggledThisTag ? syzoj.utils.makeUrl(['problems', 'tag', tagListToggledThisTag]) : syzoj.utils.makeUrl(['problems']);
+            %>
+              <a href="<%= url %>" class="ui tiny <%= tag.color %> label" style="margin-top: 3px;">
+                <%= tag.name %>
+              </a>
+          <% } %>
+        <% }} %>
+      </div>
     </div>
   </div>
   <% } %>
@@ -187,8 +255,8 @@ $(function () {
       title: 'name'
     }
   });
-  $('.ui.toggle.checkbox').checkbox({
-  });
+  $('.ui.toggle.checkbox.pp').checkbox({});
+  $('.ui.toggle.checkbox.dp').checkbox({});
 });
 
 $(document).ready(() => {
@@ -197,7 +265,6 @@ $(document).ready(() => {
       obj = $(e.currentTarget).children('input');
       checked = $(obj).prop("checked");
       url = "/problem/" + $(obj).attr("data-id") + (checked ? "/public" : "/dis_public");
-      console.log(url);
       $.post(url, {});
     })
   })
@@ -206,11 +273,11 @@ $(document).ready(() => {
       obj = $(e.currentTarget).children('input');
       checked = $(obj).prop("checked");
       url = "/problem/" + $(obj).attr("data-id") + (checked ? "/data_public" : "/dis_data_public");
-      console.log(url);
       $.post(url, {});
     })
   })
 })
 </script>
+</div>
 </div>
 <% include footer %>

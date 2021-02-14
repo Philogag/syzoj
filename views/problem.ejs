@@ -55,25 +55,46 @@ if (contest) {
           <span class="ui label">评测方式：<%= (testcases && !testcases.error) ? (testcases.spj ? 'Special Judge' : '文本比较') : '无测试数据' %></span>
       </div>
     <% } %>
-    <% if (!contest) { %>
-        <div class="row" style="margin-top: -23px">
-            <span class="ui label">上传者：
-            <% if (problem.is_anonymous && !problem.allowedManage) { %>
-              匿名
-            <% } else { %>
-              <a href="<%= syzoj.utils.makeUrl(['user', problem.user_id]) %>"><%= problem.user.username %></a>
-            <% } %>
-            </span>
-            <% if (problem.allowedManage) { %>
-                <span class="ui label">公开者：
-                <% if (problem.publicizer) { %>
-                  <a href="<%= syzoj.utils.makeUrl(['user', problem.publicizer_id]) %>"><%= problem.publicizer.username %></a>
-                <% } else { %>
-                  未知
-                <% } %>
-                </span>
-            <% } %>
+    <% if (problem.tags && problem.tags.length && (typeof contest === 'undefined' || !contest)) { %>
+      <div class="row" style="margin-top: -23px">
+        <input type="hidden" id="hidden-tags">
+        <div class="labels" id="tags">
+          <a href="javascript:;" onclick="switchTagShow(); return false;" class="ui olive grey label" id="tag-operator">显示Tag</a>
         </div>
+      </div>
+      <script>
+        let tagitems = [
+        <% for (let tag of problem.tags) { %>
+        {
+          id: <%= tag.id %>,
+          name: "<%= tag.name %>",
+          color: "<%= tag.color %>",
+        },
+        <% } %>
+      ];
+      </script>
+      <script>
+      function switchTagShow(){
+        if (localStorage.getItem('show_problem_tag') === '1'){ // opened now, go close
+          for(var obj of $("a.hideable")){
+            $("#tags")[0].removeChild($(obj)[0]);
+          }
+          localStorage.setItem('show_problem_tag', '0');
+          $("#tag-operator").html("显示Tag");
+        } else {
+          for (let t of tagitems){
+            console.log(t);
+            ss = '<a href="/problems/tag/' + t.id + '" class="ui medium ' + t.color + ' label hideable">' + t.name + '</a>';
+            $("#tags").append(ss);
+          }
+          $("#tag-operator").html("隐藏Tag");
+          localStorage.setItem('show_problem_tag', '1');
+        }
+      }
+      $(function (){
+        localStorage.setItem('show_problem_tag', '0');
+      })
+      </script>
     <% } %>
 </div>
 <div class="ui grid">
@@ -173,22 +194,30 @@ if (contest) {
 
       <% if (problem.example && examples && examples.length > 0) { %>
         <h2 class="ui attached block">样例</h2>
-        <table class="ui very basic aligned table">
-          <thead>
-            <tr>
-              <th width='50%'>输入</th>
-              <th>输出</th>
-            </tr>
-          </thead>
-          <tbody>
-          <% for (let exam of examples) { %>  
-            <tr>
-              <th><div class="ui segment font-content"><pre><code><%= exam.in %></code></pre></div></th>
-              <th><div class="ui segment font-content"><pre><code><%= exam.out %></code></pre></div></th>
-            </tr>
-          <% } %>
-          </tbody>
-        </table>
+        <% 
+        i=0;
+        for (var exam of examples) { 
+          i++;
+          %> 
+          <table class="ui celled table">
+            <thead>
+              <tr>
+                <th class="doclickboard left" style="width: 50%;" id="example-<%= i %>-input">
+                  Input.#<%= i %>
+                </th>
+                <th class="doclickboard right" id="example-<%= i %>-output">
+                  Output.#<%= i %>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><pre><code id="example-<%= i %>-input-target"><%= exam.in %></code></pre></td>
+                <td><pre><code id="example-<%= i %>-output-target"><%= exam.out %></code></pre></td>
+              </tr>
+            </tbody>
+          </table> 
+        <% } %>
       <% } %>
 
       <% if (problem.limit_and_hint) { %>
@@ -199,32 +228,6 @@ if (contest) {
     </div>
   </div>
 
-
-  <% if (problem.tags && problem.tags.length && (typeof contest === 'undefined' || !contest)) { %>
-    <div class="row">
-      <div class="column">
-        <h4 class="ui block header" id="show_tag_title_div" style="margin-bottom: 0; margin-left: -1px; margin-right: -1px; "><a href="#" id="show_tag_button" style="color: #000; ">显示分类标签</a></h4>
-        <div class="ui bottom attached segment" style="display: none; " id="show_tag_div">
-          <% for (let tag of problem.tags) { %>
-            <a href="<%= syzoj.utils.makeUrl(['problems', 'tag', tag.id]) %>" class="ui medium <%= tag.color %> label">
-              <%= tag.name %>
-            </a>
-          <% } %>
-        </div>
-      </div>
-    </div>
-    <script>
-    $(function () {
-      $('#show_tag_button').click(function (e) {
-        e.preventDefault();
-        $('#show_tag_title_div').addClass('top');
-        $('#show_tag_title_div').addClass('top attached');
-        $('#show_tag_title_div').text('分类标签');
-        $('#show_tag_div').css('display', '');
-      })
-    });
-    </script>
-  <% } %>
     <% let noSubmit = false; %>
     <%
     if (typeof contest !== 'undefined' && contest && contest.ended || (!testcases || testcases.error)) {

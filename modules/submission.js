@@ -88,7 +88,7 @@ app.get('/submissions', async (req, res) => {
       isFiltered = true;
     }
 
-    if (!inContest && (!curUser || !await curUser.hasPrivilege('manage_problem'))) {
+    if (!inContest && (!curUser || ! curUser.isTeacherAdmin())) {
       if (req.query.problem_id) {
         let problem_id = parseInt(req.query.problem_id);
         let problem = await Problem.findById(problem_id);
@@ -226,7 +226,7 @@ app.post('/submission/:id/rejudge', async (req, res) => {
     let id = parseInt(req.params.id);
     let judge = await JudgeState.findById(id);
 
-    if (judge.pending && !(res.locals.user && await res.locals.user.hasPrivilege('manage_problem'))) throw new ErrorMessage('无法重新评测一个评测中的提交。');
+    if (judge.pending && !(res.locals.user && res.locals.user.isTeacherAdmin())) throw new ErrorMessage('无法重新评测一个评测中的提交。');
 
     await judge.loadRelationships();
 

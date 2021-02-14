@@ -24,7 +24,7 @@ app.get('/', async (req, res) => {
       date: syzoj.utils.formatDate(article.public_time, 'L')
     }));
 
-    let contests = await Contest.queryRange([1, 5], { is_enabled: true }, {
+    let contests = await Contest.queryRange([1, 5], {end_time: TypeORM.MoreThan(syzoj.utils.getCurrentDate()), is_enabled: true }, {
       start_time: 'DESC'
     });
 
@@ -50,18 +50,6 @@ app.get('/', async (req, res) => {
     });
   }
 });
-
-app.get('/help', async (req, res) => {
-  try {
-    res.render('help');
-  } catch (e) {
-    syzoj.log(e);
-    res.render('error', {
-      err: e
-    });
-  }
-});
-
 
 app.get('/wiki/*', async (req, res) => {
   try {

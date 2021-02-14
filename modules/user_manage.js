@@ -114,7 +114,7 @@ app.get('/admin/groups', async (req, res) => {
         if (curUser.is_admin) {
             groups = await Group.find();
         } else {
-            let gus = await GroupUser.find({ where: { uid: curUser.id, is_admin: true } });
+            let gus = await GroupUser.find({ where: { uid: curUser.id, is_admin: true }, order: { id: 'ASC' } });
             groups = await Promise.all(gus.map(async (gu) => {
                 return await Group.findById(gu.gid);
             }));
@@ -149,8 +149,8 @@ app.get('/admin/groups/:id', async (req, res) => {
             group = await Group.findById(gid);
             if (!group.allowVisitAndEditBy(curUser)) throw new ErrorMessage('您没有权限操作这个组。');
 
-            gadmins = await GroupUser.find({ gid: gid, is_admin: true });
-            gusers = await GroupUser.find({ gid: gid, is_admin: false });
+            gadmins = await GroupUser.find({ where: { gid: gid, is_admin: true } , order: { uid: 'ASC' }});
+            gusers = await GroupUser.find({ where: { gid: gid, is_admin: false } , order: { uid: 'ASC' }});
 
             gadmins = await Promise.all(gadmins.map(async (gu) => {return await User.findById(gu.uid); }));
             gusers = await Promise.all(gusers.map(async (gu) => {return await User.findById(gu.uid); }));

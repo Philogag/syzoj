@@ -3,6 +3,7 @@ let JudgeState = syzoj.model('judge_state');
 let FormattedCode = syzoj.model('formatted_code');
 let Contest = syzoj.model('contest');
 let ProblemTag = syzoj.model('problem_tag');
+let ProblemTagGroup = syzoj.model('problem_tag_group');
 let Article = syzoj.model('article');
 
 const randomstring = require('randomstring');
@@ -21,7 +22,7 @@ app.get('/problems', async (req, res) => {
     }
 
     let query = Problem.createQueryBuilder();
-    if (!res.locals.user || !await res.locals.user.hasPrivilege('manage_problem')) {
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) {
       if (res.locals.user) {
         query.where('is_public = 1')
              .orWhere('user_id = :user_id', { user_id: res.locals.user.id });
@@ -39,6 +40,8 @@ app.get('/problems', async (req, res) => {
     let paginate = syzoj.utils.paginate(await Problem.countForPagination(query), req.query.page, syzoj.config.page.problem);
     let problems = await Problem.queryPage(paginate, query);
 
+    tag_groups = await ProblemTagGroup.find({ order: {id: "ASC"}, relations: ["tags"]});
+
     await problems.forEachAsync(async problem => {
       problem.allowedEdit = await problem.isAllowedEditBy(res.locals.user);
       problem.judge_state = await problem.getJudgeState(res.locals.user, true);
@@ -46,8 +49,9 @@ app.get('/problems', async (req, res) => {
     });
 
     res.render('problems', {
-      allowedManageProblem: res.locals.user && await res.locals.user.isTeacherAdmin(),
+      allowedManageProblem: res.locals.user && res.locals.user.isTeacherAdmin(),
       problems: problems,
+      tag_groups: tag_groups,
       paginate: paginate,
       curSort: sort,
       curOrder: order === 'asc'
@@ -70,7 +74,7 @@ app.get('/problems/search', async (req, res) => {
     }
 
     let query = Problem.createQueryBuilder();
-    if (!res.locals.user || !await res.locals.user.hasPrivilege('manage_problem')) {
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) {
       if (res.locals.user) {
         query.where(new TypeORM.Brackets(qb => {
              qb.where('is_public = 1')
@@ -108,9 +112,12 @@ app.get('/problems/search', async (req, res) => {
       problem.tags = await problem.getTags();
     });
 
+    tag_groups = await ProblemTagGroup.find({ order: {id: "ASC"}, relations: ["tags"]});
+
     res.render('problems', {
       allowedManageProblem: res.locals.user && res.locals.user.isTeacherAdmin(),
       problems: problems,
+      tag_groups: tag_groups,
       paginate: paginate,
       curSort: sort,
       curOrder: order === 'asc'
@@ -155,7 +162,7 @@ app.get('/problems/tag/:tagIDs', async (req, res) => {
       sql += '`problem`.`id` IN (SELECT `problem_id` FROM `problem_tag_map` WHERE `tag_id` = ' + tagID + ')';
     }
 
-    if (!res.locals.user || !await res.locals.user.hasPrivilege('manage_problem')) {
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) {
       if (res.locals.user) {
         sql += 'AND (`problem`.`is_public` = 1 OR `problem`.`user_id` = ' + res.locals.user.id + ')';
       } else {
@@ -177,10 +184,13 @@ app.get('/problems/tag/:tagIDs', async (req, res) => {
       return problem;
     });
 
+    tag_groups = await ProblemTagGroup.find({ order: {id: "ASC"}, relations: ["tags"]});
+
     res.render('problems', {
       allowedManageProblem: res.locals.user && res.locals.user.isTeacherAdmin(),
       problems: problems,
       tags: tags,
+      tag_groups: tag_groups,
       paginate: paginate,
       curSort: sort,
       curOrder: order === 'asc'
@@ -334,7 +344,7 @@ app.post('/problem/:id/edit', async (req, res) => {
         type: 'traditional'
       });
 
-      if (await res.locals.user.hasPrivilege('manage_problem')) {
+      if (res.locals.user.isTeacherAdmin()) {
         let customID = parseInt(req.body.id);
         if (customID) {
           if (await Problem.findById(customID)) throw new ErrorMessage('ID 已被使用。');
@@ -348,7 +358,7 @@ app.post('/problem/:id/edit', async (req, res) => {
       if (!await problem.isAllowedUseBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
       if (!await problem.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
 
-      if (await res.locals.user.hasPrivilege('manage_problem')) {
+      if (res.locals.user.isTeacherAdmin()) {
         let customID = parseInt(req.body.id);
         if (customID && customID !== id) {
           if (await Problem.findById(customID)) throw new ErrorMessage('ID 已被使用。');
@@ -437,7 +447,7 @@ app.post('/problem/:id/import', async (req, res) => {
         type: 'traditional'
       });
 
-      if (await res.locals.user.hasPrivilege('manage_problem')) {
+      if (res.locals.user.isTeacherAdmin()) {
         let customID = parseInt(req.body.id);
         if (customID) {
           if (await Problem.findById(customID)) throw new ErrorMessage('ID 已被使用。');
@@ -492,11 +502,11 @@ app.post('/problem/:id/import', async (req, res) => {
     try {
       let data = await download(req.body.url + (req.body.url.endsWith('/') ? 'testdata/download' : '/testdata/download'));
       await fs.writeFile(tmpFile.path, data);
-      await problem.updateTestdata(tmpFile.path, await res.locals.user.hasPrivilege('manage_problem'));
+      await problem.updateTestdata(tmpFile.path, res.locals.user.isTeacherAdmin());
       if (json.obj.have_additional_file) {
         let additional_file = await download(req.body.url + (req.body.url.endsWith('/') ? 'download/additional_file' : '/download/additional_file'));
         await fs.writeFile(tmpFile.path, additional_file);
-        await problem.updateFile(tmpFile.path, 'additional_file', await res.locals.user.hasPrivilege('manage_problem'));
+        await problem.updateFile(tmpFile.path, 'additional_file', res.locals.user.isTeacherAdmin());
       }
     } catch (e) {
       syzoj.log(e);
@@ -565,11 +575,11 @@ app.post('/problem/:id/manage', app.multer.fields([{ name: 'testdata', maxCount:
     if (validateMsg) throw new ErrorMessage('无效的题目数据配置。', null, validateMsg);
 
     if (req.files['testdata']) {
-      await problem.updateTestdata(req.files['testdata'][0].path, await res.locals.user.hasPrivilege('manage_problem'));
+      await problem.updateTestdata(req.files['testdata'][0].path, res.locals.user.isTeacherAdmin());
     }
 
     if (req.files['additional_file']) {
-      await problem.updateFile(req.files['additional_file'][0].path, 'additional_file', await res.locals.user.hasPrivilege('manage_problem'));
+      await problem.updateFile(req.files['additional_file'][0].path, 'additional_file', res.locals.user.isTeacherAdmin());
     }
 
     await problem.save();
@@ -838,7 +848,7 @@ app.post('/problem/:id/testdata/upload', app.multer.array('file'), async (req, r
 
     if (req.files) {
       for (let file of req.files) {
-        await problem.uploadTestdataSingleFile(file.originalname, file.path, file.size, await res.locals.user.hasPrivilege('manage_problem'));
+        await problem.uploadTestdataSingleFile(file.originalname, file.path, file.size, res.locals.user.isTeacherAdmin());
       }
     }
 

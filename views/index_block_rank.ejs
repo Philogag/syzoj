@@ -1,6 +1,6 @@
 <h4 class="ui top attached block header"><i class="ui signal icon"></i>排名</h4>
 <div class="ui bottom attached segment">
-  <table class="ui very basic center aligned table" style="table-layout: fixed; ">
+  <table class="ui very basic center aligned table">
     <thead>
       <tr>
           <th style="width: 50px; ">#</th>
@@ -8,18 +8,6 @@
           <th>积分</th>
       </tr>
     </thead>
-    <script data-cfasync="false">
-    var lineHeight = 0;
-    (function () {
-      var div = document.createElement('div');
-      div.style.position = 'fixed';
-      div.style.left = -10000;
-      div.style.visibility = 'hidden';
-      div.innerText = '测试，Test.';
-      document.body.appendChild(div);
-      lineHeight = div.clientHeight;
-    })();
-    </script>
     <tbody>
       <%
       let i = 0;
@@ -29,11 +17,9 @@
           <tr>
               <td><b><%= i %></b></td>
               <td><a href="<%= syzoj.utils.makeUrl(['user', user.id]) %>"><%= user.username %></a><% if (user.nameplate) { %><%- user.nameplate %><% } %></td>
-              <td><%= user.rating %>
-              </td>
+              <td><%= user.rating %></td>
           </tr>
-       <%
-      } %>
+      <%  } %>
     </tbody>
   </table>
 </div>

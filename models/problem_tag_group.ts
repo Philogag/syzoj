@@ -1,10 +1,10 @@
 import * as TypeORM from "typeorm";
 import Model from "./common";
 
-import ProblemTagGroup from "./problem_tag_group"
-import ProblemTagMap from "./problem_tag_map"
+import ProblemTag from "./problem_tag"
+
 @TypeORM.Entity()
-export default class ProblemTag extends Model {
+export default class ProblemTagGroup extends Model {
   static cache = true;
 
   @TypeORM.PrimaryGeneratedColumn()
@@ -16,13 +16,13 @@ export default class ProblemTag extends Model {
 
   @TypeORM.Column({ nullable: true, type: "varchar", length: 255 })
   color: string;
-
-  @TypeORM.ManyToOne(() => ProblemTagGroup, group => group.tags)
-  group: ProblemTagGroup;
+    
+  @TypeORM.OneToMany(() => ProblemTag, tag => tag.group)
+  tags: ProblemTag[];
 
   async destroy() {
     const id = (this as any).id;
-    let maps = await ProblemTagMap.find({ tag_id: id });
+    let maps = await ProblemTag.find({ where: {group: this}});
     if (maps && maps.length > 0) {
       await Promise.all(maps.map(async (x) => { await x.destroy();}))
     }

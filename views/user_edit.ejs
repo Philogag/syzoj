@@ -32,7 +32,11 @@
           <input id="public_email" name="public_email" type="checkbox" <% if (edited_user.public_email) { %> checked<% } %>>
           <label>　</label>
         </div>
-	    </div>
+      </div>
+      <div class="field <% if (user.realname) { %>disabled<% } %>">
+        <label for="realname">实名: <font style="color: red;">实名后无法自行更改，若有误请联系管理员</font></label>
+        <input class="font-content " type="text" id="realname" name="realname" value="<% if (user.realname) { %><%= user.realname %><% } %>">
+      </div>
       <div class="inline field">
         <label class="ui header">默认显示格式化后的代码（如果可用）</label>
         <div class="ui toggle checkbox">
@@ -56,31 +60,7 @@
           <input type="password" placeholder="确认密码" id="password2">
         </div>
       </div>
-      <%
-      let allowedManagePrivilege = user && user.is_admin;
-      %>
 
-      <% if (user.is_admin) { %>
-      <div class="inline field">
-        <label class="ui header">权限</label>
-        <div class="ui toggle disabled checkbox" style="margin-right: 20px; ">
-          <input disabled="disabled" type="checkbox" <% if (edited_user.is_admin) { %> checked<% } %>>
-          <label>全站管理员</label>
-        </div>
-        <div class="ui toggle <% if (!allowedManagePrivilege) { %>disabled <% } %>checkbox checkbox_privilege" data-name="manage_problem" style="margin-right: 20px; ">
-          <input <% if (!allowedManagePrivilege) { %>disabled="disabled" <% } %>type="checkbox"<% if (edited_user.privileges.includes('manage_problem')) { %> checked<% } %>>
-          <label>管理题目</label>
-        </div>
-        <div class="ui toggle <% if (!allowedManagePrivilege) { %>disabled <% } %>checkbox checkbox_privilege" data-name="manage_problem_tag" style="margin-right: 20px; ">
-          <input <% if (!allowedManagePrivilege) { %>disabled="disabled" <% } %>type="checkbox"<% if (edited_user.privileges.includes('manage_problem_tag')) { %> checked<% } %>>
-          <label>管理题目标签</label>
-        </div>
-        <div class="ui toggle <% if (!allowedManagePrivilege) { %>disabled <% } %>checkbox checkbox_privilege" data-name="manage_user">
-          <input <% if (!allowedManagePrivilege) { %>disabled="disabled" <% } %>type="checkbox"<% if (edited_user.privileges.includes('manage_user')) { %> checked<% } %>>
-          <label>管理用户</label>
-        </div>
-      </div>
-      <% } %>
       <div style="text-align: center; margin-top: 30px; ">
         <button id="submit_button" type="submit" class="ui blue labeled icon button"><i class="ui icon edit"></i>修改</button>
         <a href="<%= syzoj.utils.makeUrl(['user', edited_user.id]) %>" class="ui labeled icon button"><i class="ui icon angle left"></i>返回</a>
@@ -118,20 +98,6 @@ function check() {
 	make_md5(old_password);
 	make_md5(password1);
 	make_md5(password2);
-
-<% if (allowedManagePrivilege) { %>
-  $('.checkbox_privilege').each(function () {
-    if ($(this).checkbox('is checked')) {
-      var name = $(this).data('name');
-
-      var elem = document.createElement('input');
-      elem.type = 'hidden';
-      elem.value = name;
-      elem.name = 'privileges';
-      document.getElementById('form').appendChild(elem);
-    }
-  });
-<% } %>
 
 	return true;
 }

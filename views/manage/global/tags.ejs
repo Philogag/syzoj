@@ -1,0 +1,220 @@
+<% this.adminPage = 'tags'; %>
+<% include ../admin_header %>
+<table class="ui basic table">
+  <thead>
+    <tr>
+      <th class="two wide center aligned">组</th>
+      <th>Tag</th>
+      <th class="one wide center aligned">
+        <button class="ui tiny icon button" type="button" onclick="doEditGroup(this, true);"><i class="plus icon"></i>新建组</button>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for(let tg of tag_groups) { %>
+    <tr data-id="<%= tg.id %>" data-color="<%= tg.color %>">
+      <td class="center aligned">
+        <span class="ui header">
+          <a class="ui tiny <%= tg.color %> label">
+            <%= tg.name %>
+          </a>
+        </span>
+      </td>
+      <td>
+        <% for (let tag of tg.tags) { %>
+        <button class="ui <%= tag.color %> tiny icon button" type="button" onclick="doEditTag(this);" data-id="<%= tag.id %>" data-color="<%= tag.color %>" style="margin-top: 3px;">
+          <i class="pencil alternate icon"></i>
+          <%= tag.name %>
+        </button>
+        <% } %>
+      </td>
+      <td class="center aligned">
+        <div class="ui tiny icon buttons" style="width: fit-content;">
+          <button class="ui button"type="button" onclick="doEditTag(this, true);" ><i class="plus icon"></i></button>
+          <button class="ui button"type="button" onclick="doEditGroup(this)" ><i class="edit icon"></i></button>
+        </div>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
+
+<div class="ui small modal" id="tag-edit">
+    <i class="close icon"></i>
+    <div class="header">
+        <h4 id="tag-edit-title">编辑Tag</h4>
+    </div>
+
+    <div clas="content font-content center aligned">
+        <div class="padding">
+        <div class="ui form" style="width: 80%; left: 10%;">
+          <form id="tag-edit-form" onsubmit="return false;"  method="post">
+            <input type="hidden" id="tag_id", name="id">
+            <div class="field" style="margin-top: 14px;">
+              <label>组ID</label>
+              <input type="text" id="tag_gid" name="gid">
+            </div>
+            <div class="field" style="margin-top: 14px;">
+              <label>Tag名</label>
+              <input type="text" id="tag_name" name="name">
+            </div>
+            <div class="field" style="margin-top: 14px;">
+              <label>颜色</label>
+              <% this.color_drop_id = "tag" %>
+              <% include ../../color_picker %>
+            </div>
+            <input type="hidden" id="do-delete" name="do_delete" value="">
+          </form>
+        </div>
+        </div>
+    </div>
+
+    <div class="actions" style="margin-top: 14px;">
+      <div type="button" onclick="$('#tag-edit').modal('hide');" class="ui button"><i class="grey cancel icon"></i>Cancel</div>
+      <div type="button" onclick="doTagEditApi(true);" class="ui button"><i class="grey trash alternate icon"></i>Delete</div>
+      <div type="submit" onclick="doTagEditApi(false);" class="ui button"><i class="grey upload icon" id="edit-submit-icon"></i>OK</div>
+    </div>
+</div>
+
+<script>
+function doEditTag(obj, isnew){
+  var data = {}
+  if (!isnew) {
+    data = {
+      id: $(obj).attr('data-id'),
+      name: $(obj).text().trim(),
+      color: $(obj).attr('data-color'),
+      gid: $(obj).parents('tr').attr('data-id')
+    }
+    $("#tag-edit-title").html("编辑 - #" + data.id);
+  } else {
+    $("#tag-edit-title").html("新建");
+    data = {
+      id: '',
+      name: '',
+      color: $(obj).parents('tr').attr('data-color'),
+      gid: $(obj).parents('tr').attr('data-id')
+    }
+  }
+  $("#tag-edit").find("#tag_id").val(data.id);
+  $("#tag-edit").find("#tag_name").val(data.name);
+  $("#tag-edit").find("#tag_gid").val(data.gid);
+  $("#tag-edit").find("#tag_color").val(data.color);
+
+  $("#<%= this.color_drop_id %>_color_dropdown").dropdown();
+  $("#tag-edit").modal('show');
+}
+
+function doTagEditApi(doDelete){
+  form = $('#tag-edit-form')
+  $(form).find("#do-delete").val(doDelete);
+  console.log('Data:',$(form).serialize());
+  $.post(
+    "/admin/tags/update",
+    $(form).serialize(),
+    function(result){
+      if (result.success){
+          $('#edit-submit-icon').attr('class', 'green check icon');
+          setTimeout(function(){
+              $('#edit-window').modal('hide');
+              location.reload();
+          }, 700);
+      }else {
+          $('#edit-submit-icon').attr('class', 'red x icon');
+          setTimeout(function(){
+              $('#edit-submit-icon').attr('class', 'grey upload icon');
+          }, 2000);
+      }
+    }
+  );
+}
+</script>
+
+
+
+<div class="ui small modal" id="group-edit">
+  <i class="close icon"></i>
+  <div class="header">
+      <h4 id="group-edit-title"></h4>
+  </div>
+
+  <div clas="content font-content center aligned">
+      <div class="padding">
+      <div class="ui form" style="width: 80%; left: 10%;">
+        <form id="group-edit-form" onsubmit="return false;"  method="post">
+          <input type="hidden" id="group_id" name="id">
+          <div class="field" style="margin-top: 14px;">
+            <label>组名</label>
+            <input type="text" id="group_name" name="name">
+          </div>
+          <div class="field" style="margin-top: 14px;">
+            <label>颜色</label>
+            <% this.color_drop_id = "group" %>
+            <% include ../../color_picker %>
+          </div>
+          <input type="hidden" id="do-delete" name="do_delete" value="">
+        </form>
+      </div>
+      </div>
+  </div>
+
+  <div class="actions" style="margin-top: 14px;">
+    <div type="button" onclick="$('#group-edit').modal('hide');" class="ui button"><i class="grey cancel icon"></i>Cancel</div>
+    <div type="button" onclick="doGroupEditApi(true);" class="ui button"><i class="grey trash alternate icon"></i>Delete</div>
+    <div type="button" onclick="doGroupEditApi(false);" class="ui button"><i class="grey upload icon" id="group-submit-icon"></i>OK</div>
+  </div>
+</div>
+
+<script>
+function doEditGroup(obj, isnew){
+  var data = {}
+  if (!isnew) {
+    data = {
+      id: $(obj).parents('tr').attr('data-id'),
+      name: $($(obj).parents('tr').find('td')[0]).text().trim(),
+      color: $(obj).parents('tr').attr('data-color'),
+    }
+    $("#group-edit-title").html("编辑 - #" + data.id);
+  } else {
+    data = {
+      id: '',
+      name: '',
+      color: '',
+    }
+    $("#group-edit-title").html("新建");
+  }
+  $("#group-edit").find("#group_id").val(data.id);
+  $("#group-edit").find("#group_name").val(data.name);
+  $("#group-edit").find("#group_color").val(data.color);
+
+  $("#<%= this.color_drop_id %>_color_dropdown").dropdown();
+  $("#group-edit").modal('show');
+}
+
+function doGroupEditApi(doDelete){
+  form = $('#group-edit-form')
+  $(form).find("#do-delete").val(doDelete);
+  console.log('Data:',$(form).serialize());
+  $.post(
+    "/admin/tags/group",
+    $(form).serialize(),
+    function(result){
+      if (result.success){
+          $('#edit-submit-icon').attr('class', 'green check icon');
+          setTimeout(function(){
+              $('#edit-window').modal('hide');
+              location.reload();
+          }, 700);
+      }else {
+          $('#edit-submit-icon').attr('class', 'red x icon');
+          setTimeout(function(){
+              $('#edit-submit-icon').attr('class', 'grey upload icon');
+          }, 2000);
+      }
+    }
+  );
+}
+</script>
+
+
+<% include ../admin_footer %>

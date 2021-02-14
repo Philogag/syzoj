@@ -4,7 +4,6 @@ import Model from "./common";
 declare var syzoj: any;
 
 import JudgeState from "./judge_state";
-import UserPrivilege from "./user_privilege";
 import Article from "./article";
 import Contest from "./contest";
 
@@ -57,7 +56,7 @@ export default class User extends Model {
 
   @TypeORM.Index()
   @TypeORM.Column({ nullable: true, type: "boolean" })
-  is_show: boolean;
+  is_show: boolean; // show in public ranklist
 
   @TypeORM.Column({ nullable: true, type: "boolean", default: true })
   public_email: boolean;
@@ -92,7 +91,7 @@ export default class User extends Model {
 
   async isAllowedEditBy(user) {
     if (!user) return false;
-    if (await user.hasPrivilege('manage_user')) return true;
+    if (user.isTeacherAdmin()) return true;
     return user && (user.is_admin || this.id === user.id);
   }
 
@@ -166,48 +165,6 @@ export default class User extends Model {
 
   async renderInformation() {
     this.information = await syzoj.utils.markdown(this.information);
-  }
-
-  async getPrivileges() {
-    let privileges = await UserPrivilege.find({
-      where: {
-        user_id: this.id
-      }
-    });
-
-    return privileges.map(x => x.privilege);
-  }
-
-  async setPrivileges(newPrivileges) {
-    let oldPrivileges = await this.getPrivileges();
-
-    let delPrivileges = oldPrivileges.filter(x => !newPrivileges.includes(x));
-    let addPrivileges = newPrivileges.filter(x => !oldPrivileges.includes(x));
-
-    for (let privilege of delPrivileges) {
-      let obj = await UserPrivilege.findOne({ where: {
-        user_id: this.id,
-        privilege: privilege
-      } });
-
-      await obj.destroy();
-    }
-
-    for (let privilege of addPrivileges) {
-      let obj = await UserPrivilege.create({
-        user_id: this.id,
-        privilege: privilege
-      });
-
-      await obj.save();
-    }
-  }
-
-  async hasPrivilege(privilege) {
-    if (this.is_admin) return true;
-
-    let x = await UserPrivilege.findOne({ where: { user_id: this.id, privilege: privilege } });
-    return !!x;
   }
 
   async getLastSubmitLanguage() {

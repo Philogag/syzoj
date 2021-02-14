@@ -46,15 +46,20 @@
 };
 if (user.isSuperAdmin()){
     this.items["用户与组"].push({
-                            id: "teachers",
-                            name: '教师管理',
-                            url: '/admin/teachers',
-                        }),
+        id: "teachers",
+        name: '教师管理',
+        url: '/admin/teachers',
+    });
     this.items["后台管理"].push({
-            id: "raw",
-            name: "配置文件",
-            url: "/admin/raw",
-        })
+        id: "raw",
+        name: "配置文件",
+        url: "/admin/raw",
+    });
+    this.items["后台管理"].push({
+        id: "tags",
+        name: "题目Tag",
+        url: "/admin/tags",
+    });
 }
 %>
 

@@ -486,11 +486,11 @@ export default class Problem extends Model {
     }
 
     let res = await (tagIDs as any).mapAsync(async tagID => {
-      return ProblemTag.findById(tagID);
+      return ProblemTag.findOne({ where: { id: tagID } , relations: ['group']});
     });
 
     res.sort((a, b) => {
-      return a.color > b.color ? 1 : -1;
+      return a.group.id > b.group.id ? 1 : -1;
     });
 
     return res;

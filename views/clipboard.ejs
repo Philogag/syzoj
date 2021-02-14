@@ -2,10 +2,14 @@
 <style>
 .copybutton{
     position: absolute; 
-    top: 0px; 
-    right: -4px; 
-    border-top-left-radius: 0px; 
-    border-bottom-right-radius: 0px;
+}
+.left > .copybutton {
+    left: 50%;
+    transform: translate(-130%, -15%);
+}
+.right > .copybutton {
+    left: 100%;
+    transform: translate(-180%, -15%);
 }
 textarea.hidden{
     display: true;
@@ -18,31 +22,29 @@ function randstr(){
 }
 
 $(function(){
-    ss = '<button type="button" class="ui button copybutton" data-clipboard-action="copy"';
-    for(let p of $("code")){
-        randid = "block_" + randstr();
-        p.id = randid;
-        sss = ss + 'data-clipboard-target="#' + randid + '" >Copy</button>';
-        p.parentNode.parentNode.appendChild($(sss)[0]);
+    ss = '<button class="ui mini icon button copybutton" data-clipboard-action="copy" onclick=""><i class="ui copy outline icon"></i></button>'
+    for(let p of $(".doclickboard")){
+        button = $(ss);
+        button.attr('data-clipboard-target', '#' + $(p).attr('id') + '-target');
+        $(p).append(button[0]);
     }
 
     var clipboard = new ClipboardJS('.copybutton');
 
     clipboard.on('success', function(e) {
-        console.info('Trigger:', e.trigger);
         obj = e.trigger
-        obj.innerHTML = "Copied!";
+        $(obj).find('i').attr('class', 'ui green check icon')
         setTimeout(function(){
-            obj.innerHTML = "Copy";
-        }, 300)
+            $(obj).find('i').attr('class', 'ui copy outline icon')
+        }, 500)
     });
 
     clipboard.on('error', function (e) {
         obj = e.triger;
-        obj.innerHTML = "Failed!";
+        $(obj).find('i').attr('class', 'ui red x icon')
         setTimeout(function(){
-            obj.innerHTML = "Copy";
-        }, 300)
+            $(obj).find('i').attr('class', 'ui copy outline icon')
+        }, 500)
     });
 })
 </script>
