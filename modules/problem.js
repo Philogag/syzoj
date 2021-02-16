@@ -532,11 +532,16 @@ app.get('/problem/:id/manage', async (req, res) => {
 
     await problem.loadRelationships();
 
+    let testdata = await problem.listTestdata();
     let testcases = await syzoj.utils.parseTestdata(problem.getTestdataPath(), problem.type === 'submit-answer');
+    problem.allowedEdit = await problem.isAllowedEditBy(res.locals.user);
+    if (problem.additional_file_id)
+      await problem.additional_file.getSize();
 
     res.render('problem_manage', {
       problem: problem,
-      testcases: testcases
+      testcases: testcases,
+      testdata: testdata,
     });
   } catch (e) {
     syzoj.log(e);
@@ -810,33 +815,33 @@ app.post('/problem/:id/delete', async (req, res) => {
   }
 });
 
-app.get('/problem/:id/testdata', async (req, res) => {
-  try {
-    let id = parseInt(req.params.id);
-    let problem = await Problem.findById(id);
+// app.get('/problem/:id/testdata', async (req, res) => {
+//   try {
+//     let id = parseInt(req.params.id);
+//     let problem = await Problem.findById(id);
 
-    if (!problem) throw new ErrorMessage('无此题目。');
-    if (!await problem.isAllowedUseBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
-    if (!problem.is_data_public && !problem.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('题目数据不公开。');
+//     if (!problem) throw new ErrorMessage('无此题目。');
+//     if (!await problem.isAllowedUseBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
+//     if (!problem.is_data_public && !problem.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('题目数据不公开。');
 
-    let testdata = await problem.listTestdata();
-    let testcases = await syzoj.utils.parseTestdata(problem.getTestdataPath(), problem.type === 'submit-answer');
+//     let testdata = await problem.listTestdata();
+//     let testcases = await syzoj.utils.parseTestdata(problem.getTestdataPath(), problem.type === 'submit-answer');
 
-    problem.allowedEdit = await problem.isAllowedEditBy(res.locals.user)
+//     problem.allowedEdit = await problem.isAllowedEditBy(res.locals.user)
 
-    res.render('problem_data', {
-      problem: problem,
-      testdata: testdata,
-      testcases: testcases
-    });
-  } catch (e) {
-    syzoj.log(e);
-    res.status(404);
-    res.render('error', {
-      err: e
-    });
-  }
-});
+//     res.render('problem_data', {
+//       problem: problem,
+//       testdata: testdata,
+//       testcases: testcases
+//     });
+//   } catch (e) {
+//     syzoj.log(e);
+//     res.status(404);
+//     res.render('error', {
+//       err: e
+//     });
+//   }
+// });
 
 app.post('/problem/:id/testdata/upload', app.multer.array('file'), async (req, res) => {
   try {
@@ -852,7 +857,7 @@ app.post('/problem/:id/testdata/upload', app.multer.array('file'), async (req, r
       }
     }
 
-    res.redirect(syzoj.utils.makeUrl(['problem', id, 'testdata']));
+    res.redirect(syzoj.utils.makeUrl(['problem', id, 'manage']));
   } catch (e) {
     syzoj.log(e);
     res.render('error', {
@@ -872,7 +877,26 @@ app.post('/problem/:id/testdata/delete/:filename', async (req, res) => {
     
     await problem.deleteTestdataSingleFile(req.params.filename);
 
-    res.redirect(syzoj.utils.makeUrl(['problem', id, 'testdata']));
+    res.redirect(syzoj.utils.makeUrl(['problem', id, 'manage']));
+  } catch (e) {
+    syzoj.log(e);
+    res.render('error', {
+      err: e
+    });
+  }
+});
+
+app.post('/problem/:id/additional_file/delete', async (req, res) => {
+  try {
+    let id = parseInt(req.params.id);
+    let problem = await Problem.findById(id);
+
+    if (!problem) throw new ErrorMessage('无此题目。');
+    if (!await problem.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
+    
+    await problem.deleteAdditionalFile();
+
+    res.redirect(syzoj.utils.makeUrl(['problem', id, 'manage']));
   } catch (e) {
     syzoj.log(e);
     res.render('error', {

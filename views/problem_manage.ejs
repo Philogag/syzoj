@@ -4,8 +4,8 @@
     <div class="ui grid">
     <div class="row">
       <div class="seven wide column">
-        <form class="ui form" method="post" action=""></form>
         <% include problem_testcases %>
+        <% include problem_data %>
       </div>
       <div class="nine wide column">
         <form class="ui form" method="post" enctype="multipart/form-data" onsubmit="return checkSubmit()">
@@ -88,15 +88,17 @@
             左侧表格中第三列为选手提交时应使用的文件名。
           </div>
           <div class="field">
-            <label for="testdata">上传测试数据（请使用 ZIP 格式）</label>
+            <label for="testdata">上传测试数据（请使用 ZIP 格式）（此处上传为清空数据并重新解压）</label>
             <input type="file" id="testdata" name="testdata">
           </div>
           <div class="field">
-            <label for="additional_file">上传附加文件（请使用 ZIP 格式）</label>
+            <label for="additional_file">上传附加文件（请使用 ZIP 格式）（此处仅覆盖，留空不更新，删除在左侧）</label>
             <input type="file" id="additional_file" name="additional_file">
           </div>
-          <button type="submit" class="ui labeled icon blue button"><i class="ui edit icon"></i>提交</button>
-          <a href="<%= syzoj.utils.makeUrl(['problem', problem.id]) %>" class="ui labeled icon button"><i class="ui angle left icon"></i>返回</a>
+          <div class="ui center aligned vertical segment" style="padding-bottom: 0; ">
+            <button type="submit" class="ui labeled icon blue button"><i class="ui edit icon"></i>提交</button>
+            <a href="<%= syzoj.utils.makeUrl(['problem', problem.id]) %>" class="ui labeled icon button"><i class="ui angle left icon"></i>返回</a>
+          </div>
         </form>
       </div>
   </div>

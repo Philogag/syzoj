@@ -19,6 +19,7 @@ export default class File extends Model {
   md5: string;
 
   unzipSize?: number;
+  size?: number;
 
   getPath() {
     return File.resolvePath(this.type, this.md5);
@@ -81,5 +82,11 @@ export default class File extends Model {
 
     if (this.unzipSize === null) throw new ErrorMessage('无效的 ZIP 文件。');
     else return this.unzipSize;
+  }
+
+  async getSize() {
+    let stat = await fs.stat(this.getPath());
+    if (!stat.isFile()) return undefined;
+    return this.size = stat.size;
   }
 }
