@@ -1,5 +1,4 @@
-const jwt = require('jsonwebtoken');
-const url = require('url');
+let User = syzoj.model('user');
 
 // all the apis here is for admin page , so it need permission check
 
@@ -8,18 +7,22 @@ app.get("/api/v3/search/admins/:keyword*?", async (req, res) => {
     try {
         let User = syzoj.model('user');
 
+        if (!res.locals.user || !res.locals.user.isTeacherAdmin()) {
+            throw new ErrorMessage("Permission denied.");
+        }
+
         let keyword = decodeURI(req.params.keyword) || '';
         let conditions = [];
         const uid = parseInt(keyword) || 0;
 
         if (uid != null && !isNaN(uid)) {
-            conditions.push({ id: uid, is_teacher: true}, { id: uid, is_admin: true});
+            conditions.push({ id: uid, is_teacher: true }, { id: uid, is_admin: true });
         }
         if (keyword != null && keyword.length >= 0) {
-            like = TypeORM.Like(`%${keyword}%`) 
-            conditions.push({ username: like, is_teacher: true},{ username: like, is_admin: true});
-            conditions.push({ nickname: like, is_teacher: true},{ username: like, is_admin: true});
-            conditions.push({ realname: like, is_teacher: true},{ username: like, is_admin: true});
+            like = TypeORM.Like(`%${keyword}%`)
+            conditions.push({ username: like, is_teacher: true }, { username: like, is_admin: true });
+            conditions.push({ nickname: like, is_teacher: true }, { username: like, is_admin: true });
+            conditions.push({ realname: like, is_teacher: true }, { username: like, is_admin: true });
         }
         if (conditions.length === 0) {
             res.send({ success: true, results: [] });
@@ -33,12 +36,12 @@ app.get("/api/v3/search/admins/:keyword*?", async (req, res) => {
 
             let result = [];
 
-            result = users.map(x => ({ name: '#' + x.id + '\t' + x.username + '\t' + x.nickname + '\t' + x.realname, value: x.id}));
+            result = users.map(x => ({ name: '#' + x.id + '\t' + x.username + '\t' + x.nickname + '\t' + x.realname, value: x.id }));
             res.send({ success: true, results: result });
         }
     } catch (e) {
-    syzoj.log(e);
-    res.send({ success: false });
+        // syzoj.log(e);
+        res.send({ success: false, msg: e });
     }
 });
 
@@ -46,6 +49,10 @@ app.get("/api/v3/search/admins/:keyword*?", async (req, res) => {
 app.get("/api/v3/search/users/:keyword*?", async (req, res) => {
     try {
         let User = syzoj.model('user');
+
+        if (!res.locals.user || !res.locals.user.isTeacherAdmin()) {
+            throw new ErrorMessage("Permission denied.");
+        }
 
         let keyword = decodeURI(req.params.keyword) || '';
         let conditions = [];
@@ -71,18 +78,22 @@ app.get("/api/v3/search/users/:keyword*?", async (req, res) => {
 
             let result = [];
 
-            result = users.map(x => ({ name: '#' + x.id + '\t' + x.username + '\t' + x.nickname + '\t' + x.realname, value: x.id}));
+            result = users.map(x => ({ name: '#' + x.id + '\t' + x.username + '\t' + x.nickname + '\t' + x.realname, value: x.id }));
             res.send({ success: true, results: result });
         }
     } catch (e) {
-    syzoj.log(e);
-    res.send({ success: false });
+        // syzoj.log(e);
+        res.send({ success: false, msg: e });
     }
 });
 
 app.get("/api/v3/search/groups/:keyword*?", async (req, res) => {
     try {
         let Group = syzoj.model('group');
+
+        if (!res.locals.user || !res.locals.user.isTeacherAdmin()) {
+            throw new ErrorMessage("Permission denied.");
+        }
 
         let keyword = decodeURI(req.params.keyword) || '';
         let conditions = [];
@@ -106,11 +117,11 @@ app.get("/api/v3/search/groups/:keyword*?", async (req, res) => {
 
             let result = [];
 
-            result = groups.map(x => ({ name: '#' + x.id + '\t' + x.name , value: x.id}));
+            result = groups.map(x => ({ name: '#' + x.id + '\t' + x.name, value: x.id }));
             res.send({ success: true, results: result });
         }
     } catch (e) {
-    syzoj.log(e);
-    res.send({ success: false });
+        // syzoj.log(e);
+        res.send({ success: false, msg: e });
     }
 });
