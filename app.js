@@ -69,6 +69,7 @@ global.syzoj = {
 
     // Set assets dir
     app.use(Express.static(__dirname + '/static', { maxAge: syzoj.production ? '1y' : 0 }));
+    app.use(Express.static(__dirname + '/data/uploads/static', { maxAge: syzoj.production ? '1y' : 0 })); // image bed
 
     // Set template engine ejs
     app.set('view engine', 'ejs');

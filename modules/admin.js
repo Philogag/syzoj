@@ -53,6 +53,7 @@ let configItems = {
   'limit.submit_answer': { name: '提交答案题目答案大小（单位：byte）', type: Number },
   'limit.custom_test_input': { name: '自定义测试输入文件大小（单位：byte）', type: Number },
   'limit.testdata_filecount': { name: '测试数据文件数量（单位：byte）', type: Number },
+  'limit.image_size': { name: '图床图片大小上限（单位：byte）', type: Number },
   '每页显示数量': null,
   'page.problem': { name: '题库', type: Number },
   'page.judge_state': { name: '提交记录', type: Number },
