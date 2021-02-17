@@ -46,8 +46,7 @@ function image_manager_window_reload_list(){
     $.post(
         "/api/image/list",
         { manager: window.location.pathname },
-        (ret, text, xhr) => {
-            console.log(ret);
+        (ret, text, xhr) => {                                                                                           
             $("#image-manager-rows").html('')
             for (var row of ret.data){
                 ss = "<tr data-id='" + row.id + "'>"
@@ -76,7 +75,6 @@ function image_manager_window_do_upload(){
     data.append('name', file.name);
     data.append('manager', window.location.pathname);
     
-    console.log(data);
     $.ajax({
         url: "/api/image/upload",
         type: "post",
