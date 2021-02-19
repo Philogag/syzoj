@@ -27,7 +27,7 @@
             </div>
           </form>
         </div>
-            <div class="ui negative message hidden" id='<%= importpage.ids %>-err-box'>
+            <div class="ui attached negative message" id='<%= importpage.ids %>-err-box' style="display: none;">
                 <div class="header" id='<%= importpage.ids %>-err-header'></div>
                 <p id='<%= importpage.ids %>-err-text'></p>
             </div>
@@ -113,17 +113,15 @@ button = {
 
 function showMessage(title, text, level){
     $('#<%= importpage.ids %>-err-box').removeClass("negative orange positive");
-    $('#<%= importpage.ids %>-err-box').addClass('level');
+    $('#<%= importpage.ids %>-err-box').addClass(level);
 
     $('#<%= importpage.ids %>-err-header').html(title);
     $('#<%= importpage.ids %>-err-text').html(text);
 
-    $('#<%= importpage.ids %>-err-box').removeClass('hidden');
-    $('#<%= importpage.ids %>-err-box').addClass('visible');
+    $('#<%= importpage.ids %>-err-box').css('display', '');
 }
 function hideMessage(){
-    $('#<%= importpage.ids %>-err-box').removeClass('visible');
-    $('#<%= importpage.ids %>-err-box').addClass('hidden');   
+    $('#<%= importpage.ids %>-err-box').css('display', 'none');  
 }
 
 function setButton(type){
