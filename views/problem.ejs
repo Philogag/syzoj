@@ -10,12 +10,22 @@ if (contest) {
 <% include header %>
 <style>
 #languages-menu::-webkit-scrollbar, #testcase-menu::-webkit-scrollbar {
-    width: 0px;
-    background: transparent;
+  width: 0px;
+  background: transparent;
 }
 
 #languages-menu .item::after, #testcase-menu .item::after {
-    display: none;
+  display: none;
+}
+
+.example {
+  white-space:pre-wrap;
+  white-space:-moz-pre-wrap;
+  white-space:-pre-wrap;
+  white-space:-o-pre-wrap;
+  word-wrap:break-word;
+
+  max-height: fit-content;
 }
 </style>
 
@@ -199,7 +209,7 @@ if (contest) {
         for (var exam of examples) { 
           i++;
           %> 
-          <table class="ui celled table">
+          <table class="ui celled table" style="width: 100%; table-layout:fixed">
             <thead>
               <tr>
                 <th class="doclickboard left" style="width: 50%;" id="example-<%= i %>-input">
@@ -212,8 +222,8 @@ if (contest) {
             </thead>
             <tbody>
               <tr>
-                <td><pre><code id="example-<%= i %>-input-target"><%= exam.in %></code></pre></td>
-                <td><pre><code id="example-<%= i %>-output-target"><%= exam.out %></code></pre></td>
+                <td><pre class="example"><code id="example-<%= i %>-input-target"><%= exam.in %></code></pre></td>
+                <td><pre class="example"><code id="example-<%= i %>-output-target"><%= exam.out %></code></pre></td>
               </tr>
             </tbody>
           </table> 
