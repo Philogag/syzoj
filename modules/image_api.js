@@ -17,7 +17,7 @@ app.post('/api/image/list', async (req, res) => {
 
     res.send({ success: true, data: images });
   } catch (e) {
-    rse.send({ success: false, msg: String(e) });
+    res.send({ success: false, msg: e.message });
   }
 });
 
@@ -28,7 +28,7 @@ app.post('/api/image/upload', app.multer.fields([{ name: 'image', maxCount: 1 }]
     var file = req.files.image[0];
     var manager = req.body.manager;
 
-    if (file.size > syzoj.config.limit.image_size) throw new ErrorMessage('图片太大。');
+    if (file.size > syzoj.config.limit.image_size) throw new ErrorMessage('图片过大, 应小于' + syzoj.utils.formatSize(syzoj.config.limit.image_size) + "。");
     let filename = file.filename + "_" + syzoj.utils.randomString(6) + "." + file.originalname.split('.').pop().toLowerCase();
     await fs.move(file.path, Image.resolvePath(filename), { overwrite: true });
 
@@ -46,7 +46,8 @@ app.post('/api/image/upload', app.multer.fields([{ name: 'image', maxCount: 1 }]
 
     res.send({ success: true })
   } catch (e) {
-    res.send({ success: false, msg: String(e) });
+    // console.log(e);
+    res.send({ success: false, msg: e.message });
   }
 });
 
@@ -61,7 +62,7 @@ app.get('/api/image/delete/:id', async (req, res) => {
     }
     res.send({success: true})
   } catch (e) {
-    rse.send({ success: false, msg: String(e) });
+    res.send({ success: false, msg: e.message });
   }
 })
 
@@ -83,6 +84,6 @@ app.post('/api/image/rename', async (req, res) => {
       res.send({ success: false, msg: "Image not found." });
     }
   } catch (e) {
-    res.send({ success: false, msg: String(e) });
+    res.send({ success: false, msg: e.message });
   }
 });

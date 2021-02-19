@@ -90,7 +90,7 @@ module.exports = {
   },
   formatSize(x, precision) {
       if (typeof x !== 'number') return '0 B';
-      let unit = 'B', units = ['K', 'M', 'G', 'T'];
+      let unit = 'B', units = ['KB', 'MB', 'GB', 'TB'];
       for (let i in units) if (x > 1024) x /= 1024, unit = units[i];
       var fixed = x === Math.round(x) ? x.toString() : x.toFixed(precision);
       return fixed + ' ' + unit;

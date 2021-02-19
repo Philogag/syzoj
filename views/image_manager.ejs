@@ -18,7 +18,8 @@ function image_manager_window_show_upload(){
 </script>
 <div class="ui modal" id="image-manager-window">
     <i class="close icon"></i>
-  <div class="header">图片管理 Image Management</div>
+  <div class="ui attached header" style="border-radius: .28571429rem;">图片管理 Image Management</div>
+  <div class="ui bottom attached negative message" style="display: none;" id="image-manager-error">Error</div>
   <div class="content">
     <div class="padding">
     <table class="ui very basic table">
@@ -29,7 +30,7 @@ function image_manager_window_show_upload(){
                 <th class="one wide center aligned " colspan=2>
                     <input type="file" id="image_select" style="display: none" onchange="image_manager_window_do_upload()" accept="image/*,*.*">
                     <div class="ui small buttons ">
-                        <button class="ui icon button" type="button" data-tooltip="上传图片" onclick="image_manager_window_show_upload();"><i class="ui upload icon"></i></button>
+                        <button class="ui icon button" type="button" data-tooltip="上传图片" id="image-manager-upload" onclick="image_manager_window_show_upload();"><i class="ui upload icon"></i></button>
                         <button class="ui icon button" type="button" data-tooltip="刷新列表" onclick="image_manager_window_reload_list();"><i class="ui redo icon"></i></button>
                     </div>
                 </th>
@@ -80,8 +81,18 @@ function image_manager_window_do_upload(){
         type: "post",
         data: data,
         success: (res, text, xhr) => {
-            if (res.success)
-                image_manager_window_reload_list()
+            console.log(res);
+            if (res.success){
+                image_manager_window_reload_list();
+            }
+            else {
+                $('#image-manager-error').html(res.msg);
+                $('#image-manager-error').attr('class', 'ui bottom attached negative message')
+                $('#image-manager-error').css("display","");
+                setTimeout(function(){
+                    $('#image-manager-error').css("display","none");
+                }, 5000);
+            }
         },
         processData: false,
         contentType: false,

@@ -41,7 +41,7 @@ app.get("/api/v3/search/admins/:keyword*?", async (req, res) => {
         }
     } catch (e) {
         // syzoj.log(e);
-        res.send({ success: false, msg: e });
+        res.send({ success: false, msg: e.message });
     }
 });
 
@@ -83,7 +83,7 @@ app.get("/api/v3/search/users/:keyword*?", async (req, res) => {
         }
     } catch (e) {
         // syzoj.log(e);
-        res.send({ success: false, msg: e });
+        res.send({ success: false, msg: e.message });
     }
 });
 
@@ -122,6 +122,6 @@ app.get("/api/v3/search/groups/:keyword*?", async (req, res) => {
         }
     } catch (e) {
         // syzoj.log(e);
-        res.send({ success: false, msg: e });
+        res.send({ success: false, msg: e.message });
     }
 });
