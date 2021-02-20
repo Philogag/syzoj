@@ -73,7 +73,7 @@ export default class Contest extends Model {
   @TypeORM.Column({ nullable: true, type: "text" })
   allowedUser: string; 
 
-  @TypeORM.ManyToMany(type => Group, allowedGroup => Group.allowedContest)
+  @TypeORM.ManyToMany(type => Group, group => group.allowedContest)
   @TypeORM.JoinTable()
   allowedGroup: Group[];
 

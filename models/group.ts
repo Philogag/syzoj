@@ -17,7 +17,7 @@ export default class Group extends Model {
     @TypeORM.Column({ nullable: true, type: "varchar", length: 120 })
     name: string;
 
-    @TypeORM.ManyToMany(type => Contest, allowedContest => Contest.allowedGroup)
+    @TypeORM.ManyToMany(type => Contest, contest => contest.allowedGroup)
     allowedContest: Contest[];
 
     async allowVisitAndEditBy(user: User) {
