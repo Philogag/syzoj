@@ -1,0 +1,8 @@
+{
+  "database": "syzoj",
+  "username": "syzoj",
+  "password": "@DATABASE_PASSWORD@",
+  "host": "127.0.0.1",
+  "migrated_to_typeorm": true,
+  "cache_size": 1000
+}

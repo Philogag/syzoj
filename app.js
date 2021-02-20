@@ -7,7 +7,8 @@ const fs = require('fs'),
       commandLineArgs = require('command-line-args');
 
 const optionDefinitions = [
-  { name: 'config', alias: 'c', type: String, defaultValue: __dirname + '/config.json' },
+  { name: 'globalConfig', alias: 'g', type: String, defaultValue: __dirname + '/config.json' },
+  { name: 'sqlConfig', alias: 's', type: String, defaultValue: __dirname + '/config-sql.json'}
 ];
 
 const options = commandLineArgs(optionDefinitions);
@@ -25,7 +26,8 @@ Promise.config({
 
 global.syzoj = {
   rootDir: __dirname,
-  config: require('object-assign-deep')({}, require('./config-example.json'), require(options.config)),
+  config: require('object-assign-deep')({}, require('./config-example.json'), require(options.globalConfig)),
+  sqlconfig: require('object-assign-deep')({}, require('./config-sql-example.json'), require(options.sqlConfig)),
   languages: require('./language-config.json'),
   configDir: options.config,
   models: [],
@@ -37,8 +39,8 @@ global.syzoj = {
     console.log(obj);
   },
   checkMigratedToTypeORM() {
-    const userConfig = require(options.config);
-    if (!userConfig.db.migrated_to_typeorm) {
+    const userConfig = require(options.sqlConfig);
+    if (!userConfig.migrated_to_typeorm) {
       app.use((req, res) => res.send('Please refer to <a href="https://github.com/syzoj/syzoj/wiki/TypeORM-%E8%BF%81%E7%A7%BB%E6%8C%87%E5%8D%97">TypeORM Migration Guide</a>.'));
       app.listen(parseInt(syzoj.config.port), syzoj.config.hostname);
       return false;
@@ -51,11 +53,11 @@ global.syzoj = {
     if (syzoj.config.session_secret === '@SESSION_SECRET@'
      || syzoj.config.judge_token === '@JUDGE_TOKEN@'
      || (syzoj.config.email_jwt_secret === '@EMAIL_JWT_SECRET@' && syzoj.config.register_mail)
-     || syzoj.config.db.password === '@DATABASE_PASSWORD@') {
+     || syzoj.sqlconfig.password === '@DATABASE_PASSWORD@') {
       console.log('Please generate and fill the secrets in config!');
       process.exit();
     }
-
+    
     let Express = require('express');
     global.app = Express();
 
@@ -168,11 +170,11 @@ global.syzoj = {
 
     await TypeORM.createConnection({
       type: 'mariadb',
-      host: this.config.db.host.split(':')[0],
-      port: this.config.db.host.split(':')[1] || 3306,
-      username: this.config.db.username,
-      password: this.config.db.password,
-      database: this.config.db.database,
+      host: this.sqlconfig.host.split(':')[0],
+      port: this.sqlconfig.host.split(':')[1] || 3306,
+      username: this.sqlconfig.username,
+      password: this.sqlconfig.password,
+      database: this.sqlconfig.database,
       entities: models,
       synchronize: true,
       logging: !syzoj.production,

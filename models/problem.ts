@@ -18,7 +18,7 @@ import * as LRUCache from "lru-cache";
 import * as DeepCopy from "deepcopy";
 
 const problemTagCache = new LRUCache<number, number[]>({
-  max: syzoj.config.db.cache_size
+  max: syzoj.sqlconfig.cache_size
 });
 
 enum ProblemType {

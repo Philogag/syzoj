@@ -25,7 +25,7 @@ const caches: Map<string, LRUCache<number, Model>> = new Map();
 function ensureCache(modelName) {
   if (!caches.has(modelName)) {
     caches.set(modelName, new LRUCache({
-      max: syzoj.config.db.cache_size
+      max: syzoj.sqlconfig.cache_size
     }));
   }
 
