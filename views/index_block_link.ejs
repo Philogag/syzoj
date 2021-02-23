@@ -1,11 +1,10 @@
-
 <% if (typeof links !== 'undefined' && links && links.length) { %>
 <h4 class="ui top attached block header"><i class="ui linkify icon"></i>友情链接</h4>
 <div class="ui bottom attached segment">
     <ul style="margin: 0; padding-left: 20px; ">
-    <% for (let link of links) { %>
+        <% for (let link of links) { %>
         <li><a href="<%= link.url %>"><%= link.title %></a></li>
-    <% } %>
+        <% } %>
     </ul>
 </div>
 <% } %>

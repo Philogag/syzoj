@@ -25,7 +25,7 @@ app.get('/problems', async (req, res) => {
     if (!res.locals.user || !res.locals.user.isTeacherAdmin()) {
       if (res.locals.user) {
         query.where('is_public = 1')
-             .orWhere('user_id = :user_id', { user_id: res.locals.user.id });
+          .orWhere('user_id = :user_id', { user_id: res.locals.user.id });
       } else {
         query.where('is_public = 1');
       }
@@ -40,7 +40,7 @@ app.get('/problems', async (req, res) => {
     let paginate = syzoj.utils.paginate(await Problem.countForPagination(query), req.query.page, syzoj.config.page.problem);
     let problems = await Problem.queryPage(paginate, query);
 
-    tag_groups = await ProblemTagGroup.find({ order: {id: "ASC"}, relations: ["tags"]});
+    tag_groups = await ProblemTagGroup.find({ order: { id: "ASC" }, relations: ["tags"] });
 
     await problems.forEachAsync(async problem => {
       problem.allowedEdit = await problem.isAllowedEditBy(res.locals.user);
@@ -77,23 +77,23 @@ app.get('/problems/search', async (req, res) => {
     if (!res.locals.user || !res.locals.user.isTeacherAdmin()) {
       if (res.locals.user) {
         query.where(new TypeORM.Brackets(qb => {
-             qb.where('is_public = 1')
-                 .orWhere('user_id = :user_id', { user_id: res.locals.user.id })
-             }))
-             .andWhere(new TypeORM.Brackets(qb => {
-               qb.where('title LIKE :title', { title: `%${req.query.keyword}%` })
-                 .orWhere('id = :id', { id: id })
-             }));
+          qb.where('is_public = 1')
+            .orWhere('user_id = :user_id', { user_id: res.locals.user.id })
+        }))
+          .andWhere(new TypeORM.Brackets(qb => {
+            qb.where('title LIKE :title', { title: `%${req.query.keyword}%` })
+              .orWhere('id = :id', { id: id })
+          }));
       } else {
         query.where('is_public = 1')
-             .andWhere(new TypeORM.Brackets(qb => {
-               qb.where('title LIKE :title', { title: `%${req.query.keyword}%` })
-                 .orWhere('id = :id', { id: id })
-             }));
+          .andWhere(new TypeORM.Brackets(qb => {
+            qb.where('title LIKE :title', { title: `%${req.query.keyword}%` })
+              .orWhere('id = :id', { id: id })
+          }));
       }
     } else {
       query.where('title LIKE :title', { title: `%${req.query.keyword}%` })
-           .orWhere('id = :id', { id: id })
+        .orWhere('id = :id', { id: id })
     }
 
     query.orderBy('id = ' + id.toString(), 'DESC');
@@ -112,7 +112,7 @@ app.get('/problems/search', async (req, res) => {
       problem.tags = await problem.getTags();
     });
 
-    tag_groups = await ProblemTagGroup.find({ order: {id: "ASC"}, relations: ["tags"]});
+    tag_groups = await ProblemTagGroup.find({ order: { id: "ASC" }, relations: ["tags"] });
 
     res.render('problems', {
       allowedManageProblem: res.locals.user && res.locals.user.isTeacherAdmin(),
@@ -184,7 +184,7 @@ app.get('/problems/tag/:tagIDs', async (req, res) => {
       return problem;
     });
 
-    tag_groups = await ProblemTagGroup.find({ order: {id: "ASC"}, relations: ["tags"]});
+    tag_groups = await ProblemTagGroup.find({ order: { id: "ASC" }, relations: ["tags"] });
 
     res.render('problems', {
       allowedManageProblem: res.locals.user && res.locals.user.isTeacherAdmin(),
@@ -216,10 +216,10 @@ app.get('/problem/:id', async (req, res) => {
     problem.allowedEdit = await problem.isAllowedEditBy(res.locals.user);
     problem.allowedManage = await problem.isAllowedManageBy(res.locals.user);
 
-    console.log(problem.example);
+    // console.log(problem.example);
     try {
       examples = JSON.parse(problem.example);
-    } catch(SyntaxError){
+    } catch (SyntaxError) {
       examples = [];
     }
 
@@ -295,7 +295,7 @@ app.get('/problem/:id/edit', async (req, res) => {
 
     if (!problem) {
       if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
-      if (!res.locals.user.isTeacherAdmin())  throw new ErrorMessage('您没有权限进行此操作。');
+      if (!res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
       problem = await Problem.create({
         time_limit: syzoj.config.default.problem.time_limit,
         memory_limit: syzoj.config.default.problem.memory_limit,
@@ -315,7 +315,7 @@ app.get('/problem/:id/edit', async (req, res) => {
 
     try {
       examples = JSON.parse(problem.example);
-    } catch(SyntaxError){
+    } catch (SyntaxError) {
       examples = [];
     }
 
@@ -769,7 +769,7 @@ app.post('/problem/:id/submit', app.multer.fields([{ name: 'answer', maxCount: 1
 
           try {
             await formattedCode.save();
-          } catch (e) {}
+          } catch (e) { }
         }
       }
     }
@@ -874,7 +874,7 @@ app.post('/problem/:id/testdata/delete/:filename', async (req, res) => {
     if (!problem) throw new ErrorMessage('无此题目。');
     if (!await problem.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
     if (typeof req.params.filename === 'string' && (req.params.filename.includes('../'))) throw new ErrorMessage('您没有权限进行此操作。)');
-    
+
     await problem.deleteTestdataSingleFile(req.params.filename);
 
     res.redirect(syzoj.utils.makeUrl(['problem', id, 'manage']));
@@ -893,7 +893,7 @@ app.post('/problem/:id/additional_file/delete', async (req, res) => {
 
     if (!problem) throw new ErrorMessage('无此题目。');
     if (!await problem.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
-    
+
     await problem.deleteAdditionalFile();
 
     res.redirect(syzoj.utils.makeUrl(['problem', id, 'manage']));
@@ -927,7 +927,7 @@ app.get('/problem/:id/testdata/download/:filename?', async (req, res) => {
     if (!problem) throw new ErrorMessage('无此题目。');
     if (!await problem.isAllowedUseBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
     if (typeof req.params.filename === 'string' && (req.params.filename.includes('../'))) throw new ErrorMessage('您没有权限进行此操作。)');
-    
+
     if (!problem.is_data_public && !problem.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('题目数据不公开。');
 
     if (!req.params.filename) {
@@ -1074,7 +1074,7 @@ app.post('/problem/:id/custom-test', app.multer.fields([{ name: 'code_upload', m
 
 app.get('/random_problem', async (req, res) => {
   try {
-    let pids = await Problem.find({ select: ["id"],where: {is_public: true}});
+    let pids = await Problem.find({ select: ["id"], where: { is_public: true } });
     let rand_p = Math.floor((Math.random() * pids.length))
     // console.log(pids[rand_p].id);
     res.redirect(syzoj.utils.makeUrl(['problem', pids[rand_p].id]));

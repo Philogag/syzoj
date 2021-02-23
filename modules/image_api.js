@@ -8,7 +8,7 @@ app.post('/api/image/list', async (req, res) => {
   try {
     if (!res.locals.user) throw new ErrorMessage("请登录");
 
-    console.log(req.body);
+    // console.log(req.body);
     images = await Image.find({ manager: req.body.manager });
     if (images)
       images = images.map(x => { return { id: x.id, name: x.name, url: x.getURL() } });
@@ -60,7 +60,7 @@ app.get('/api/image/delete/:id', async (req, res) => {
       await fs.unlink(image.getPath());
       await image.destroy();
     }
-    res.send({success: true})
+    res.send({ success: true })
   } catch (e) {
     res.send({ success: false, msg: e.message });
   }

@@ -10,15 +10,16 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
     <div class="row" style="white-space: nowrap; ">
       <div class="seven wide column">
         <% if (typeof tags === 'undefined') { %>
-          <form action="<%= syzoj.utils.makeUrl(['problems', 'search']) %>" method="get">
-            <div class="ui search" style="width: 280px; height: 28px; margin-top: -5.3px; ">
-              <div class="ui left icon input" style="width: 100%; ">
-                <input class="prompt" style="width: 100%; " type="text" value="<%= req.query.keyword %>" placeholder="ID / 题目名 …" name="keyword">
-                <i class="search icon"></i>
-              </div>
-              <div class="results" style="width: 100%; "></div>
+        <form action="<%= syzoj.utils.makeUrl(['problems', 'search']) %>" method="get">
+          <div class="ui search" style="width: 280px; height: 28px; margin-top: -5.3px; ">
+            <div class="ui left icon input" style="width: 100%; ">
+              <input class="prompt" style="width: 100%; " type="text" value="<%= req.query.keyword %>"
+                placeholder="ID / 题目名 …" name="keyword">
+              <i class="search icon"></i>
             </div>
-          </form>
+            <div class="results" style="width: 100%; "></div>
+          </div>
+        </form>
         <% } %>
       </div>
       <div class="nine wide right aligned column">
@@ -31,7 +32,7 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
         <script data-cfasync="false">
           $(function () {
             if (localStorage.getItem('show_tag') === '1') {
-              console.log('default show.')
+              // console.log('default show.')
               $('#show_tag_input').attr('checked', '');
             }
             $('#show_tag').checkbox({
@@ -47,7 +48,7 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
               }
             });
 
-            console.log("check box init over");
+            // console.log("check box init over");
           });
         </script>
 
@@ -55,10 +56,12 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
           <% if (allowedManageProblem) { %>
           <div style="margin-left: 10px; " class="ui mini buttons">
             <div class="ui labeled icon mini dropdown button" id="add_problem_dropdown"><i class="plus icon"></i> 添加题目
-            <div class="menu">
-              <a class="item" href="<%= syzoj.utils.makeUrl(['problem', 0, 'edit']) %>"><i class="file icon"></i> 新建题目</a>
-              <a class="item" href="<%= syzoj.utils.makeUrl(['problem', 0, 'import']) %>"><i class="cloud download icon"></i> 导入题目</a>
-            </div>
+              <div class="menu">
+                <a class="item" href="<%= syzoj.utils.makeUrl(['problem', 0, 'edit']) %>"><i class="file icon"></i>
+                  新建题目</a>
+                <a class="item" href="<%= syzoj.utils.makeUrl(['problem', 0, 'import']) %>"><i
+                    class="cloud download icon"></i> 导入题目</a>
+              </div>
             </div>
           </div>
           <% } %>
@@ -67,34 +70,34 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
     </div>
   </div>
 
-<% if (problems.length) { %>
+  <% if (problems.length) { %>
   <div style="margin-bottom: 10px; ">
     <% include page %>
   </div>
 
-<div class="ui attached segment" style="left: -10%; width: 90%; border: 0px;">
-  <div class="ui right close rail">
-    <div class="ui attached segment" style="border-radius: 8px;">
-      <h3 class="ui header">Tags: </h3>
-      <% if (typeof tags !== 'undefined') { 
+  <div class="ui attached segment" style="left: -10%; width: 90%; border: 0px;">
+    <div class="ui right close rail">
+      <div class="ui attached segment" style="border-radius: 8px;">
+        <h3 class="ui header">Tags: </h3>
+        <% if (typeof tags !== 'undefined') { 
         tags.sort((a, b) => {
           return a.color > b.color ? 1 : -1;
         }); 
       %>
-        <h4 class="ui dividing header"  style="margin-top: 7px; margin-bottom: 0px;">Selected Tag</h4>
+        <h4 class="ui dividing header" style="margin-top: 7px; margin-bottom: 0px;">Selected Tag</h4>
         <% for (let tag of tags) { %>
-          <% let tagListRemovedThisTag = tagIDs.filter(x => x != tag.id).sort().join(','); %>
-          <% let url = tagListRemovedThisTag ? syzoj.utils.makeUrl(['problems', 'tag', tagListRemovedThisTag]) : syzoj.utils.makeUrl(['problems']); %>
-          <a href="<%= url %>" class="ui olive tiny <%= tag.color %> label" style="margin-top: 3px;">
-            <%= tag.name %>
-            <i aria-hidden="true" class="delete icon"></i>
-          </a>
+        <% let tagListRemovedThisTag = tagIDs.filter(x => x != tag.id).sort().join(','); %>
+        <% let url = tagListRemovedThisTag ? syzoj.utils.makeUrl(['problems', 'tag', tagListRemovedThisTag]) : syzoj.utils.makeUrl(['problems']); %>
+        <a href="<%= url %>" class="ui olive tiny <%= tag.color %> label" style="margin-top: 3px;">
+          <%= tag.name %>
+          <i aria-hidden="true" class="delete icon"></i>
+        </a>
         <% } %>
         <div style="margin-top: 20px;"></div>
-      <% } %>
-      <% if (!tag_groups || tag_groups.length === 0) { %>
+        <% } %>
+        <% if (!tag_groups || tag_groups.length === 0) { %>
         <p>No Tags Yet</p>
-      <% } else { for(let tg of tag_groups) if (tg.tags && tg.tags.length > 0) { %>
+        <% } else { for(let tg of tag_groups) if (tg.tags && tg.tags.length > 0) { %>
         <h5 class="ui dividing header" style="margin-top: 7px; margin-bottom: 0px;"><%= tg.name %></h5>
         <% for (let tag of tg.tags) { 
           let tagListToggledThisTag;
@@ -104,50 +107,51 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
 
           let url = tagListToggledThisTag ? syzoj.utils.makeUrl(['problems', 'tag', tagListToggledThisTag]) : syzoj.utils.makeUrl(['problems']);
           %>
-            <a href="<%= url %>" class="ui tiny <%= tag.color %> label" style="margin-top: 3px;">
-              <%= tag.name %>
-            </a>
+        <a href="<%= url %>" class="ui tiny <%= tag.color %> label" style="margin-top: 3px;">
+          <%= tag.name %>
+        </a>
         <% } %>
-      <% }} %>
+        <% }} %>
+      </div>
     </div>
-  </div>
-  <table class="ui very basic center aligned table">
-    <thead>
-      <tr>
-        <% if (user) { %>
-        <th class="one wide">提交状态</th>
-        <% } %>
-        <th class="one wide"><%- createSortableTitle('id', '编号', true) %></th>
-        <th class="left aligned"><%- createSortableTitle('title', '题目名称', true) %></th>
-        <% if (user && user.isTeacherAdmin()) { %>
+    <table class="ui very basic center aligned table">
+      <thead>
+        <tr>
+          <% if (user) { %>
+          <th class="one wide">提交状态</th>
+          <% } %>
+          <th class="one wide"><%- createSortableTitle('id', '编号', true) %></th>
+          <th class="left aligned"><%- createSortableTitle('title', '题目名称', true) %></th>
+          <% if (user && user.isTeacherAdmin()) { %>
           <th class="one wide center aligned">题目公开</th>
           <th class="one wide center aligned">数据公开</th>
-        <% } %>
-        <th class="one wide"><%- createSortableTitle('submit_num', '提交', false) %></th>
-        <th class="one wide">通过率</th>
-      </tr>
-    </thead>
-    <tbody>
-    <% for (let problem of problems) { %>
+          <% } %>
+          <th class="one wide"><%- createSortableTitle('submit_num', '提交', false) %></th>
+          <th class="one wide">通过率</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (let problem of problems) { %>
         <% if (problem.is_public || problem.allowedEdit) { %>
         <tr style="height: 44px; ">
-            <% if (user) { %>
-                <td>
-                <% if (problem.judge_state) { %>
-                  <a href="<%= syzoj.utils.makeUrl(['submission', problem.judge_state.id]) %>">
-                    <span class="status <%= problem.judge_state.status.toLowerCase().split(' ').join('_') %>">
-                      <i class="<%= icon[problem.judge_state.status] || 'remove' %> icon"></i>
-                    </span>
-                  </a>
-                <% } %>
-                </td>
+          <% if (user) { %>
+          <td>
+            <% if (problem.judge_state) { %>
+            <a href="<%= syzoj.utils.makeUrl(['submission', problem.judge_state.id]) %>">
+              <span class="status <%= problem.judge_state.status.toLowerCase().split(' ').join('_') %>">
+                <i class="<%= icon[problem.judge_state.status] || 'remove' %> icon"></i>
+              </span>
+            </a>
             <% } %>
-            <td><b><%= problem.id %></b></td>
-            <td class="left aligned">
-              <a style="vertical-align: middle; " href="<%= syzoj.utils.makeUrl(['problem', problem.id]) %>"><%= problem.title %>
-              </a>
-              <div class="show_tag_controled" style="float: right; ">
-                <%
+          </td>
+          <% } %>
+          <td><b><%= problem.id %></b></td>
+          <td class="left aligned">
+            <a style="vertical-align: middle; "
+              href="<%= syzoj.utils.makeUrl(['problem', problem.id]) %>"><%= problem.title %>
+            </a>
+            <div class="show_tag_controled" style="float: right; ">
+              <%
                 if (problem.tags) {
                   for (let tag of problem.tags) {
                     let tagListToggledThisTag;
@@ -157,64 +161,72 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
 
                     let url = tagListToggledThisTag ? syzoj.utils.makeUrl(['problems', 'tag', tagListToggledThisTag]) : syzoj.utils.makeUrl(['problems']);
                   %>
-                  <span class="ui header">
-                    <a href="<%= url %>" class="ui tiny <%= tag.color %> label">
-                      <%= tag.name %>
-                    </a>
-                  </span>
-                  <%
+              <span class="ui header">
+                <a href="<%= url %>" class="ui tiny <%= tag.color %> label">
+                  <%= tag.name %>
+                </a>
+              </span>
+              <%
                   }
                 }
                 %>
-              </div>
-            </td>
-            <% if (user && user.isTeacherAdmin()) { %>
-              <td><div class="ui toggle checkbox pp"><input type="checkbox" data-id="<%= problem.id %>" <% if (problem.is_public) { %>checked<% } %> ></div></td>
-              <td><div class="ui toggle checkbox dp"><input type="checkbox" data-id="<%= problem.id %>" <% if (problem.is_data_public) { %>checked<% } %> ></div></td>
-            <% } %>
-            <td><%= problem.ac_num %>/<%= problem.submit_num %></td>
-            <td><%= problem.submit_num != 0 ? (((problem.ac_num / problem.submit_num * 100) || 0).toFixed(2) + '%') : '-' %></td>
+            </div>
+          </td>
+          <% if (user && user.isTeacherAdmin()) { %>
+          <td>
+            <div class="ui toggle checkbox pp"><input type="checkbox" data-id="<%= problem.id %>"
+                <% if (problem.is_public) { %>checked<% } %>></div>
+          </td>
+          <td>
+            <div class="ui toggle checkbox dp"><input type="checkbox" data-id="<%= problem.id %>"
+                <% if (problem.is_data_public) { %>checked<% } %>></div>
+          </td>
+          <% } %>
+          <td><%= problem.ac_num %>/<%= problem.submit_num %></td>
+          <td>
+            <%= problem.submit_num != 0 ? (((problem.ac_num / problem.submit_num * 100) || 0).toFixed(2) + '%') : '-' %>
+          </td>
         </tr>
         <% } %>
-    <% } %>
-    </tbody>
-  </table><br>
-  <% include page  %>
-  <% } else { %>
-  <div class="ui attached segment"  style="left: -10%; width: 90%; border: 0px;">
-    <div class="ui attached placeholder segment">
-    <div class="ui icon header">
-      <% if (typeof req.query.keyword !== 'undefined') { %>
-      <i class="search icon" style="margin-bottom: 20px; "></i>
-      找不到符合条件的题目
-      <% } else { %>
-      <i class="list icon" style="margin-bottom: 20px; "></i>
-      暂无题目
-      <% } %>
-    </div>
-    </div>
-    <div class="ui right close rail">
-      <div class="ui attached segment" style="border-radius: 8px;">
-        <h3 class="ui header">Tags: </h3>
-        <% if (typeof tags !== 'undefined') { 
+        <% } %>
+      </tbody>
+    </table><br>
+    <% include page  %>
+    <% } else { %>
+    <div class="ui attached segment" style="left: -10%; width: 90%; border: 0px;">
+      <div class="ui attached placeholder segment">
+        <div class="ui icon header">
+          <% if (typeof req.query.keyword !== 'undefined') { %>
+          <i class="search icon" style="margin-bottom: 20px; "></i>
+          找不到符合条件的题目
+          <% } else { %>
+          <i class="list icon" style="margin-bottom: 20px; "></i>
+          暂无题目
+          <% } %>
+        </div>
+      </div>
+      <div class="ui right close rail">
+        <div class="ui attached segment" style="border-radius: 8px;">
+          <h3 class="ui header">Tags: </h3>
+          <% if (typeof tags !== 'undefined') { 
           tags.sort((a, b) => {
             return a.color > b.color ? 1 : -1;
           }); 
         %>
-          <h4 class="ui dividing header"  style="margin-top: 7px; margin-bottom: 0px;">Selected Tag</h4>
+          <h4 class="ui dividing header" style="margin-top: 7px; margin-bottom: 0px;">Selected Tag</h4>
           <% for (let tag of tags) { %>
-            <% let tagListRemovedThisTag = tagIDs.filter(x => x != tag.id).sort().join(','); %>
-            <% let url = tagListRemovedThisTag ? syzoj.utils.makeUrl(['problems', 'tag', tagListRemovedThisTag]) : syzoj.utils.makeUrl(['problems']); %>
-            <a href="<%= url %>" class="ui olive tiny <%= tag.color %> label" style="margin-top: 3px;">
-              <%= tag.name %>
-              <i aria-hidden="true" class="delete icon"></i>
-            </a>
+          <% let tagListRemovedThisTag = tagIDs.filter(x => x != tag.id).sort().join(','); %>
+          <% let url = tagListRemovedThisTag ? syzoj.utils.makeUrl(['problems', 'tag', tagListRemovedThisTag]) : syzoj.utils.makeUrl(['problems']); %>
+          <a href="<%= url %>" class="ui olive tiny <%= tag.color %> label" style="margin-top: 3px;">
+            <%= tag.name %>
+            <i aria-hidden="true" class="delete icon"></i>
+          </a>
           <% } %>
           <div style="margin-top: 20px;"></div>
-        <% } %>
-        <% if (!tag_groups || tag_groups.length === 0) { %>
+          <% } %>
+          <% if (!tag_groups || tag_groups.length === 0) { %>
           <p>No Tags Yet</p>
-        <% } else { for(let tg of tag_groups) if (tg.tags && tg.tags.length > 0) { %>
+          <% } else { for(let tg of tag_groups) if (tg.tags && tg.tags.length > 0) { %>
           <h5 class="ui dividing header" style="margin-top: 7px; margin-bottom: 0px;"><%= tg.name %></h5>
           <% for (let tag of tg.tags) { 
             let tagListToggledThisTag;
@@ -224,60 +236,60 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
   
             let url = tagListToggledThisTag ? syzoj.utils.makeUrl(['problems', 'tag', tagListToggledThisTag]) : syzoj.utils.makeUrl(['problems']);
             %>
-              <a href="<%= url %>" class="ui tiny <%= tag.color %> label" style="margin-top: 3px;">
-                <%= tag.name %>
-              </a>
+          <a href="<%= url %>" class="ui tiny <%= tag.color %> label" style="margin-top: 3px;">
+            <%= tag.name %>
+          </a>
           <% } %>
-        <% }} %>
+          <% }} %>
+        </div>
       </div>
     </div>
+    <% } %>
+    <script>
+      document.addEventListener('keydown', function (event) {
+        if (event.keyCode === 39) document.getElementById('page_next').click();
+        else if (event.keyCode === 37) document.getElementById('page_prev').click();
+      });
+
+      $(function () {
+        $('#add_problem_dropdown').dropdown();
+      });
+    </script>
+    <script>
+      $(function () {
+        $('.ui.search').search({
+          debug: true,
+          apiSettings: {
+            url: '/api/v2/search/problems/{query}',
+            cache: false
+          },
+          fields: {
+            title: 'name'
+          }
+        });
+        $('.ui.toggle.checkbox.pp').checkbox({});
+        $('.ui.toggle.checkbox.dp').checkbox({});
+      });
+
+      $(document).ready(() => {
+        $('.ui.toggle.checkbox.pp').each((i, e) => {
+          $(e).on("click", (e) => {
+            obj = $(e.currentTarget).children('input');
+            checked = $(obj).prop("checked");
+            url = "/problem/" + $(obj).attr("data-id") + (checked ? "/public" : "/dis_public");
+            $.post(url, {});
+          })
+        })
+        $('.ui.toggle.checkbox.dp').each((i, e) => {
+          $(e).on("click", (e) => {
+            obj = $(e.currentTarget).children('input');
+            checked = $(obj).prop("checked");
+            url = "/problem/" + $(obj).attr("data-id") + (checked ? "/data_public" : "/dis_data_public");
+            $.post(url, {});
+          })
+        })
+      })
+    </script>
   </div>
-  <% } %>
-<script>
-document.addEventListener('keydown', function (event) {
-  if (event.keyCode === 39) document.getElementById('page_next').click();
-  else if (event.keyCode === 37) document.getElementById('page_prev').click();
-});
-
-$(function () {
-  $('#add_problem_dropdown').dropdown();
-});
-</script>
-<script>
-$(function () {
-  $('.ui.search').search({
-    debug: true,
-    apiSettings: {
-      url: '/api/v2/search/problems/{query}',
-      cache: false
-    },
-    fields: {
-      title: 'name'
-    }
-  });
-  $('.ui.toggle.checkbox.pp').checkbox({});
-  $('.ui.toggle.checkbox.dp').checkbox({});
-});
-
-$(document).ready(() => {
-  $('.ui.toggle.checkbox.pp').each((i, e) => {
-    $(e).on("click", (e)=>{
-      obj = $(e.currentTarget).children('input');
-      checked = $(obj).prop("checked");
-      url = "/problem/" + $(obj).attr("data-id") + (checked ? "/public" : "/dis_public");
-      $.post(url, {});
-    })
-  })
-  $('.ui.toggle.checkbox.dp').each((i, e) => {
-    $(e).on("click", (e)=>{
-      obj = $(e.currentTarget).children('input');
-      checked = $(obj).prop("checked");
-      url = "/problem/" + $(obj).attr("data-id") + (checked ? "/data_public" : "/dis_data_public");
-      $.post(url, {});
-    })
-  })
-})
-</script>
-</div>
 </div>
 <% include footer %>

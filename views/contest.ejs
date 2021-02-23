@@ -1,31 +1,48 @@
 <% this.title = contest.title + ' - 比赛' %>
 <style>
-.ui.label.pointing.below.left::before { left: 12%; }
-.ui.label.pointing.below.right::before { left: 88%; }
-.ui.label.pointing.below.left { margin-bottom: 0; }
-.ui.label.pointing.below.right { margin-bottom: 0; float: right; }
-#back_to_contest { display: none;  }
-div#time-block {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0,0,0,0);
-  border: 0px;
-}
-div#time-block.h2{
-  color: orangered;
-  font-size: 24px;
-}
+  .ui.label.pointing.below.left::before {
+    left: 12%;
+  }
+
+  .ui.label.pointing.below.right::before {
+    left: 88%;
+  }
+
+  .ui.label.pointing.below.left {
+    margin-bottom: 0;
+  }
+
+  .ui.label.pointing.below.right {
+    margin-bottom: 0;
+    float: right;
+  }
+
+  #back_to_contest {
+    display: none;
+  }
+
+  div#time-block {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0);
+    border: 0px;
+  }
+
+  div#time-block.h2 {
+    color: orangered;
+    font-size: 24px;
+  }
 </style>
 <% include header %>
 <div class="padding">
 
   <% if (contest.public_mode === 'public') { %>
-    <% sec_tab = '<span class="ui header"><div class="ui mini green label">公开</div></span>' %>
+  <% sec_tab = '<span class="ui header"><div class="ui mini green label">公开</div></span>' %>
   <% } else if (contest.public_mode === 'invite') { %>
-    <% sec_tab = '<span class="ui header"><div class="ui mini red label">邀请</div></span>' %>
+  <% sec_tab = '<span class="ui header"><div class="ui mini red label">邀请</div></span>' %>
   <% } else { %>
-    <% sec_tab = '<span class="ui header"><div class="ui mini orange label">密码</div></span>' %>
+  <% sec_tab = '<span class="ui header"><div class="ui mini orange label">密码</div></span>' %>
   <% } %>
 
   <h1><%= contest.title %><%- sec_tab %></h1>
@@ -37,12 +54,15 @@ div#time-block.h2{
   <% if (contest.running && start.split(' ')[0] === end.split(' ')[0]) {
     start = start.split(' ')[1]; end = end.split(' ')[1];
   } %>
-  
-  <div class="ui below middle" id="time-block"><h2 class="orange" id="_t"></h2></div>
+
+  <div class="ui below middle" id="time-block">
+    <h2 class="orange" id="_t"></h2>
+  </div>
   <div class="ui pointing below left label"><%= start %></div>
   <div class="ui pointing below right label"><%= end %></div>
   <% let timePercentage = Math.floor(Math.min(1, (syzoj.utils.getCurrentDate() - contest.start_time) / (contest.end_time - contest.start_time)) * 100); %>
-  <div id="timer-progress" class="ui tiny indicating progress<% if (timePercentage == 100) { %> success<% } %>" data-percent="<%= timePercentage %>">
+  <div id="timer-progress" class="ui tiny indicating progress<% if (timePercentage == 100) { %> success<% } %>"
+    data-percent="<%= timePercentage %>">
     <div class="bar" style="width: <%= timePercentage %>%;"></div>
   </div>
   <div class="ui grid">
@@ -54,32 +74,36 @@ div#time-block.h2{
             syzoj.utils.makeUrl(['contest', contest.id, 'submissions']); %>
           <a class="ui small positive button" href="<%= submissionsUrl %>">提交记录</a>
           <% if(contest.type !== 'noi') { %>
-            <a class="ui small orange button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'ranklist']) %>">比赛榜单</a>
+          <a class="ui small orange button"
+            href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'ranklist']) %>">比赛榜单</a>
           <% } %>
           <% if (isSupervisior) { %>
-            <a class="ui small button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'edit']) %>">编辑比赛</a>
-            <a class="ui small button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'export_rank']) %>">榜单导出</a>
-            <a class="ui small button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'export_submissions']) %>">代码导出</a>
+          <a class="ui small button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'edit']) %>">编辑比赛</a>
+          <a class="ui small button" href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'export_rank']) %>">榜单导出</a>
+          <a class="ui small button"
+            href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'export_submissions']) %>">代码导出</a>
           <% } %>
         </div>
       </div>
     </div>
-  <% if (typeof contest.lang !== 'undefind' && contest.lang){ %>
+    <% if (typeof contest.lang !== 'undefind' && contest.lang){ %>
     <div class="row">
       <div class="column">
         <div class="ui bottom attached segment font-content">
-          <h4>本场比赛限制使用语言: 
+          <h4>本场比赛限制使用语言:
             <% for (var k in contestlang){ %>
-              <% if (contestlang[k].hasOwnProperty('enable') && contestlang[k]['enable']) { %>
-                <span class="ui header"><div class="ui mini green label"><%= contestlang[k]["show"] %></div></span>
-              <% } %>
+            <% if (contestlang[k].hasOwnProperty('enable') && contestlang[k]['enable']) { %>
+            <span class="ui header">
+              <div class="ui mini green label"><%= contestlang[k]["show"] %></div>
+            </span>
+            <% } %>
             <% } %>
           </h4>
         </div>
       </div>
     </div>
-  <% } %>
-  <% if (contest.information) { %>
+    <% } %>
+    <% if (contest.information) { %>
     <div class="row">
       <div class="column">
         <h4 class="ui top attached block header">信息与公告</h4>
@@ -88,98 +112,103 @@ div#time-block.h2{
         </div>
       </div>
     </div>
-  <% } %>
+    <% } %>
 
-  <% if (unveiled) { %>
+    <% if (unveiled) { %>
     <div class="row">
       <div class="column">
-         <table class="ui selectable celled table">
-            <thead>
-              <tr>
-                <th class="one wide" style="text-align: center">状态</th>
-                <th>题目</th>
-                <% if (hasStatistics) { %>
-                  <th class="one wide center aligned">统计</th>
-                <% } %>
-              </tr>
-            </thead>
-            <tbody>
-              <%
+        <table class="ui selectable celled table">
+          <thead>
+            <tr>
+              <th class="one wide" style="text-align: center">状态</th>
+              <th>题目</th>
+              <% if (hasStatistics) { %>
+              <th class="one wide center aligned">统计</th>
+              <% } %>
+            </tr>
+          </thead>
+          <tbody>
+            <%
               let i = 0;
               for (let problem of problems) {
                 i++;
               %>
-              <tr>
-                <td class="center aligned" style="white-space: nowrap; ">
+            <tr>
+              <td class="center aligned" style="white-space: nowrap; ">
                 <% if (problem.judge_id) { %>
-                  <a href="<%= syzoj.utils.makeUrl(['contest', 'submission', problem.judge_id]) %>">
+                <a href="<%= syzoj.utils.makeUrl(['contest', 'submission', problem.judge_id]) %>">
                   <% if (typeof problem.status === 'string') { %>
-                    <span class="status <%= problem.status.toLowerCase().split(' ').join('_') %>">
-                      <b>
+                  <span class="status <%= problem.status.toLowerCase().split(' ').join('_') %>">
+                    <b>
                       <i class="<%= icon[getStatusMeta(problem.status)] || 'remove' %> icon"></i>
                       <%= problem.feedback || problem.status %>
-                      </b>
-                    </span>
+                    </b>
+                  </span>
                   <% } else if (typeof problem.status === 'object') { %>
-                    <% if (problem.status.accepted) { %>
-                      <span class="score score_10">
-                        <% if (problem.status.unacceptedCount === 0) { %>
-                          <i class="check icon green"></i>
-                        <% } else { %>
-                          <i class="check icon red"></i><%= problem.status.unacceptedCount %>
-                        <% } %>
-                      </span>
+                  <% if (problem.status.accepted) { %>
+                  <span class="score score_10">
+                    <% if (problem.status.unacceptedCount === 0) { %>
+                    <i class="check icon green"></i>
                     <% } else { %>
-                      <span class="score score_0">
-                        <% if (problem.status.unacceptedCount !== 0) { %>
-                          <i class="close icon red"></i><%= problem.status.unacceptedCount %>
-                        <% } %>
-                      </span>
+                    <i class="check icon red"></i><%= problem.status.unacceptedCount %>
                     <% } %>
+                  </span>
+                  <% } else { %>
+                  <span class="score score_0">
+                    <% if (problem.status.unacceptedCount !== 0) { %>
+                    <i class="close icon red"></i><%= problem.status.unacceptedCount %>
+                    <% } %>
+                  </span>
                   <% } %>
-                <% } %>
-                </td>
-                <td><a href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'problem', i]) %>"><%= syzoj.utils.removeTitleTag(problem.problem.title) %></a></td>
-                <% if (hasStatistics) { %>
-                  <td class="center aligned" style="white-space: nowrap; ">
-                  <a href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'submissions'], { problem_id: i, status: 'Accepted' }) %>"><%= problem.statistics.accepted %></a>
-                  /
-                    <a href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'submissions'], { problem_id: i, min_score: 1 }) %>"><%= problem.statistics.partially %></a>
-                    <% if (contest.type === 'noi' || contest.type === 'ioi') { %>
-                    /
                   <% } %>
-                  <a href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'submissions'], { problem_id: i }) %>"><%= problem.statistics.attempt %></a>
-                  </td>
+                  <% } %>
+              </td>
+              <td><a
+                  href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'problem', i]) %>"><%= syzoj.utils.removeTitleTag(problem.problem.title) %></a>
+              </td>
+              <% if (hasStatistics) { %>
+              <td class="center aligned" style="white-space: nowrap; ">
+                <a
+                  href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'submissions'], { problem_id: i, status: 'Accepted' }) %>"><%= problem.statistics.accepted %></a>
+                /
+                <a
+                  href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'submissions'], { problem_id: i, min_score: 1 }) %>"><%= problem.statistics.partially %></a>
+                <% if (contest.type === 'noi' || contest.type === 'ioi') { %>
+                /
                 <% } %>
-              </tr>
+                <a
+                  href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'submissions'], { problem_id: i }) %>"><%= problem.statistics.attempt %></a>
+              </td>
+              <% } %>
+            </tr>
             <% } %>
-            </tbody>
+          </tbody>
         </table>
       </div>
     </div>
-  <% } %>
+    <% } %>
   </div>
 </div>
 
 <script>
-$(function () {
-  setInterval(function () {
-    $('#timer-progress').progress({
-      value: Date.now() / 1000 - <%= contest.start_time %>,
-      total: <%= contest.end_time - contest.start_time %>
+  $(function () {
+    setInterval(function () {
+      $('#timer-progress').progress({
+        value: Date.now() / 1000 - <%= contest.start_time %>,
+        total: <%= contest.end_time - contest.start_time %>
     });
-  }, 5000);
-});
-$(function () {
-  setInterval(function () {
-    var leftTime=Number("<%= contest.end_time %>") - Date.now() / 1000;
-    if (leftTime>=0) {
-      h = Math.floor(leftTime/60/60);
-      m = Math.floor(leftTime/60%60);
-      s = Math.floor(leftTime%60);
-      document.getElementById("_t").innerHTML = h.toString() + ":" + m.toString().padStart(2,0) + ":" + s.toString().padStart(2, 0);
-    }
-  }, 1000);
-});
+    }, 5000);
+  });
+  $(function () {
+    setInterval(function () {
+      var leftTime = Number("<%= contest.end_time %>") - Date.now() / 1000;
+      if (leftTime >= 0) {
+        h = Math.floor(leftTime / 60 / 60);
+        m = Math.floor(leftTime / 60 % 60);
+        s = Math.floor(leftTime % 60);
+        document.getElementById("_t").innerHTML = h.toString() + ":" + m.toString().padStart(2, 0) + ":" + s.toString().padStart(2, 0);
+      }
+    }, 1000);
+  });
 </script>
 <% include footer %>

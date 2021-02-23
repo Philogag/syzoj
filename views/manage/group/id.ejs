@@ -22,13 +22,13 @@
     <div style="margin-top: 20px;">
         <div class="ui grid" style="margin-top: 20px;">
             <div style="width: 600px !important;">
-            <select id="search_admins" class="ui fluid search dropdown">
-                <option value="">仅 教师级别账号 能成为组管理员</option>
-            </select>
+                <select id="search_admins" class="ui fluid search dropdown">
+                    <option value="">仅 教师级别账号 能成为组管理员</option>
+                </select>
             </div>
         </div>
     </div>
-    <table class="ui very basic center aligned table"  style="margin-top: 40px;">
+    <table class="ui very basic center aligned table" style="margin-top: 40px;">
         <thead>
             <tr>
                 <th class="ui one wide">ID</th>
@@ -43,154 +43,157 @@
             <% if (gadmins.length > 0) { %>
             <% for (let u of gadmins) { %>
             <tr id="admin-row-<%= u.id %>" style="height: 24px" class="adminuserrow">
-            <td class="ui one wide"><%= u.id %></td>
-            <td class="ui three wide"><%= u.username %></td>
-            <td class="ui three wide"><%= u.nickname %></td>
-            <td class="ui three wide"><%= u.realname %></td>
-            <td></td>
-            <td class="ui one wide">
-                <div class="ui buttons">
-                <button type="button" onclick="deleteRow(this);" class="ui icon button"><i class="trash alternate icon"></i></button>
-                </div>
-            </td>
+                <td class="ui one wide"><%= u.id %></td>
+                <td class="ui three wide"><%= u.username %></td>
+                <td class="ui three wide"><%= u.nickname %></td>
+                <td class="ui three wide"><%= u.realname %></td>
+                <td></td>
+                <td class="ui one wide">
+                    <div class="ui buttons">
+                        <button type="button" onclick="deleteRow(this);" class="ui icon button"><i
+                                class="trash alternate icon"></i></button>
+                    </div>
+                </td>
             </tr>
             <% } %>
             <% } %>
         </tbody>
-        </table>
+    </table>
 </div>
 <div style="margin-top: 20px;">
     <h3>普通组员</h3>
     <div style="margin-top: 20px;">
         <div class="ui grid" style="margin-top: 20px;">
-        <div class="four wide">
-            <div style="width: 600px !important;">
-                <select id="search_users" class="ui fluid search dropdown">
-                    <option value="">添加用户到组: 输入 id、用户名、昵称、实名 均可搜索</option>
-                </select> 
+            <div class="four wide">
+                <div style="width: 600px !important;">
+                    <select id="search_users" class="ui fluid search dropdown">
+                        <option value="">添加用户到组: 输入 id、用户名、昵称、实名 均可搜索</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="three wide right floated">
-            <button class="ui labeled icon button" onclick="$('#import-window').modal('show');" ><i class="plus icon"></i>从文件导入</button>
-        </div>
+            <div class="three wide right floated">
+                <button class="ui labeled icon button" onclick="$('#import-window').modal('show');"><i
+                        class="plus icon"></i>从文件导入</button>
+            </div>
         </div>
     </div>
-    
-    <table class="ui very basic center aligned table"  style="margin-top: 40px;">
-    <thead>
-        <tr>
-            <th class="ui one wide">ID</th>
-            <th class="ui three wide">用户名</th>
-            <th class="ui three wide">昵称</th>
-            <th class="ui three wide">实名</th>
-            <th></th>
-            <th class="ui one wide">操作</th>
-        </tr>
-    </thead>
-    <tbody id="user-table">
-        <% if (gusers.length > 0) { for (let u of gusers) { %>
-        <tr id="row-<%= u.id %>"  style="height: 24px">
-        <td><%= u.id %></td>
-        <td><%= u.username %></td>
-        <td><%= u.nickname %></td>
-        <td><%= u.realname %></td>
-        <td></td>
-        <td>
-            <div class="ui buttons">
-                <button type="button" onclick="deleteRow(this);" class="ui icon button"><i class="trash alternate icon"></i></button>
-            </div>
-        </td>
-        </tr>
-        <% }} %>
-    </tbody>
+
+    <table class="ui very basic center aligned table" style="margin-top: 40px;">
+        <thead>
+            <tr>
+                <th class="ui one wide">ID</th>
+                <th class="ui three wide">用户名</th>
+                <th class="ui three wide">昵称</th>
+                <th class="ui three wide">实名</th>
+                <th></th>
+                <th class="ui one wide">操作</th>
+            </tr>
+        </thead>
+        <tbody id="user-table">
+            <% if (gusers.length > 0) { for (let u of gusers) { %>
+            <tr id="row-<%= u.id %>" style="height: 24px">
+                <td><%= u.id %></td>
+                <td><%= u.username %></td>
+                <td><%= u.nickname %></td>
+                <td><%= u.realname %></td>
+                <td></td>
+                <td>
+                    <div class="ui buttons">
+                        <button type="button" onclick="deleteRow(this);" class="ui icon button"><i
+                                class="trash alternate icon"></i></button>
+                    </div>
+                </td>
+            </tr>
+            <% }} %>
+        </tbody>
     </table>
-    
+
 </div>
 
 
 <script>
-// Dropdown Init.
-$(function (){
-    $('#search_admins').dropdown({
-        debug: true,
-        apiSettings: {
-          url: '/api/v3/search/admins/{query}',
-          successTest: (res) => {return res.success;},
-          onResponse: (res) => {
-            var a = []
-            $('#admin-user-table').find('tr').each((i, e) => { a.push(parseInt($(e).find('td')[0].innerText)); });
-            if (res.results) {
-                res.results = res.results.filter(function(x){ return !a.includes(parseInt(x.value))});
-            }
-            return res;
-          },
-          cache: false
-        },
-        onChange: function(val, name, e){
-            if (val){
-                var a = []
-                $('#admin-user-table').find('tr').each((i, e) => { a.push(parseInt($(e).find('td')[0].innerText)); });
-                console.log(a, a.includes(parseInt(val)));
-                if (!a.includes(parseInt(val))){
-                    newRow(name, true);
+    // Dropdown Init.
+    $(function () {
+        $('#search_admins').dropdown({
+            debug: true,
+            apiSettings: {
+                url: '/api/v3/search/admins/{query}',
+                successTest: (res) => { return res.success; },
+                onResponse: (res) => {
+                    var a = []
+                    $('#admin-user-table').find('tr').each((i, e) => { a.push(parseInt($(e).find('td')[0].innerText)); });
+                    if (res.results) {
+                        res.results = res.results.filter(function (x) { return !a.includes(parseInt(x.value)) });
+                    }
+                    return res;
+                },
+                cache: false
+            },
+            onChange: function (val, name, e) {
+                if (val) {
+                    var a = []
+                    $('#admin-user-table').find('tr').each((i, e) => { a.push(parseInt($(e).find('td')[0].innerText)); });
+                    // console.log(a, a.includes(parseInt(val)));
+                    if (!a.includes(parseInt(val))) {
+                        newRow(name, true);
+                    }
                 }
+                $('#search_admins').dropdown('clear');
             }
-            $('#search_admins').dropdown('clear'); 
-        }
-    });
-    $('#search_users').dropdown({
-        debug: true,
-        apiSettings: {
-          url: '/api/v3/search/users/{query}',
-          successTest: (res) => {return res.success;},
-          onResponse: (res) => {
-            var a = []
-            $('#user-table').find('tr').each((i, e) => { a.push(parseInt($(e).find('td')[0].innerText)); });
-            if (res.results) {
-                res.results = res.results.filter(function(x){ return !a.includes(parseInt(x.value))});
-            }
-            return res;
-          },
-          cache: false
-        },
-        onChange: function(val, name, e){
-            if (val){
-                var a = []
-                $('#user-table').find('tr').each((i, e) => { a.push(parseInt($(e).find('td')[0].innerText)); });
-                console.log(a, a.includes(parseInt(val)));
-                if (!a.includes(parseInt(val))){
-                    newRow(name, false);
+        });
+        $('#search_users').dropdown({
+            debug: true,
+            apiSettings: {
+                url: '/api/v3/search/users/{query}',
+                successTest: (res) => { return res.success; },
+                onResponse: (res) => {
+                    var a = []
+                    $('#user-table').find('tr').each((i, e) => { a.push(parseInt($(e).find('td')[0].innerText)); });
+                    if (res.results) {
+                        res.results = res.results.filter(function (x) { return !a.includes(parseInt(x.value)) });
+                    }
+                    return res;
+                },
+                cache: false
+            },
+            onChange: function (val, name, e) {
+                if (val) {
+                    var a = []
+                    $('#user-table').find('tr').each((i, e) => { a.push(parseInt($(e).find('td')[0].innerText)); });
+                    // console.log(a, a.includes(parseInt(val)));
+                    if (!a.includes(parseInt(val))) {
+                        newRow(name, false);
+                    }
                 }
+                $('#search_users').dropdown('clear');
             }
-            $('#search_users').dropdown('clear'); 
-        }
+        });
     });
-});
 </script>
 <script>
-// Add or Delete a new normal/admin user
-function newRow(strrow, is_admin){
-    row = strrow.split('\t');
-    console.log(row);
-    user = {
-        id: row[0].replace("#", ''),
-        username: row[1],
-        nickname: row[2],
-        realname: row[3]
-    }
-    data = {
-        operation: 'update',
-        data: [
-            {username: row[1], is_admin: is_admin}
-        ]
-    }
-    console.log('Operate:', data);
-    $.post(
-        "<%= '/admin/groups/' + group.id + '/user' %>",
-        data,
-        function(res){
-            if (res.success){
-                addobjstr = '<tr style="height: 24px">'
+    // Add or Delete a new normal/admin user
+    function newRow(strrow, is_admin) {
+        row = strrow.split('\t');
+        // console.log(row);
+        user = {
+            id: row[0].replace("#", ''),
+            username: row[1],
+            nickname: row[2],
+            realname: row[3]
+        }
+        data = {
+            operation: 'update',
+            data: [
+                { username: row[1], is_admin: is_admin }
+            ]
+        }
+        //console.log('Operate:', data);
+        $.post(
+            "<%= '/admin/groups/' + group.id + '/user' %>",
+            data,
+            function (res) {
+                if (res.success) {
+                    addobjstr = '<tr style="height: 24px">'
                         + '<td>' + user.id + '</td>'
                         + '<td>' + user.username + '</td>'
                         + '<td>' + user.nickname + '</td>'
@@ -198,79 +201,79 @@ function newRow(strrow, is_admin){
                         + '<td></td>'
                         + '<td><div class="ui buttons"><button type="button" onclick="deleteRow(this);" class="ui icon button"><i class="trash alternate icon"></i></button></div></td>'
                         + '</tr>'
-                if (is_admin){
-                    $('#admin-user-table').append(addobjstr)
+                    if (is_admin) {
+                        $('#admin-user-table').append(addobjstr)
+                    } else {
+                        $('#user-table').append(addobjstr)
+                    }
                 } else {
-                    $('#user-table').append(addobjstr)
+                    console.log(res.msg);
                 }
-            }else {
-                console.log(res.msg);
             }
-        }
-    );
-}
-function deleteRow(obj){
-    row = $(obj).parents("tr").find('td');
-    data = {
-        operation: 'delete',
-        data: [
-            {username: row[1].innerText}
-        ]
+        );
     }
-    console.log('Operate:', data);
-    $.post(
-        "<%= '/admin/groups/' + group.id + '/user' %>",
-        data,
-        function(result){
-            console.log(result);
-            if (result.success){
-                rmobj = obj.parentNode.parentNode.parentNode;
-                rmobj.parentNode.removeChild(rmobj);
-            }else {
-                $(obj).attr('data-tooltip', result.msg)
-            }
+    function deleteRow(obj) {
+        row = $(obj).parents("tr").find('td');
+        data = {
+            operation: 'delete',
+            data: [
+                { username: row[1].innerText }
+            ]
         }
-    );
-    return false;
-}
+        // console.log('Operate:', data);
+        $.post(
+            "<%= '/admin/groups/' + group.id + '/user' %>",
+            data,
+            function (result) {
+                // console.log(result);
+                if (result.success) {
+                    rmobj = obj.parentNode.parentNode.parentNode;
+                    rmobj.parentNode.removeChild(rmobj);
+                } else {
+                    $(obj).attr('data-tooltip', result.msg)
+                }
+            }
+        );
+        return false;
+    }
 </script>
 <script>
-// Rename Group Window
-function doEditWindowShow(obj){
-    row = $(obj).parents("tr").find('td');
-    $('#edit-title').text("#<%= group.id %>");
-    $('#edit-name').val($('#group-name').text());
-    $('#edit-form').attr("href",'/admin/groups/<%= group.id %>');
-    $('#edit-submit-icon').attr('class', 'grey upload icon');
+    // Rename Group Window
+    function doEditWindowShow(obj) {
+        row = $(obj).parents("tr").find('td');
+        $('#edit-title').text("#<%= group.id %>");
+        $('#edit-name').val($('#group-name').text());
+        $('#edit-form').attr("href", '/admin/groups/<%= group.id %>');
+        $('#edit-submit-icon').attr('class', 'grey upload icon');
 
-    $('#edit-window').modal('show');
-}
+        $('#edit-window').modal('show');
+    }
 
-function doEditApi(){
-    console.log("Try submit.");
-    $('#edit-submit-icon').attr('class', 'spinner loading icon');
+    function doEditApi() {
+        // console.log("Try submit.");
+        $('#edit-submit-icon').attr('class', 'spinner loading icon');
 
-    console.log('Data:',$("#edit-form").serialize());
-    $.post(
-        $('#edit-form').attr("href"),
-        $("#edit-form").serialize(),
-        function(result){
-        if (result.success){
-            $('#edit-submit-icon').attr('class', 'green check icon');
-            $('#group-name').html(result.group.name);
-            setTimeout(function(){
-                $('#edit-window').modal('hide');
-            }, 700);
-        }else {
-            $('#edit-submit-icon').attr('class', 'red x icon');
-            setTimeout(function(){
-                $('#edit-submit-icon').attr('class', 'grey upload icon');
-            }, 2000);
-        }
-        }
-    );
-    return false;
-}
-    </script>
+        // console.log('Data:',$("#edit-form").serialize());
+        $.post(
+            $('#edit-form').attr("href"),
+            $("#edit-form").serialize(),
+            function (result) {
+                if (result.success) {
+                    $('#edit-submit-icon').attr('class', 'green check icon');
+                    $('#group-name').html(result.group.name);
+                    setTimeout(function () {
+                        $('#edit-window').modal('hide');
+                    }, 700);
+                } else {
+                    $('#edit-submit-icon').attr('class', 'red x icon');
+                    setTimeout(function () {
+                        $('#edit-submit-icon').attr('class', 'grey upload icon');
+                    }, 2000);
+                }
+            }
+        );
+        return false;
+    }
+</script>
 
 <% include ../admin_footer %>

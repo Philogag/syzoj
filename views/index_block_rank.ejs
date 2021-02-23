@@ -3,9 +3,9 @@
   <table class="ui very basic center aligned table">
     <thead>
       <tr>
-          <th style="width: 50px; ">#</th>
-          <th style="width: 170px; ">用户名</th>
-          <th>积分</th>
+        <th style="width: 50px; ">#</th>
+        <th style="width: 170px; ">用户名</th>
+        <th>积分</th>
       </tr>
     </thead>
     <tbody>
@@ -14,11 +14,13 @@
       for (let user of ranklist) {
         ++i;
       %>
-          <tr>
-              <td><b><%= i %></b></td>
-              <td><a href="<%= syzoj.utils.makeUrl(['user', user.id]) %>"><%= user.username %></a><% if (user.nameplate) { %><%- user.nameplate %><% } %></td>
-              <td><%= user.rating %></td>
-          </tr>
+      <tr>
+        <td><b><%= i %></b></td>
+        <td><a
+            href="<%= syzoj.utils.makeUrl(['user', user.id]) %>"><%= user.username %></a><% if (user.nameplate) { %><%- user.nameplate %><% } %>
+        </td>
+        <td><%= user.rating %></td>
+      </tr>
       <%  } %>
     </tbody>
   </table>

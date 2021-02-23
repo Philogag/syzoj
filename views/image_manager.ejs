@@ -1,114 +1,121 @@
 <style>
-#image-manager{
-    position: fixed;
-    bottom: 60px;
-    right: 60px;
-}
+    #image-manager {
+        position: fixed;
+        bottom: 60px;
+        right: 60px;
+    }
 </style>
-<button type="button" class="ui huge circular icon button" id="image-manager" data-tooltip="图床 Figure bed" onclick="image_manager_window_show();"><i class="images outline icon"></i></button>
+<button type="button" class="ui huge circular icon button" id="image-manager" data-tooltip="图床 Figure bed"
+    onclick="image_manager_window_show();"><i class="images outline icon"></i></button>
 <script>
-function image_manager_window_show(){
-    $('#image-manager-window').modal('show');
-    image_manager_window_reload_list();
-}
-function image_manager_window_show_upload(){
-    $('#image_select').click();
-}
+    function image_manager_window_show() {
+        $('#image-manager-window').modal('show');
+        image_manager_window_reload_list();
+    }
+    function image_manager_window_show_upload() {
+        $('#image_select').click();
+    }
 
 </script>
 <div class="ui modal" id="image-manager-window">
     <i class="close icon"></i>
-  <div class="ui header" style="border-radius: .28571429rem;">图片管理 Image Management</div>
-  <div class="content">
-    <div class="padding">
-    <div class="ui negative message" style="display: none;" id="image-manager-error">Error</div>
-    <table class="ui very basic table">
-        <thead>
-            <tr>
-                <th><div>图片 Image</div><th>
-                <th class="one wide center aligned"> Preview</th>
-                <th class="one wide center aligned " colspan=2>
-                    <input type="file" id="image_select" style="display: none" onchange="image_manager_window_do_upload()" accept="image/*,*.*">
-                    <div class="ui small buttons ">
-                        <button class="ui icon button" type="button" data-tooltip="上传图片" id="image-manager-upload" onclick="image_manager_window_show_upload();"><i class="ui upload icon"></i></button>
-                        <button class="ui icon button" type="button" data-tooltip="刷新列表" onclick="image_manager_window_reload_list();"><i class="ui redo icon"></i></button>
-                    </div>
-                </th>
-            </tr>
-        </thead>
-        <tbody id="image-manager-rows"></tbody>
-    </table>
+    <div class="ui header" style="border-radius: .28571429rem;">图片管理 Image Management</div>
+    <div class="content">
+        <div class="padding">
+            <div class="ui negative message" style="display: none;" id="image-manager-error">Error</div>
+            <table class="ui very basic table">
+                <thead>
+                    <tr>
+                        <th>
+                            <div>图片 Image</div>
+                        <th>
+                        <th class="one wide center aligned"> Preview</th>
+                        <th class="one wide center aligned " colspan=2>
+                            <input type="file" id="image_select" style="display: none"
+                                onchange="image_manager_window_do_upload()" accept="image/*,*.*">
+                            <div class="ui small buttons ">
+                                <button class="ui icon button" type="button" data-tooltip="上传图片"
+                                    id="image-manager-upload" onclick="image_manager_window_show_upload();"><i
+                                        class="ui upload icon"></i></button>
+                                <button class="ui icon button" type="button" data-tooltip="刷新列表"
+                                    onclick="image_manager_window_reload_list();"><i class="ui redo icon"></i></button>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="image-manager-rows"></tbody>
+            </table>
+        </div>
     </div>
-  </div>
 </div>
 
 <script>
-function image_manager_window_reload_list(){
-    $.post(
-        "/api/image/list",
-        { manager: window.location.pathname },
-        (ret, text, xhr) => {                                                                                           
-            $("#image-manager-rows").html('')
-            for (var row of ret.data){
-                ss = "<tr data-id='" + row.id + "'>"
-                   + '<td data-tooltip="Click to edit." data-position="top left">' + row.name + "</td>"
-                   + '<td></td>'
-                   + '<td><button class="ui center aligned small icon button preview_button" data-html="<img src=\'' + row.url + '\'>""><i class="ui eye icon"></i></button></td>'
-                   + '<td><button class="ui center aligned small icon button copybutton" data-tooltip="Copy Url as Markdown" data-clipboard-action="copy" data-clipboard-text="![' + row.name + "](" + row.url + ')"><i class="ui copy icon"></i></button></td>'
-                   + '<td><button class="ui center aligned small icon button" data-tooltip="Delete" onclick="image_manager_window_do_delete(this);"><i class="ui trash alternate outline icon"></i></button></td>'
-                   + '</tr>';
-                $("#image-manager-rows").append(ss);
+    function image_manager_window_reload_list() {
+        $.post(
+            "/api/image/list",
+            { manager: window.location.pathname },
+            (ret, text, xhr) => {
+                $("#image-manager-rows").html('')
+                for (var row of ret.data) {
+                    ss = "<tr data-id='" + row.id + "'>"
+                        + '<td data-tooltip="Click to edit." data-position="top left">' + row.name + "</td>"
+                        + '<td></td>'
+                        + '<td><button class="ui center aligned small icon button preview_button" data-html="<img src=\'' + row.url + '\'>""><i class="ui eye icon"></i></button></td>'
+                        + '<td><button class="ui center aligned small icon button copybutton" data-tooltip="Copy Url as Markdown" data-clipboard-action="copy" data-clipboard-text="![' + row.name + "](" + row.url + ')"><i class="ui copy icon"></i></button></td>'
+                        + '<td><button class="ui center aligned small icon button" data-tooltip="Delete" onclick="image_manager_window_do_delete(this);"><i class="ui trash alternate outline icon"></i></button></td>'
+                        + '</tr>';
+                    $("#image-manager-rows").append(ss);
+                }
+                for (var obj of $('.preview_button')) {
+                    $(obj).popup({
+                        position: 'top left',
+                        target: $(obj).parents('tr'),
+                    })
+                }
+                var clipboard = new ClipboardJS('.copybutton');
             }
-            for(var obj of $('.preview_button')){
-                $(obj).popup({
-                    position: 'top left',
-                    target: $(obj).parents('tr'),
-                })
-            }
-            var clipboard = new ClipboardJS('.copybutton');
-        }
-    )
-}
-function image_manager_window_do_upload(){
-    var file = $("#image_select")[0].files[0];
-    var data = new FormData();
-    data.append('image', file);
-    data.append('name', file.name);
-    data.append('manager', window.location.pathname);
-    
-    $.ajax({
-        url: "/api/image/upload",
-        type: "post",
-        data: data,
-        success: (res, text, xhr) => {
-            console.log(res);
-            if (res.success){
-                image_manager_window_reload_list();
-            }
-            else {
-                $('#image-manager-error').html(res.msg);
-                $('#image-manager-error').attr('class', 'ui bottom attached negative message')
-                $('#image-manager-error').css("display","");
-                setTimeout(function(){
-                    $('#image-manager-error').css("display","none");
-                }, 5000);
-            }
-        },
-        processData: false,
-        contentType: false,
-    })
-}
-function image_manager_window_do_rename(){
+        )
+    }
+    function image_manager_window_do_upload() {
+        var file = $("#image_select")[0].files[0];
+        var data = new FormData();
+        data.append('image', file);
+        data.append('name', file.name);
+        data.append('manager', window.location.pathname);
 
-}
-function image_manager_window_do_delete(obj){
-    $.ajax({
-        url: "/api/image/delete/" + $(obj).parents('tr').attr('data-id'),
-        type: "get",
-        success: (res, text, xhr) => {
-            if (res.success)
-                image_manager_window_reload_list()
-        }
-    })
-}
+        $.ajax({
+            url: "/api/image/upload",
+            type: "post",
+            data: data,
+            success: (res, text, xhr) => {
+                // console.log(res);
+                if (res.success) {
+                    image_manager_window_reload_list();
+                }
+                else {
+                    $('#image-manager-error').html(res.msg);
+                    $('#image-manager-error').attr('class', 'ui bottom attached negative message')
+                    $('#image-manager-error').css("display", "");
+                    setTimeout(function () {
+                        $('#image-manager-error').css("display", "none");
+                    }, 5000);
+                }
+            },
+            processData: false,
+            contentType: false,
+        })
+    }
+    function image_manager_window_do_rename() {
+
+    }
+    function image_manager_window_do_delete(obj) {
+        $.ajax({
+            url: "/api/image/delete/" + $(obj).parents('tr').attr('data-id'),
+            type: "get",
+            success: (res, text, xhr) => {
+                if (res.success)
+                    image_manager_window_reload_list()
+            }
+        })
+    }
 </script>

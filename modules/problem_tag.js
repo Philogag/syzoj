@@ -3,7 +3,7 @@ let ProblemTag = syzoj.model('problem_tag');
 
 app.get('/admin/tags', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.isSuperAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
 
     tag_groups = await ProblemTagGroup.find({ order: {id: "ASC"}, relations: ["tags"]});
 
@@ -20,12 +20,12 @@ app.get('/admin/tags', async (req, res) => {
 
 app.post('/admin/tags/update', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.isSuperAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
 
     let id = parseInt(req.body.id);
     let tag = await ProblemTag.findById(id);
 
-    console.log(req.body);
+    // console.log(req.body);
 
     if (req.body.do_delete === "false") {
       if (!tag) {
@@ -40,7 +40,7 @@ app.post('/admin/tags/update', async (req, res) => {
       }
 
       let gid = parseInt(req.body.gid);
-      console.log(gid);
+      // console.log(gid);
       tgroup = await ProblemTagGroup.findById(gid);
       if (!tgroup) {
         throw new ErrorMessage("组不存在。");
@@ -70,7 +70,7 @@ app.post('/admin/tags/update', async (req, res) => {
 
 app.post('/admin/tags/group', async (req, res) => {
   try {
-    if (!res.locals.user || !res.locals.user.isSuperAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user || !res.locals.user.isTeacherAdmin()) throw new ErrorMessage('您没有权限进行此操作。');
 
     let id = parseInt(req.body.id);
     let tg = await ProblemTagGroup.findById(id);

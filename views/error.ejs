@@ -13,11 +13,11 @@ if (!(err instanceof ErrorMessage)) {
       <%= err.message %>
     </div>
     <% if (err.details) { %>
-      <p><%= err.details %></p>
+    <p><%= err.details %></p>
     <% } %>
     <p>
       <% for (let text in err.nextUrls) { %>
-        <a href="<%= err.nextUrls[text] %>" style="margin-right: 5px; "><%= text %></a>
+      <a href="<%= err.nextUrls[text] %>" style="margin-right: 5px; "><%= text %></a>
       <% } %>
       <a href="javascript:history.go(-1)">返回上一页</a>
     </p>

@@ -1,50 +1,52 @@
-
 <style>
-.copybutton{
-    position: absolute; 
-}
-.left > .copybutton {
-    left: 50%;
-    transform: translate(-130%, -15%);
-}
-.right > .copybutton {
-    left: 100%;
-    transform: translate(-180%, -15%);
-}
-textarea.hidden{
-    display: true;
-}
+    .copybutton {
+        position: absolute;
+    }
+
+    .left>.copybutton {
+        left: 50%;
+        transform: translate(-130%, -15%);
+    }
+
+    .right>.copybutton {
+        left: 100%;
+        transform: translate(-180%, -15%);
+    }
+
+    textarea.hidden {
+        display: true;
+    }
 </style>
 <textarea id="clipboard" type="hidden" style="display:none;"></textarea>
 <script>
-function randstr(){
-    return Math.random().toString(36).slice(-8)
-}
-
-$(function(){
-    ss = '<button class="ui mini icon button copybutton" data-clipboard-action="copy" onclick=""><i class="ui copy outline icon"></i></button>'
-    for(let p of $(".doclickboard")){
-        button = $(ss);
-        button.attr('data-clipboard-target', '#' + $(p).attr('id') + '-target');
-        $(p).append(button[0]);
+    function randstr() {
+        return Math.random().toString(36).slice(-8)
     }
 
-    var clipboard = new ClipboardJS('.copybutton');
+    $(function () {
+        ss = '<button class="ui mini icon button copybutton" data-clipboard-action="copy" onclick=""><i class="ui copy outline icon"></i></button>'
+        for (let p of $(".doclickboard")) {
+            button = $(ss);
+            button.attr('data-clipboard-target', '#' + $(p).attr('id') + '-target');
+            $(p).append(button[0]);
+        }
 
-    clipboard.on('success', function(e) {
-        obj = e.trigger
-        $(obj).find('i').attr('class', 'ui green check icon')
-        setTimeout(function(){
-            $(obj).find('i').attr('class', 'ui copy outline icon')
-        }, 500)
-    });
+        var clipboard = new ClipboardJS('.copybutton');
 
-    clipboard.on('error', function (e) {
-        obj = e.triger;
-        $(obj).find('i').attr('class', 'ui red x icon')
-        setTimeout(function(){
-            $(obj).find('i').attr('class', 'ui copy outline icon')
-        }, 500)
-    });
-})
+        clipboard.on('success', function (e) {
+            obj = e.trigger
+            $(obj).find('i').attr('class', 'ui green check icon')
+            setTimeout(function () {
+                $(obj).find('i').attr('class', 'ui copy outline icon')
+            }, 500)
+        });
+
+        clipboard.on('error', function (e) {
+            obj = e.triger;
+            $(obj).find('i').attr('class', 'ui red x icon')
+            setTimeout(function () {
+                $(obj).find('i').attr('class', 'ui copy outline icon')
+            }, 500)
+        });
+    })
 </script>

@@ -1,15 +1,16 @@
 <% this.title = '比赛' %>
 <% include header %>
 <div class="padding">
-    <div class="ui grid" style="margin-bottom: 10px; ">
-        <div class="ui thirteen wide column">
-          <form action="<%= syzoj.utils.makeUrl(['contests']) %>" class="ui mini form" method="get" role="form" id="form">
-            <div class="inline fields" style="margin-bottom: 25px; white-space: nowrap; ">
-              <label style="font-size: 1.2em; margin-right: 5px; ">筛选:   </label>
-              <div class="field"><input name="title" placeholder="名称" style="width: 200px; " type="text" value="<%= args.title %>"></div>
-              <div class="field" style="width: 140px;">
-                <select class="ui fluid dropdown" id="contest_type" name="type">
-                  <%
+  <div class="ui grid" style="margin-bottom: 10px; ">
+    <div class="ui thirteen wide column">
+      <form action="<%= syzoj.utils.makeUrl(['contests']) %>" class="ui mini form" method="get" role="form" id="form">
+        <div class="inline fields" style="margin-bottom: 25px; white-space: nowrap; ">
+          <label style="font-size: 1.2em; margin-right: 5px; ">筛选: </label>
+          <div class="field"><input name="title" placeholder="名称" style="width: 200px; " type="text"
+              value="<%= args.title %>"></div>
+          <div class="field" style="width: 140px;">
+            <select class="ui fluid dropdown" id="contest_type" name="type">
+              <%
                     kv = {
                       none: "类型 - 不限",
                       acm: "Acm",
@@ -17,14 +18,15 @@
                       noi: "NOI",
                     }
                   %>
-                  <% for (var k in kv) { %>
-                    <option class="item" value="<% if(k !== 'none') { %><%= k %><% } %>" <% if(k === args.type) { %>selected<% } %> ><%= kv[k] %></option>
-                  <% } %>
-                </select>
-              </div>
-              <div class="field" style="width: 140px;">
-                <select class="ui fluid dropdown" id="contest_pub" name="pub">
-                  <%
+              <% for (var k in kv) { %>
+              <option class="item" value="<% if(k !== 'none') { %><%= k %><% } %>"
+                <% if(k === args.type) { %>selected<% } %>><%= kv[k] %></option>
+              <% } %>
+            </select>
+          </div>
+          <div class="field" style="width: 140px;">
+            <select class="ui fluid dropdown" id="contest_pub" name="pub">
+              <%
                   kv = {
                     none: "权限 - 不限",
                     public: "公开",
@@ -32,111 +34,113 @@
                     passwd: "密码",
                   }
                 %>
-                <% for (var k in kv) { %>
-                  <option class="item" value="<% if(k !== 'none') { %><%= k %><% } %>" <% if(k === args.pub) { %>selected<% } %> ><%= kv[k] %></option>
-                <% } %>
-                </select>
-              </div>
-              <div class="field">
-                <div class="ui checkbox">
-                    <input id="mine-id" type="checkbox" name="mine" <% if(args.mine === 'on') { %>checked<% } %>>
-                    <label for="mine-id">我的比赛</label>
-                </div>
-              </div>
-              
-              <button class="ui labeled icon mini button" type="submit">
-                <i class="search icon"></i>
-                查询
-              </button>
-            </div>
-
-          </form>
-        </div>
-        <% if (user && user.isTeacherAdmin()) { %>
-        <div class="three wide right floated column">
-        <form class="ui mini form">
-          <div class="inline fields" style="margin-bottom: 25px; white-space: nowrap; ">
-            <a href="<%= syzoj.utils.makeUrl(['contest', 0, 'edit']) %>" class="ui mini labeled icon right floated button" style="margin-left: auto; ">
-              <i class="ui icon write"></i>
-              添加比赛
-            </a>
+              <% for (var k in kv) { %>
+              <option class="item" value="<% if(k !== 'none') { %><%= k %><% } %>"
+                <% if(k === args.pub) { %>selected<% } %>><%= kv[k] %></option>
+              <% } %>
+            </select>
           </div>
-        </form>
+          <div class="field">
+            <div class="ui checkbox">
+              <input id="mine-id" type="checkbox" name="mine" <% if(args.mine === 'on') { %>checked<% } %>>
+              <label for="mine-id">我的比赛</label>
+            </div>
+          </div>
+
+          <button class="ui labeled icon mini button" type="submit">
+            <i class="search icon"></i>
+            查询
+          </button>
         </div>
-        <% } %>
+
+      </form>
     </div>
+    <% if (user && user.isTeacherAdmin()) { %>
+    <div class="three wide right floated column">
+      <form class="ui mini form">
+        <div class="inline fields" style="margin-bottom: 25px; white-space: nowrap; ">
+          <a href="<%= syzoj.utils.makeUrl(['contest', 0, 'edit']) %>" class="ui mini labeled icon right floated button"
+            style="margin-left: auto; ">
+            <i class="ui icon write"></i>
+            添加比赛
+          </a>
+        </div>
+      </form>
+    </div>
+    <% } %>
+  </div>
 
-    <% if (contests.length) { %>
+  <% if (contests.length) { %>
 
-    <table class="ui very basic center aligned table"  style="margin-bottom: -10px; ">
-      <thead>
-        <tr>
-          <th>比赛名称</th>
-          <th>状态</th>
-          <th>开始时间</th>
-          <th>结束时间</th>
-          <th>类型</th>
-          <th>描述</th>
-        </tr>
-      </thead>
-      <tbody>
-        <%
+  <table class="ui very basic center aligned table" style="margin-bottom: -10px; ">
+    <thead>
+      <tr>
+        <th>比赛名称</th>
+        <th>状态</th>
+        <th>开始时间</th>
+        <th>结束时间</th>
+        <th>类型</th>
+        <th>描述</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%
         for (let contest of contests) {
           let now = syzoj.utils.getCurrentDate();
           let tag = '';
         %>
-        <tr>
-          <% if (!contest.is_enabled) { %>
-            <% ensble_tab = '<span class="ui header"><div class="ui mini red label">Disable</div></span>' %>
-          <% } else { %>
-            <% ensble_tab = '' %>
-          <% } %>
-
-          <% if (now < contest.start_time) { %>
-            <% time_tag = '<span class="ui header"><div class="ui mini red label">未开始</div></span>' %>
-          <% } else if (now >= contest.start_time && now < contest.end_time) { %>
-            <% time_tag = '<span class="ui header"><div class="ui mini green label">进行中</div></span>' %>
-          <% } else { %>
-            <% time_tag = '<span class="ui header"><div class="ui mini grey label">已结束</div></span>' %>
-          <% } %>
-
-          <% if (contest.public_mode === 'public') { %>
-            <% sec_tab = '<span class="ui header"><div class="ui mini green label">公开</div></span>' %>
-          <% } else if (contest.public_mode === 'invite') { %>
-            <% sec_tab = '<span class="ui header"><div class="ui mini red label">邀请</div></span>' %>
-          <% } else { %>
-            <% sec_tab = '<span class="ui header"><div class="ui mini orange label">密码</div></span>' %>
-          <% } %>
-
-          <td><a href="<%= syzoj.utils.makeUrl(['contest', contest.id]) %>"><%= contest.title %></a></td>
-          <td><%- ensble_tab %><%- time_tag %><%- sec_tab %></td>
-          <td><%= syzoj.utils.formatDate(contest.start_time) %></td>
-          <td><%= syzoj.utils.formatDate(contest.end_time) %></td>
-          <td> <%- contest.type %> </td>
-          <td class="font-content"><%- contest.subtitle %></td>
-        </tr>
+      <tr>
+        <% if (!contest.is_enabled) { %>
+        <% ensble_tab = '<span class="ui header"><div class="ui mini red label">Disable</div></span>' %>
+        <% } else { %>
+        <% ensble_tab = '' %>
         <% } %>
-      </tbody>
-    </table>
-    <% } else { %>
-    <div class="ui placeholder segment">
-      <div class="ui icon header">
-        <i class="calendar icon" style="margin-bottom: 20px; "></i>
-        暂无比赛
-      </div>
-      <% if (user && user.is_admin) { %>
-      <a href="<%= syzoj.utils.makeUrl(['contest', 0, 'edit']) %>" class="ui primary labeled icon button">
-        <i class="ui icon write"></i>
-        添加第一场比赛
-      </a>
+
+        <% if (now < contest.start_time) { %>
+        <% time_tag = '<span class="ui header"><div class="ui mini red label">未开始</div></span>' %>
+        <% } else if (now >= contest.start_time && now < contest.end_time) { %>
+        <% time_tag = '<span class="ui header"><div class="ui mini green label">进行中</div></span>' %>
+        <% } else { %>
+        <% time_tag = '<span class="ui header"><div class="ui mini grey label">已结束</div></span>' %>
+        <% } %>
+
+        <% if (contest.public_mode === 'public') { %>
+        <% sec_tab = '<span class="ui header"><div class="ui mini green label">公开</div></span>' %>
+        <% } else if (contest.public_mode === 'invite') { %>
+        <% sec_tab = '<span class="ui header"><div class="ui mini red label">邀请</div></span>' %>
+        <% } else { %>
+        <% sec_tab = '<span class="ui header"><div class="ui mini orange label">密码</div></span>' %>
+        <% } %>
+
+        <td><a href="<%= syzoj.utils.makeUrl(['contest', contest.id]) %>"><%= contest.title %></a></td>
+        <td><%- ensble_tab %><%- time_tag %><%- sec_tab %></td>
+        <td><%= syzoj.utils.formatDate(contest.start_time) %></td>
+        <td><%= syzoj.utils.formatDate(contest.end_time) %></td>
+        <td> <%- contest.type %> </td>
+        <td class="font-content"><%- contest.subtitle %></td>
+      </tr>
       <% } %>
+    </tbody>
+  </table>
+  <% } else { %>
+  <div class="ui placeholder segment">
+    <div class="ui icon header">
+      <i class="calendar icon" style="margin-bottom: 20px; "></i>
+      暂无比赛
     </div>
+    <% if (user && user.is_admin) { %>
+    <a href="<%= syzoj.utils.makeUrl(['contest', 0, 'edit']) %>" class="ui primary labeled icon button">
+      <i class="ui icon write"></i>
+      添加第一场比赛
+    </a>
     <% } %>
+  </div>
+  <% } %>
   <br>
   <% include page %>
 
   <script>
-    $(function (){
+    $(function () {
       $('#contest_type').dropdown({
         clearable: true
       });

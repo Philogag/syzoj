@@ -1,7 +1,7 @@
 <script>
   window.pathLib = "<%- lib('') %>";
   window.pathSelfLib = "<%- selfLib('') %>";
-  
+
   var originalConsoleWarn = console.warn;
   console.warn = function (message) {
     if (message.startsWith('Duplicate definition of module')) return;

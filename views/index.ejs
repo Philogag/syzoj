@@ -9,25 +9,25 @@
 
     </div>
     <div class="right floated five wide column">
-        <% include index_block_hitokoto %>
-        <% include index_block_psearch %>
-        <% include index_block_rank %>
-        <% include index_block_link %>
+      <% include index_block_hitokoto %>
+      <% include index_block_psearch %>
+      <% include index_block_rank %>
+      <% include index_block_link %>
     </div>
   </div>
 </div>
 <script>
-$(function () {
-  $('.ui.search').search({
-    debug: true,
-    apiSettings: {
-      url: '/api/v2/search/problems/{query}',
-      cache: false
-    },
-    fields: {
-      title: 'name'
-    }
+  $(function () {
+    $('.ui.search').search({
+      debug: true,
+      apiSettings: {
+        url: '/api/v2/search/problems/{query}',
+        cache: false
+      },
+      fields: {
+        title: 'name'
+      }
+    });
   });
-});
 </script>
 <% include footer %>

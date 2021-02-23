@@ -210,7 +210,7 @@ export default class Contest extends Model {
         }
         if (!contest.allowedGroup || contest.allowedGroup.length <= 0)
           return false;
-        console.log(contest.allowedGroup);
+        // console.log(contest.allowedGroup);
         let gids = contest.allowedGroup.map(x => x.id);
         let gusers = await GroupUser.findOne({
           uid: user.id,

@@ -124,7 +124,7 @@ app.get('/contest/:id/edit', async (req, res) => {
 //    exit:    Contest.isEditAllowed
 app.post('/contest/:id/edit', async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     let contest_id = parseInt(req.params.id);
     let contest = await Contest.findById(contest_id);
     let ranklist = null;
@@ -185,7 +185,7 @@ app.post('/contest/:id/edit', async (req, res) => {
 
     contest.is_enabled = req.body.is_enable === 'on';
 
-    console.log(contest);
+    // console.log(contest);
 
     await contest.save();
 

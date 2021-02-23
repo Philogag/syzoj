@@ -364,7 +364,7 @@ app.post('/admin/rejudge', async (req, res) => {
         }));
       } else if (req.body.language === 'non-submit-answer') {
         query.andWhere('language != :language', { language: '' })
-             .andWhere('language IS NOT NULL');;
+          .andWhere('language IS NOT NULL');;
       } else {
         query.andWhere('language = :language', { language: req.body.language });
       }
@@ -482,7 +482,7 @@ app.get('/admin/serviceID', async (req, res) => {
     if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
 
     res.send({
-        serviceID: syzoj.serviceID
+      serviceID: syzoj.serviceID
     });
   } catch (e) {
     syzoj.log(e);

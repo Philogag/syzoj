@@ -1,9 +1,9 @@
 <% this.title = article.id ? '编辑帖子' : '发表帖子'; %>
 <% include header %>
 <style type="text/css">
-    .am-panel-title{
+  .am-panel-title {
     font-size: 1.6em;
-    }
+  }
 </style>
 <div class="padding">
   <form class="" method="post">
@@ -23,12 +23,12 @@
         </div>
       </div>
 
-    <% if (user && user.is_admin) { %>
-        <div class="ui <% if (article.is_notice) { %>checked <% } %>checkbox" style="margin-top: 15px; ">
-          <input <% if (article.is_notice) { %>checked=""<% } %> name="is_notice" type="checkbox">
-          <label><strong>公告</strong></label>
-          <p style="margin-top: 5px; ">选择后将显示在首页公告栏。</p>
-        </div>
+      <% if (user && user.is_admin) { %>
+      <div class="ui <% if (article.is_notice) { %>checked <% } %>checkbox" style="margin-top: 15px; ">
+        <input <% if (article.is_notice) { %>checked="" <% } %> name="is_notice" type="checkbox">
+        <label><strong>公告</strong></label>
+        <p style="margin-top: 5px; ">选择后将显示在首页公告栏。</p>
+      </div>
       <% } %>
     </div>
     <div class="ui bottom attached tab segment" data-tab="preview">
@@ -36,15 +36,15 @@
       <div id="pv-content" class="font-content"></div>
     </div>
     <div style="text-align: center; ">
-    <button id="submit_button" type="submit" class="ui labeled submit icon button">
-      <i class="icon edit"></i> 提交
-    </button>
+      <button id="submit_button" type="submit" class="ui labeled submit icon button">
+        <i class="icon edit"></i> 提交
+      </button>
     </div>
   </form>
 </div>
 
 <script type="text/javascript">
-$(function () {
+  $(function () {
     function render(output, input) {
       $.post('/api/markdown', { s: input.val() }, function (s) {
         output.html(s);
@@ -56,7 +56,7 @@ $(function () {
       render($("#pv-content"), $("#content"));
     });
     $('.tabular.menu .item').tab();
-})
+  })
 </script>
 <% include image_manager %>
 <% include footer %>
