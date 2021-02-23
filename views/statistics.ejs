@@ -112,7 +112,7 @@ let types = {
   <script type="text/javascript">
     new Morris.Bar({
       element: 'score-distribution-chart',
-      data: <% - serializejs(statistics.scoreDistribution) %>,
+      data: <%- serializejs(statistics.scoreDistribution) %>,
       barColors: function (r, s, type) {
         return getColorOfScore(r.label);
       },
@@ -138,7 +138,7 @@ let types = {
   %>
       new Morris.Line({
         element: 'score-distribution-chart-pre',
-        data: <% - serializejs(statistics.prefixSum) %>,
+        data: <%- serializejs(statistics.prefixSum) %>,
         xkey: 'score',
         ykeys: ['count'],
         labels: ['number'],
@@ -170,7 +170,7 @@ let types = {
   %>
       new Morris.Line({
         element: 'score-distribution-chart-suf',
-        data: <% - serializejs(statistics.suffixSum) %>,
+        data: <%- serializejs(statistics.suffixSum) %>,
         xkey: 'score',
         ykeys: ['count'],
         labels: ['number'],

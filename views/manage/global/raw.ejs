@@ -10,7 +10,7 @@
   <input type="hidden" name="data">
 
   <script type="text/javascript">
-    var originalData = <% - serializejs(data) %>;
+    var originalData = <%- serializejs(data) %>;
     var input = $('[name="data"]');
     input.val(originalData);
 

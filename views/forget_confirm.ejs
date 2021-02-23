@@ -50,7 +50,7 @@
             url: "/api/reset_password",
             type: 'POST',
             data: {
-                "token": <% - serializejs(token) %>,
+                "token": <%- serializejs(token) %>,
                 "password": password
             },
             async: true,
