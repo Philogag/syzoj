@@ -41,10 +41,12 @@
     <thead>
       <tr>
         <th class="ui one wide">ID</th>
-        <th class="ui three wide">用户名</th>
-        <th class="ui three wide">昵称</th>
-        <th class="ui three wide">实名</th>
+        <th class="ui two wide">用户名</th>
+        <th class="ui two wide">昵称</th>
+        <th class="ui two wide">实名</th>
         <th class="ui"></th>
+        <th class="ui one wide" data-tooltip="是否在全局rank中显示">Rank</th>
+        <th class="ui one wide" data-tooltip="是否允许登录">Login</th>
         <th class="ui one wide">权限级</th>
         <th class="ui one wide center aligned">操作</th>
       </tr>
@@ -58,6 +60,18 @@
         <td ><%= user.realname %></td>
         <td></td>
         <td>
+          <div class="ui disabled checkbox">
+            <input type="checkbox" disabled="disabled" <% if (user.is_show) { %>checked<% } %>>
+            <label></label>
+          </div>
+        </td>
+        <td>
+          <div class="ui disabled checkbox">
+            <input type="checkbox" disabled="disabled" <% if (user.can_login) { %>checked<% } %>>
+            <label></label>
+          </div>
+        </td>
+        <td>
           <% if (user.isSuperAdmin()){ %>
             <span class="ui header"><div class="ui mini red label">Admin</div></span>
           <% } else if (user.isTeacherAdmin()) { %>
@@ -67,7 +81,6 @@
         <td >
           <div class="ui buttons">
             <button type="button" onclick="doEditWindowShow(this);" class="ui icon button"><i class="edit icon"></i></button>
-            <button type="button" onclick="deleteP(this);" class="ui icon button"><i class="trash alternate icon"></i></button>
           </div>
         </td>
       </tr>

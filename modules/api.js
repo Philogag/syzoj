@@ -15,6 +15,7 @@ app.post('/api/login', async (req, res) => {
     let user = await User.fromName(req.body.username);
 
     if (!user) throw 1001;
+    if (!user.can_login) throw 1004;
     else if (user.password == null || user.password === '') res.send({ error_code: 1003 });
     else if (user.password !== req.body.password) res.send({ error_code: 1002 });
     else {
@@ -23,7 +24,7 @@ app.post('/api/login', async (req, res) => {
       res.send({ error_code: 1 });
     }
   } catch (e) {
-    syzoj.log(e);
+    // syzoj.log(e);
     res.send({ error_code: e });
   }
 });

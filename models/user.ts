@@ -55,8 +55,12 @@ export default class User extends Model {
   creater: number;
 
   @TypeORM.Index()
-  @TypeORM.Column({ nullable: true, type: "boolean" })
+  @TypeORM.Column({ nullable: true, type: "boolean", default: true })
   is_show: boolean; // show in public ranklist
+
+  @TypeORM.Index()
+  @TypeORM.Column({ nullable: true, type: "boolean", default: true })
+  can_login: boolean; // show in public ranklist
 
   @TypeORM.Column({ nullable: true, type: "boolean", default: true })
   public_email: boolean;

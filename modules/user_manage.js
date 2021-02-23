@@ -36,22 +36,26 @@ app.post('/admin/user/edit/:id', async (req, res) => {
         if (!curUser || !curUser.isTeacherAdmin()) throw new ErrorMessage('您没有权限执行此操作。');
 
         let goalUser = await User.findById(parseInt(req.params.id));
-        console.log(goalUser);
-       // if (!curUser.is_admin && !await allowEditByGroup(curUser, goalUser)) throw new ErrorMessage('您没有权限编辑这个用户。');
-        console.log(req.body);
+
+        // console.log(req.body);
+        
         if (req.body.password)
             goalUser.password = req.body.password;
         
         goalUser.nickname = req.body.nickname;
         goalUser.realname = req.body.realname;
-        console.log(goalUser);
+        goalUser.is_show = (req.body.is_show === 'on');
+        goalUser.can_login = (req.body.can_login === 'on');
+        // console.log(goalUser);
         await goalUser.save();
         res.send({
             success: true, user: {
                 id: goalUser.id,
                 username: goalUser.username,
                 nickname: goalUser.nickname,
-                realname: goalUser.realname
+                realname: goalUser.realname,
+                is_show: goalUser.is_show,
+                can_login: goalUser.can_login
             }
         });
     } catch (e) {
@@ -69,7 +73,7 @@ app.post('/admin/user/operate_many', async (req, res) => {
         let create_cnt = 0; let update_cnt = 0;
         let failed = [];
         for (let row of req.body.users) {
-            console.log(row);
+            // console.log(row);
             goalUser = await User.find({ username: row.username });
             if (!goalUser || goalUser.length === 0) { // Create
                 create_cnt++;
@@ -184,7 +188,7 @@ app.post('/admin/groups/:id', async (req, res) => {
             group = await Group.findById(gid);
             if (!group.allowVisitAndEditBy(curUser)) throw new ErrorMessage('您没有权限操作这个组。');
         }
-        console.log(req.body);
+        // console.log(req.body);
 
         let msg = '';
         let succ_cnt = 0;
@@ -309,7 +313,7 @@ app.post('/admin/teacher/update', async (req, res) => {
 
         let goalUser = await User.findById(req.body.uid);
         
-        console.log(goalUser);
+        // console.log(goalUser);
         goalUser.is_teacher = (req.body.enable === 'true');
         await goalUser.save();
         

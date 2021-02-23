@@ -6,72 +6,105 @@
 
     <div clas="content font-content center aligned">
         <div class="padding">
-        <div class="ui form" style="width: 80%;left: 10%;">
-          <form id="edit-form" onsubmit="return false;"  method="post">
-            <div class="field" style="margin-top: 14px;">
-              <label>昵称</label>
-              <input type="text" id="edit-user-nickname" name="nickname">
+            <div class="ui form" style="width: 80%;left: 10%;">
+                <form id="edit-form" onsubmit="return false;" method="post">
+                    <div class="field" style="margin-top: 14px;">
+                        <label>昵称</label>
+                        <input type="text" id="edit-user-nickname" name="nickname">
+                    </div>
+                    <div class="field">
+                        <label>实名</label>
+                        <input type="text" id="edit-user-realname" name="realname">
+                    </div>
+                    <div class="field">
+                        <label>密码(留空则不做修改)</label>
+                        <input type="password" id="edit-user-password" name="password">
+                    </div>
+
+                    <div class="ui toggle checkbox" id="edit-user-isshow">
+                        <input type="checkbox" name="is_show">
+                        <label>公开排名</label>
+                    </div>
+                    <div class="ui toggle checkbox" id="edit-user-canlogin" style="margin-left: 20px;">
+                        <input type="checkbox" name="can_login">
+                        <label>允许登录</label>
+                    </div>
+                </form>
             </div>
-            <div class="field">
-                <label>实名</label>
-                <input type="text" id="edit-user-realname" name="realname">
-            </div>
-            <div class="field">
-                <label>密码(留空则不做修改)</label>
-                <input type="password" id="edit-user-password" name="password"> 
-            </div>
-          </form>
-        </div>
         </div>
     </div>
 
     <div class="actions" style="margin-top: 14px;">
-      <div type="button" onclick="$('#edit-user-window').modal('hide');" class="ui button"><i class="grey cancel icon"></i>Cancel</div>
-      <div type="submit" onclick="doUserEditApi();" class="ui button"><i class="grey upload icon" id="edit-submit-icon"></i>OK</div>
+        <div type="button" onclick="$('#edit-user-window').modal('hide');" class="ui button"><i
+                class="grey cancel icon"></i>Cancel</div>
+        <div type="submit" onclick="doUserEditApi();" class="ui button"><i class="grey upload icon"
+                id="edit-submit-icon"></i>OK</div>
     </div>
-    
+
 </div>
-  
+
 <script>
-function doEditWindowShow(obj){
-    row = $(obj).parents("tr").find('td');
-    $('#edit-user-title').text("#" + row[0].innerText + " - " + row[1].innerText);
-    $('#edit-user-nickname').val(row[2].innerText);
-    $('#edit-user-realname').val(row[3].innerText);
-    $('#edit-user-password').val('');
-    $('#edit-form').attr("href",'/admin/user/edit/' + row[0].innerText);
-    $('#edit-submit-icon').attr('class', 'grey upload icon');
 
-    $('#edit-user-window').modal('show');
-}
+    $('#edit-user-isshow').checkbox();
+    $('#edit-user-canlogin').checkbox();
+    function doEditWindowShow(obj) {
+        row = $(obj).parents("tr").find('td');
+        $('#edit-user-title').text("#" + row[0].innerText + " - " + row[1].innerText);
+        $('#edit-user-nickname').val(row[2].innerText);
+        $('#edit-user-realname').val(row[3].innerText);
+        $('#edit-user-password').val('');
+        if ($(row[5]).find('input').prop('checked')) {
+            $('#edit-user-isshow').checkbox('set checked');
+        } else {
+            $('#edit-user-isshow').checkbox('set unchecked');
+        }
+        if ($(row[6]).find('input').prop('checked')) {
+            $('#edit-user-canlogin').checkbox('set checked');
+        } else {
+            $('#edit-user-canlogin').checkbox('set unchecked');
+        }
+        $('#edit-form').attr("href", '/admin/user/edit/' + row[0].innerText);
+        $('#edit-submit-icon').attr('class', 'grey upload icon');
 
-function doUserEditApi(){
-    console.log("Try submit.");
-    $('#edit-submit-icon').attr('class', 'spinner loading icon');
-    if ($('#edit-user-password').val())
-        $('#edit-user-password').val(md5($('#edit-user-password').val() + "syzoj2_xxx"));
-    
-    console.log('Data:',$("#edit-form").serialize());
-    $.post(
-        $('#edit-form').attr("href"),
-        $("#edit-form").serialize(),
-        function(result){
-        if (result.success){
-            $('#edit-submit-icon').attr('class', 'green check icon');
-            row = $('#row-' + result.user.id).children('td');
-            $(row[2]).html(result.user.nickname);
-            $(row[3]).html(result.user.realname);
-            setTimeout(function(){
-                $('#edit-user-window').modal('hide');
-            }, 2000);
-        }else {
-            $('#edit-submit-icon').attr('class', 'red x icon');
-            setTimeout(function(){
-                $('#edit-submit-icon').attr('class', 'grey upload icon');
-            }, 2000);
-        }
-        }
-    );
-    return false;
-}
+        $('#edit-user-window').modal('show');
+    }
+
+    function doUserEditApi() {
+        $('#edit-submit-icon').attr('class', 'spinner loading icon');
+        if ($('#edit-user-password').val())
+            $('#edit-user-password').val(md5($('#edit-user-password').val() + "syzoj2_xxx"));
+
+        $.post(
+            $('#edit-form').attr("href"),
+            $("#edit-form").serialize(),
+            function (result) {
+                if (result.success) {
+                    // console.log(result.user);
+                    $('#edit-submit-icon').attr('class', 'green check icon');
+                    row = $('#row-' + result.user.id).children('td');
+                    $(row[2]).html(result.user.nickname);
+                    $(row[3]).html(result.user.realname);
+                    if (result.user.is_show) {
+                        $(row[5]).children('.checkbox').checkbox('set checked')
+                    } else {
+                        $(row[5]).children('.checkbox').checkbox('set unchecked')
+                    }
+                    if (result.user.can_login) {
+                        $(row[6]).children('.checkbox').checkbox('set checked')
+                    } else {
+                        $(row[6]).children('.checkbox').checkbox('set unchecked')
+                    }
+                    setTimeout(function () {
+                        $('#edit-user-window').modal('hide');
+                    }, 1500);
+                } else {
+                    $('#edit-submit-icon').attr('class', 'red x icon');
+                    setTimeout(function () {
+                        $('#edit-submit-icon').attr('class', 'grey upload icon');
+                    }, 2000);
+                }
+            }
+        );
+        return false;
+    }
 </script>
