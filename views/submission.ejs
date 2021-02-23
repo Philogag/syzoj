@@ -56,7 +56,7 @@
           :progress="getProgress()" :compiling="detailResult && !detailResult.compile"></tr>
       </tbody>
     </table>
-
+    <% if(code){ %>
     <code-box no-escape v-bind:content="code">
       <% if (formattedCode !== null) { %>
       <a onclick="toggleFormattedCode()" class="ui button"
@@ -68,8 +68,9 @@
           格式化代码
         </template>
       </a>
-      <% } %>
+    <% } %>
     </code-box>
+    <% } %>
     <code-box v-if="detailResult && detailResult.compile" no-escape title="编译信息"
       v-bind:content="detailResult.compile.message"></code-box>
     <code-box v-if="detailResult" title="系统信息" v-bind:content="detailResult.systemMessage"></code-box>
@@ -180,8 +181,8 @@
       }
     });
     const socketUrl = "/detail";
-    const displayConfig = <% - serializejs(displayConfig) %>;
-    const token = <% - serializejs(socketToken) %>;
+    const displayConfig = <%- serializejs(displayConfig) %>;
+    const token = <%- serializejs(socketToken) %>;
 
     const TestcaseResultType = {};
     (function (TestcaseResultType) {
@@ -218,8 +219,8 @@
       TaskStatus[TaskStatus["Skipped"] = 4] = "Skipped";
     })(TaskStatus);
 
-    const unformattedCode = <% - serializejs(code) %>;
-    const formattedCode = <% - serializejs(formattedCode) %>;
+    const unformattedCode = <%- serializejs(code) %>;
+    const formattedCode = <%- serializejs(formattedCode) %>;
 
     function toggleFormattedCode() {
       if (vueApp.currentFormatted) {
@@ -235,14 +236,14 @@
       el: '#vueAppFuckSafari',
       data: {
         roughData: {
-          info: <% - serializejs(info) %>,
-          result: <% - serializejs(roughResult) %>,
+          info: <%- serializejs(info) %>,
+          result: <%- serializejs(roughResult) %>,
           running: false,
           displayConfig: displayConfig
         },
-        code: <% - serializejs(preferFormattedCode && formattedCode !== null) -%> ? formattedCode : unformattedCode,
-        currentFormatted: <% - serializejs(preferFormattedCode && formattedCode !== null) -%>,
-        detailResult: <% - serializejs(detailResult) %>,
+        code: <%- serializejs(preferFormattedCode && formattedCode !== null) -%> ? formattedCode : unformattedCode,
+        currentFormatted: <%- serializejs(preferFormattedCode && formattedCode !== null) -%>,
+        detailResult: <%- serializejs(detailResult) %>,
         displayConfig: displayConfig,
       },
       computed: {

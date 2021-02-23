@@ -632,7 +632,7 @@ app.get('/contest/submission/:id', async (req, res) => {
     res.render('submission', {
       info: getSubmissionInfo(judge, displayConfig),
       roughResult: getRoughResult(judge, displayConfig),
-      code: (displayConfig.showCode && judge.problem.type !== 'submit-answer') ? judge.code.toString("utf8") : '',
+      code: (displayConfig.showCode && judge.problem.type !== 'submit-answer' && res.locals.user && (res.locals.user.id === judge.user_id || res.locals.user.isTeacherAdmin())) ? judge.code.toString("utf8") : '',
       formattedCode: judge.formattedCode ? judge.formattedCode.toString("utf8") : null,
       preferFormattedCode: res.locals.user ? res.locals.user.prefer_formatted_code : false,
       detailResult: processOverallResult(judge.result, displayConfig),
