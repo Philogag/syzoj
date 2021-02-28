@@ -25,16 +25,22 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
       <div class="nine wide right aligned column">
         <div class="ui toggle checkbox" id="show_tag">
           <style id="show_tag_style"></style>
-          <input type="checkbox" id="show_tag_input">
+          <input type="checkbox" id="show_tag_input" >
           <label>显示分类标签</label>
         </div>
 
         <script data-cfasync="false">
           $(function () {
-            if (localStorage.getItem('show_tag') === '1') {
-              // console.log('default show.')
-              $('#show_tag_input').attr('checked', '');
+            // init tag status 
+            console.log(localStorage.getItem('show_tag'))
+            if (localStorage.getItem('show_tag') === '0') {
+              $('#show_tag_input').attr('checked', false);
+              $('#show_tag_style').html('.show_tag_controled { width: 0; white-space: nowrap; overflow: hidden; }');
+            } else {
+              $('#show_tag_input').attr('checked', true);
+              $('#show_tag_style').html('.show_tag_controled { white-space: nowrap; overflow: hidden; }');
             }
+
             $('#show_tag').checkbox({
               debug: true,
               onChange: () => {
