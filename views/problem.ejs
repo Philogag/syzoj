@@ -366,8 +366,9 @@ if (contest) {
                     let language = allowLang[0];
                     if (state) {
                       language = state.language;
-                    } else if (lastLanguage) language = lastLanguage;
-                    %>
+                    } else if (lastLanguage) 
+                      language = lastLanguage;
+              %>
               <% for (lang of allowLang) { %>
               <a style="border-radius: 0; " class="item<%= lang === language ? ' active' : '' %>"
                 data-value="<%= lang %>" data-mode="<%= syzoj.languages[lang].editor %>">
@@ -425,9 +426,8 @@ if (contest) {
     $('#submit_code input[name=code]').val(editor.getValue());
     return true;
   }
-
-  $('#languages-menu')[0].scrollTop = $('#languages-menu .active')[0].offsetTop - $('#languages-menu')[0].firstElementChild.offsetTop;
-
+</script>
+<script type="text/javascript">
   $(function () {
     $('#languages-menu .item').click(function () {
       $(this)
@@ -440,6 +440,9 @@ if (contest) {
       monaco.editor.setModelLanguage(editor.getModel(), $(this).data('mode'));
     });
   });
+</script>
+<script type="text/javascript">
+  $('#languages-menu')[0].scrollTop = $('#languages-menu .active')[0].offsetTop - $('#languages-menu')[0].firstElementChild.offsetTop;
 </script>
 
 <% } else { %>
