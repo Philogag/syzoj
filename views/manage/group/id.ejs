@@ -18,6 +18,11 @@
 </h2>
 
 <div style="margin-top: 20px;">
+    <h3>统计</h3>
+    <div style="margin-top: 20px;">
+        <div>当前共有管理员 <font id="admin_cnt"><%= group.num_admin %></font> 人，组员 <font id="user_cnt"><%= group.num_user %></font> 人</div>
+    </div>
+
     <h3>组管理员</h3>
     <div style="margin-top: 20px;">
         <div class="ui grid" style="margin-top: 20px;">
@@ -206,6 +211,7 @@
                     } else {
                         $('#user-table').append(addobjstr)
                     }
+                    updateNumberCount(result.group.num_admin, result.group.num_user);
                 } else {
                     console.log(res.msg);
                 }
@@ -229,12 +235,18 @@
                 if (result.success) {
                     rmobj = obj.parentNode.parentNode.parentNode;
                     rmobj.parentNode.removeChild(rmobj);
+                    updateNumberCount(result.group.num_admin, result.group.num_user);
                 } else {
                     $(obj).attr('data-tooltip', result.msg)
                 }
             }
         );
         return false;
+    }
+
+    function updateNumberCount(admin, user){
+        $('#admin_cnt').html(admin);
+        $('#user_cnt').html(user);
     }
 </script>
 <script>

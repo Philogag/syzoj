@@ -16,6 +16,12 @@ export default class Group extends Model {
 
     @TypeORM.Column({ nullable: true, type: "varchar", length: 120 })
     name: string;
+    
+    @TypeORM.Column({ nullable: true, type: "integer", default: 0})
+    num_admin: number;
+
+    @TypeORM.Column({ nullable: true, type: "integer", default: 0})
+    num_user: number;
 
     @TypeORM.ManyToMany(type => Contest, contest => contest.allowedGroup)
     allowedContest: Contest[];
@@ -31,5 +37,12 @@ export default class Group extends Model {
                 return false;
         }
         return false;
+    }
+
+    async countMembers() {
+        this.num_admin = (await GroupUser.find({ gid: this.id, is_admin: true })).length;
+        this.num_user = (await GroupUser.find({ gid: this.id, is_admin: false })).length;
+
+        this.save();
     }
 }

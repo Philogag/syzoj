@@ -12,6 +12,8 @@
       <th class="ui one wide">ID</th>
       <th class="ui three wide">组名</th>
       <th></th>
+      <th class="ui one wide">管理员</th>
+      <th class="ui one wide">组员</th>
       <th class="ui one wide">操作</th>
     </tr>
   </thead>
@@ -22,6 +24,8 @@
       <td class="ui three wide"><a
           href="<%= syzoj.utils.makeUrl(['admin', 'groups', group.id]) %>"><%= group.name %></a></td>
       <td></td>
+      <td><%= group.num_admin %></td>
+      <td><%= group.num_user %></td>
       <td class="ui one wide">
         <div class="ui buttons">
           <button type="button" onclick="doEditWindowShow(this)" class="ui icon button"><i

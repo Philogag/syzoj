@@ -271,6 +271,9 @@ app.post('/admin/groups/:id/user', async (req, res) => {
                 break;
         }
         msg = "Success: " + succ_cnt + "<br>Failed: " + fail_cnt;
+
+        await group.countMembers();
+
         res.send({ success: true , msg: msg, group: group});
     } catch (e) {
         syzoj.log(e);
