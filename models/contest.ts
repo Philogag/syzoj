@@ -192,37 +192,37 @@ export default class Contest extends Model {
       case 'public':
         if (!player_exist) await contest.createPlayer(user.id);
         return true;
-      
+        break;
       
       case 'invite':
-        if (Contest.isEditAllowed(user, contest)) {
-          if (!player_exist) await contest.createPlayer(user.id);
+        console.log(contest.public_mode)
+        if (await Contest.isEditAllowed(user, contest)) {
+          // console.log('Allowed by Admin list.')
           return true;
         }
-        if (contest.admins.split('|').map(x => parseInt(x)).includes(user.id)) {
-          let player_c = await ContestPlayer.create({
-            contest_id: contest.id, 
-            user_id: user.id,
-            star: true
-          })
-          await player_c.save();
+        if (contest.allowedUser.split('|').map(x => parseInt(x)).includes(user.id)) {
+          if (!player_exist) await contest.createPlayer(user.id);
+          // console.log('Allowed by user list.')
           return true;
         }
         if (!contest.allowedGroup || contest.allowedGroup.length <= 0)
           return false;
-        // console.log(contest.allowedGroup);
+        console.log(contest.allowedGroup);
         let gids = contest.allowedGroup.map(x => x.id);
         let gusers = await GroupUser.findOne({
           uid: user.id,
           gid: TypeORM.In(gids)
         });
+        console.log(gids);
+        console.log(gusers);
         if (gusers) { // allowed by group
           if (!player_exist) await contest.createPlayer(user.id);
+          // console.log('Allowed by group.')
           return true;
         }
         else
           return false;
-        
+        break;
         
       case 'passwd':
         if (player_exist)
@@ -232,14 +232,14 @@ export default class Contest extends Model {
           return true;
         }
         return false;
+        break;
     }
   }
   
   static async isEditAllowed(user, contest) {
     if (!user) return false;
-    let permission = contest.admins.split('|').map(x => parseInt(x)).includes(user.id)
-      || contest.holder_id === user.id
-      || user.isSuperAdmin() // super admin can edit any thing.
+    var permission = Boolean(contest.admins.split('|').map(x => parseInt(x)).includes(user.id) || (contest.holder_id === user.id) || user.isSuperAdmin()); // super admin can edit any thing.
+    // console.log(permission)
     if (permission) {
       let player = await ContestPlayer.findOne({ contest_id: contest.id, user_id: user.id });
       let player_exist = Boolean(player);
