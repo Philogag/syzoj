@@ -107,6 +107,10 @@ export default class User extends Model {
     return this.is_admin;
   }
 
+  getRealname() {
+    return this.realname ? this.realname : "null";
+  }
+
   getQueryBuilderForACProblems() {
     return JudgeState.createQueryBuilder()
                      .select(`DISTINCT(problem_id)`)

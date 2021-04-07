@@ -99,6 +99,25 @@
     "ruby",
     "haskell"
   ],
+  "languages_export_extention": {
+    "cpp": "cpp",
+    "cpp11": "cpp",
+    "cpp17": "cpp",
+    "cpp-noilinux": "cpp",
+    "cpp11-noilinux": "cpp",
+    "cpp11-clang": "cpp",
+    "cpp17-clang": "cpp",
+    "c": "cpp",
+    "c-noilinux": "cpp",
+    "csharp": "cs",
+    "java": "java",
+    "pascal": "pas",
+    "python2": "py",
+    "python3": "py",
+    "nodejs": "js",
+    "ruby": "rb",
+    "haskell": "hs"
+  },
   "links": [
     {
       "title": "LibreOJ",

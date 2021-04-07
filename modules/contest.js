@@ -8,6 +8,7 @@ let Group = syzoj.model('group');
 
 const url = require('url');
 const jwt = require('jsonwebtoken');
+const util = require("util");
 const { getSubmissionInfo, getRoughResult, processOverallResult } = require('../libs/submissions_process');
 
 function isLogin(user) {
@@ -772,7 +773,7 @@ app.get('/contest/:id/export_rank', async (req, res) => {
     if (!contest) throw new ErrorMessage('无此比赛。');
 
     if (!(contest.isRunning() || contest.isEnded())) {
-      throw new ErrorMessage('比赛尚未开始。');
+      throw new ErrorMessage('比赛尚未结束。');
     }
     const curUser = res.locals.user;
     if (!Contest.isEditAllowed(curUser, contest)) throw new ErrorMessage('您没有权限执行此操作。');
@@ -964,8 +965,8 @@ app.get('/contest/:id/export_rank', async (req, res) => {
         console.log(err);
       } else {
         console.log("Export rank of \"" + contest.title + "\" successfully.");
-        fs.unlinkSync("/opt/syzoj/export/" + filename);
       }
+      fs.unlinkSync("/opt/syzoj/export/" + filename);
     });
   } catch (e) {
     syzoj.log(e);
@@ -983,29 +984,66 @@ app.get('/contest/:id/export_submissions', async (req, res) => {
     let contest = await Contest.findById(id);
     if (!contest) throw new ErrorMessage('无此比赛。');
 
-    let problems_id = await contest.getProblems();
-
-    contest.ended = contest.isEnded();
     if (!(contest.isRunning() || contest.isEnded())) {
-      if (await problem.isAllowedUseBy(res.locals.user)) {
-        return res.redirect(syzoj.utils.makeUrl(['problem', problem_id, 'download', 'additional_file']));
+      throw new ErrorMessage('比赛尚未结束。');
+    }
+    const curUser = res.locals.user;
+    if (!Contest.isEditAllowed(curUser, contest)) throw new ErrorMessage('您没有权限执行此操作。');
+
+    let problems_id = await contest.getProblems();
+    pathname = "/opt/syzoj/export/contest_" + contest.id + "_" + syzoj.utils.randomString(16);
+    syzoj.utils.mkdirsSync(pathname);
+
+    console.log(pathname);
+
+    players = await ContestPlayer.find({ contest_id: contest.id });
+
+    objs = []
+    i = 1
+    for (var pid of problems_id) {
+      objs.push({
+        path: '' + (i++) + "-p" + pid,
+        id: pid
+      })
+    }
+
+    await Promise.all(objs.map(async (p) => {
+      var ppath = pathname + "/" + (p.path);
+      await syzoj.utils.mkdirsSync(ppath);
+      return Promise.all(players.map(async (player) => {
+        if (player.score_details.hasOwnProperty(p.id)) {
+          var submit_id = player.score_details[p.id]['judge_id'];
+          var player_id = player.user_id;
+
+          var submition = await JudgeState.findById(submit_id);
+          var puser = await User.findById(player_id);
+          var filename = puser.id + "_" + puser.getRealname() + "_" + submit_id + "." + syzoj.config.languages_export_extention[submition.language];
+
+          fs.writeFileSync(ppath + '/' + filename, submition.code, { flag: 'w+' });
+          // console.log(p.id + ": " + filename + ' done.');
+        }
+      })).then(() => {
+        // console.log("Problem-" + p.id + " export finished.");
+      });
+    })).then(() => {
+      console.log("Export code files finished.");
+    }).then(async () => {
+      let execAsync = util.promisify(require('child_process').exec);
+      await execAsync('cd ' + pathname + ' && ' + __dirname + '/../bin/zip -m -q -r ' + pathname + '.zip ./*');
+    }).then(() => {
+      console.log("Zip done.");
+    });
+
+    res.download(pathname + ".zip", contest.title + "_" + 'code_' + syzoj.utils.getCurrentDate() + ".zip", function (err) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Export rank of \"" + contest.title + "\" successfully.");
       }
-      throw new ErrorMessage('比赛尚未开始。');
-    }
+      fs.unlinkSync(pathname + '.zip');
+      fs.rmdirSync(pathname);
+    });
 
-    const isSupervisior = await contest.isSupervisior(curUser);
-    let permission = await contest.allowUser(curUser.id);
-    if (!permission && !isSupervisior) {
-      res.redirect(syzoj.utils.makeUrl(['contest', contest.id, 'login']));
-    } else if (!permission && isSupervisior) {
-      await contest.createPlayer(curUser.id);
-    }
-
-    await problem.loadRelationships();
-
-    if (!problem.additional_file) throw new ErrorMessage('无附加文件。');
-
-    res.download(problem.additional_file.getPath(), `additional_file_${id}_${pid}.zip`);
   } catch (e) {
     syzoj.log(e);
     res.status(404);
