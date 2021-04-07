@@ -40,7 +40,13 @@
       <tr>
         <td><b><%= i %></b></td>
         <td><a
-            href="<%= syzoj.utils.makeUrl(['user', user.id]) %>"><%= user.username %></a><% if (user.nameplate) { %><%- user.nameplate %><% } %>
+            href="<%= syzoj.utils.makeUrl(['user', user.id]) %>"><%= user.username %>
+            <% if (user.is_admin) { %>
+              <span class="ui header"><div class="ui mini grey label">管理员</div></span>
+            <% } else if (user.is_teacher) { %>
+              <span class="ui header"><div class="ui mini grey label">教师</div></span>
+            <% } %>
+          </a><% if (user.nameplate) { %><%- user.nameplate %><% } %>
         </td>
         <td class="font-content">
           <script id="user-infomation-script-<%= i %>" data-cfasync="false">

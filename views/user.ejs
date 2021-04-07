@@ -27,7 +27,15 @@
                 <div class="content">
                     <div class="header"><%= show_user.username %><% if (show_user.nameplate) { %><%- show_user.nameplate %><% } %> <% if (show_user.sex == 1) { %><i class="man icon"></i><% } else if (show_user.sex == -1) { %><i class="woman icon"></i><% } %></div>
                     <div class="meta">
-                        <a class="group"><%= show_user.is_admin ? '管理员' : '普通用户' %></a>
+                        <a class="group">
+                            <% if (show_user.is_admin) { %>
+                                超级管理员
+                            <% } else if (show_user.is_teacher) { %>
+                                教师
+                            <% } else { %>
+                                普通用户
+                            <% } %>
+                        </a>
                     </div>
                 </div>
                 <div class="extra content">
@@ -77,7 +85,7 @@
                                             <h4 class="ui top attached block header">通过的题目</h4>
                                             <div class="ui bottom attached segment">
                                                 <% for (let problem of show_user.ac_problems) { %>
-                                                    <a href="<%= syzoj.utils.makeUrl(['problem', problem]) %>"><%= problem %></a>
+                                                    <a href="<%= syzoj.utils.makeUrl(['problem', problem]) %>">#<%= problem %></a>
                                                 <% } %>
                                             </div>
                                         </div>
