@@ -325,12 +325,12 @@ module.exports = {
     else return host + req.originalUrl;
   },
   mkdirsSync(dirname, mode = "0777") {
-    function makefatherpath(path) {
-      if (fs.existsSync(dirname)){
+    function makefatherpath(fpath) {
+      if (fs.existsSync(fpath)){
         return true;
       } else {
-        if(makefatherpath(path.dirname(dirname))){
-          fs.mkdirSync(dirname, mode);
+        if(makefatherpath(path.dirname(fpath))){
+          fs.mkdirSync(fpath, mode);
           return true;
         }
       }
